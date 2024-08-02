@@ -6,7 +6,8 @@ Date: 2024-08-02
 Authors@R: c(person("Mohammad Javad", "Davoudabadi", role = c("aut","cre"), email = "mohammad.davoudabadi@sydney.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
              person("John", "Ormerod", role = "aut", email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
              person("Garth", "Tarr", role = c("aut"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")),
-             person("Samuel", "Mueller", role = "aut", email = "samuel.mueller@sydney.edu.au", comment = c(ORCID = "0000-0002-3087-8127")))
+             person("Samuel", "Mueller", role = "aut", email = "samuel.mueller@sydney.edu.au", comment = c(ORCID = "0000-0002-3087-8127")),
+             person("Jonathon", "Tidswell", role = c("aut"), email = "jonathon.tidswell@sydney.edu.au", comment = c(ORCID = "0000-0000-0000-0000")))
 Maintainer: Mohammad Javad Davoudabadi <mohammad.davoudabadi@sydney.edu.au>
 Description: TBA
 License: GPL-3
@@ -16,5 +17,6 @@ LinkingTo: Rcpp,
   RcppArmadillo,
   RcppEigen,
   RcppClock
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Encoding: UTF-8
+URL: https://garthtarr.github.io/BayesianLasso/
