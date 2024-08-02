@@ -1,12 +1,14 @@
 Package: BayesianLasso
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
-Version: 1.0
-Date: 2024-05-23
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as
-       one or more full sentences.
+Title: A better Bayesian Lasso
+Version: 0.1.0
+Date: 2024-08-02
+Authors@R: c(person("Mohammad Javad", "Davoudabadi", role = c("aut","cre"), email = "mohammad.davoudabadi@sydney.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
+             person("John", "Ormerod", role = "aut", email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
+             person("Garth", "Tarr", role = c("aut"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")),
+             person("Samuel", "Mueller", role = "aut", email = "samuel.mueller@sydney.edu.au", comment = c(ORCID = "0000-0002-3087-8127")))
+Maintainer: Mohammad Javad Davoudabadi <mohammad.davoudabadi@sydney.edu.au>
+Description: TBA
 License: GPL-3
 Imports: Rcpp (>= 1.0.12)
 LinkingTo: Rcpp,
