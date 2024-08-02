@@ -1,0 +1,31 @@
+---
+title: "Testing"
+format: html
+editor: source
+---
+
+## Diabetes
+
+```{r}
+library(lars)
+library(BayesianLasso)
+```
+
+```{r}
+data(diabetes, package = "lars")
+dataset_name <- "diabetes"
+res <- list("x"=diabetes$x,"y"=diabetes$y)
+```
+
+```{r}
+
+# ti_mfvb <- system.time({
+#   res_mfvb <- bayesian_lasso_mfvb_tune_pgtn_c(
+#     mX, vy, lambda0, sigma2_hat=sigma2_star, a, b, u, v,
+#     maxiter = 1000, tol = 1.0E-5, TRUE)
+# })[3]
+```
+
+
+
+
