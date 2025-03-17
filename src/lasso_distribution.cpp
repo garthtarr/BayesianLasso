@@ -1,4 +1,4 @@
- 
+
 #include <RcppArmadillo.h>
 #include <RcppNumerical.h>
 
@@ -6,11 +6,11 @@
 #include <Rmath.h>
 #include <limits>
 #include <cmath>
- 
- 
+
+
 #include "zeta.h"
- 
-// [[Rcpp::depends(RcppArmadillo)]] 
+
+// [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(RcppNumerical)]]
 
@@ -34,7 +34,7 @@ double expit_c(double x) {
 /*
  * returns the square of the inverse mills of standard normal
  * target precision is 7 significant figures
- * Copyright Jonathon Tidswell 2023 
+ * Copyright Jonathon Tidswell 2023
  */
 
 
@@ -46,17 +46,17 @@ double sq_inv_mills_7sf(double x)
   if (std::isnan(x)) {
     return x;
   }
-  
+
   /* rounds to zero below */
   if (x <= -27.2634433268347819989685) /* -0x1.b437105991ad6p+4 */ {
     return 0.0;
   }
-  
+
   /* rounds to infinity above */
   if (x >= 1.3407807929942595611e+154) /* 0x1.FFFFFFFFFFFFFp+511 */ {
     return std::numeric_limits<double>::infinity();
   }
-  
+
   double x2 = x*x;
   double r;
   if (x > 1.5) {
@@ -107,34 +107,34 @@ double sq_inv_mills_7sf(double x)
 
 
 /*
- * returns the the mills ratio for positive x 
+ * returns the the mills ratio for positive x
  * target precision is 7 significant figures
- * Copyright Jonathon Tidswell 2023 
+ * Copyright Jonathon Tidswell 2023
  */
 
 // [[Rcpp::export]]
 double right_mills_7sf(double x)
 {
-  constexpr double ic0 = 0.7978845608028653558798921; // sqrt (2/ pi ) 
-  
-  static const double p[] = { -1.12643475305799970055164642552926e-06, 
-                              26.81429811665765648114383134062559067694, 
-                              18.29336030983142542299653149128468446642, 
-                              5.58111735915492754757719601092611634864, 
-                              0.79787503529789429999743769828129023563, 
+  constexpr double ic0 = 0.7978845608028653558798921; // sqrt (2/ pi )
+
+  static const double p[] = { -1.12643475305799970055164642552926e-06,
+                              26.81429811665765648114383134062559067694,
+                              18.29336030983142542299653149128468446642,
+                              5.58111735915492754757719601092611634864,
+                              0.79787503529789429999743769828129023563,
                               1.914179115901329712299805428058e-08 };
-  
+
   static const double q[] = { 58.87671219132194287109318373473336268934,
-                              104.80902166512815500819200358588558548367, 
-                              80.67484673653551809206654268432287397133, 
-                              34.2906558057946726110203459419681364754, 
+                              104.80902166512815500819200358588558548367,
+                              80.67484673653551809206654268432287397133,
+                              34.2906558057946726110203459419681364754,
                               8.24728325495053757189664039333639636203, 1.0 };
-  
+
   double num = p[0] + x*(p[1] + x*(p[2] + x*(p[3] + x*(p[4] + x*p[5]))));
   double denom = q[0] + x*(q[1] + x*(q[2] + x*(q[3] + x*(q[4] + x)))); // note q[5] = 1
-  
+
   double m = num / denom;
-  m = m+1; 
+  m = m+1;
   m = m/(x+ic0);
   return m;
 }
@@ -142,26 +142,26 @@ double right_mills_7sf(double x)
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
- * returns the the mills ratio for positive x 
+ * returns the the mills ratio for positive x
  * target precision is 12 significant figures
- * Copyright Jonathon Tidswell 2023 
+ * Copyright Jonathon Tidswell 2023
  */
 
 // [[Rcpp::export]]
 double right_mills_12sf(double x)
 {
-  static const double p[] = {46697.7602201933, 69339.6909002865, 50590.6980372328, 
-                             23184.62760379742, 7236.31450136984, 1572.136841909630, 
+  static const double p[] = {46697.7602201933, 69339.6909002865, 50590.6980372328,
+                             23184.62760379742, 7236.31450136984, 1572.136841909630,
                              232.9967987466022, 21.74833514806325, 1.000000000000095};
-  static const double q[] = {37259.42190376593, 85053.78630172011, 89598.92885811838, 
-                             57370.93777717682, 24713.27114352290, 7467.311205544661, 
-                             1593.885178714749, 233.9967987305447, 21.74833514813385, 
+  static const double q[] = {37259.42190376593, 85053.78630172011, 89598.92885811838,
+                             57370.93777717682, 24713.27114352290, 7467.311205544661,
+                             1593.885178714749, 233.9967987305447, 21.74833514813385,
                              1.0};
-  
+
   double num = p[0] + x*(p[1] + x*(p[2] + x*(p[3] + x*(p[4] + x*(p[5] + x*(p[6] + x*(p[7] + x*p[8])))))));
   double denom = q[0] + x*(q[1] + x*(q[2] + x*(q[3] + x*(q[4] + x*(q[5] + x*(q[6] + x*(q[7] + x*(q[8] + x))))))));
   double m = num / denom;
-  
+
   // warning intermediate overflow for x > 1.75e34, but asymptotic is close enough
   m = (x < 1.75e34 ? m : 1/x);
   return m;
@@ -169,49 +169,49 @@ double right_mills_12sf(double x)
 
 ////////////////////////////////////////////////////////////////////////////////
 
- 
-int check_abc(double a_val, double b_val, double c_val) 
+
+int check_abc(double a_val, double b_val, double c_val)
 {
   //Rcout << "a: " << a << "\n";
   //Rcout << "b: " << b << "\n";
   //Rcout << "c: " << c << "\n";
-  
+
   int error_type = 0;
-  
+
   bool a_nan = (std::isnan(a_val)),
     b_nan = (std::isnan(b_val)),
-    c_nan = (std::isnan(c_val));  
-  
+    c_nan = (std::isnan(c_val));
+
   bool cond_nan = (a_nan || b_nan || c_nan);
   if (cond_nan) {
     stop("a_val, b_val, or c_val is a NaN.");
     error_type = 1;
   }
-  
+
   bool a_inf = (!arma::is_finite(a_val)),
     b_inf = (!arma::is_finite(b_val)),
     c_inf = (!arma::is_finite(c_val));
-  
+
   if ((a_inf?1:0) + (b_inf?1:0)  + (c_inf?1:0) > 1) {
     stop("a_val, b_val, or c_val is a infinite.");
     error_type = 2;
   }
-  
+
   if ((a_val==0)&&(b_val==0)) {
     stop("Either a=0 or b=0, but not both.");
     error_type = 3;
   }
-  
+
   if ((a_val<0)) {
     stop("a is negative.");
     error_type = 4;
   }
-  
+
   if ((c_val<0)) {
     stop("c is negative.");
     error_type = 4;
-  }  
-  
+  }
+
   return error_type;
 }
 
@@ -231,14 +231,14 @@ double zcalc_7sf( double a, double b, double c, int type)
   //Rcout << "a: " << a << "\n";
   //Rcout << "b: " << b << "\n";
   //Rcout << "c: " << c << "\n";
-  
+
   int error_type = check_abc( a,  b,  c);
-  
+
   // calculate v1 and v2
   // handle extreme values
   double sigma2 = 1 / a;
   double sigma = sqrt(sigma2);
-  double b_abs = fabs(b); 
+  double b_abs = fabs(b);
   double v1 = (c - b_abs) * sigma; // this wont overflow
   double v2 = (c + b_abs); // this might overflow
   if (!std::isinf(v2)) {
@@ -248,24 +248,24 @@ double zcalc_7sf( double a, double b, double c, int type)
     // this may underflow, and slower, so use as fallback
     v2 = c * sigma + b_abs * sigma;
   }
-  
+
   // deal with sign of v1
   bool flipSign = v1 < 0;
   v1 = fabs(v1);
-  
+
   // calculate two (right) mills ratios (prefer use SIMD)
-  
+
   double m1 = 0.0;
   double m2 = 0.0;
   //if (type==1) {
   //  m1 = right_mills_7sf(v1);
   //  m2 = right_mills_7sf(v2);
-  //} 
+  //}
   //if (type==2) {
     m1 = right_mills_12sf(v1);
     m2 = right_mills_12sf(v2);
   //}
-  
+
   m1 = (flipSign ? -m1 : m1);
   double z = m1 + m2;
   if (flipSign) {
@@ -273,39 +273,39 @@ double zcalc_7sf( double a, double b, double c, int type)
     double phi_inv = M_SQRT_2PI * exp(v1 * v1 / 2);
     z = z + phi_inv;
     m1 = phi_inv + m1;
-  } 
+  }
   z = z*sigma;
-  
+
   return z;
 }
 
 
 // [[Rcpp::export]]
-Rcpp::List calculate_lasso_dist_stats_c_v1(double a_val, double b_val, double c_val) 
+Rcpp::List calculate_lasso_dist_stats_c_v1(double a_val, double b_val, double c_val)
 {
   double mu_plus = (b_val - c_val)/a_val;
   double mu_minus = (b_val + c_val)/a_val;
   double sigma2 = 1/a_val;
   double sigma = sqrt(sigma2);
-  
+
   double r_plus = mu_plus/sigma;
   double r_minus = mu_minus/sigma;
-  
+
   double z_plus  = zeta_c(1, r_plus);
   double z_minus = zeta_c(1,-r_minus);
-  
+
   double log_pm = R::pnorm(-(b_val + c_val)*sigma, 0.0, 1.0, 1, 1);
   double log_pp = R::pnorm( (b_val - c_val)*sigma, 0.0, 1.0, 1, 1);
   double w = expit_c(log_pm - log_pp + 2*b_val*c_val*sigma2);
-  
-  return List::create(_["mu_plus"] = mu_plus, 
-                      _["mu_minus"] = mu_minus, 
-                      _["sigma2"] = sigma2, 
-                      _["sigma"] = sigma, 
-                      _["z_plus"] = z_plus, 
+
+  return List::create(_["mu_plus"] = mu_plus,
+                      _["mu_minus"] = mu_minus,
+                      _["sigma2"] = sigma2,
+                      _["sigma"] = sigma,
+                      _["z_plus"] = z_plus,
                       _["z_minus"] = z_minus,
-                      _["r_plus"] = r_plus, 
-                      _["r_minus"] = r_minus, 
+                      _["r_plus"] = r_plus,
+                      _["r_minus"] = r_minus,
                       _["w"] = w);
 }
 
@@ -313,19 +313,19 @@ Rcpp::List calculate_lasso_dist_stats_c_v1(double a_val, double b_val, double c_
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-Rcpp::List calculate_lasso_dist_stats_c_v2(double a_val, double b_val, double c_val) 
+Rcpp::List calculate_lasso_dist_stats_c_v2(double a_val, double b_val, double c_val)
 {
   int error_type = check_abc( a_val, b_val, c_val);
   int type = 2;
-  
+
   // Will stop if there is something funny with a_val, b_val or c_val
   // So we can proceed knowing there isn't anything "wrong" with a_val, b_val or c_val.
-  
+
   // calculate v1 and v2
   // handle extreme values
   double sigma2 = 1 / a_val;
   double sigma = sqrt(sigma2);
-  double b_abs = fabs(b_val); 
+  double b_abs = fabs(b_val);
   double v1 = (c_val - b_abs) * sigma; // this wont overflow
   double v2 = (c_val + b_abs); // this might overflow
   if (!std::isinf(v2)) {
@@ -335,23 +335,23 @@ Rcpp::List calculate_lasso_dist_stats_c_v2(double a_val, double b_val, double c_
     // this may underflow, and slower, so use as fallback
     v2 = c_val * sigma + b_abs * sigma;
   }
-  
+
   // deal with sign of v1
   bool flipSign = v1 < 0;
   v1 = fabs(v1);
-  
+
   // calculate two (right) mills ratios (prefer use SIMD)
   double m1 = 0.0;
   double m2 = 0.0;
   if (type==1) {
     m1 = right_mills_7sf(v1);
     m2 = right_mills_7sf(v2);
-  } 
+  }
   if (type==2) {
     m1 = right_mills_12sf(v1);
     m2 = right_mills_12sf(v2);
   }
-  
+
   m1 = (flipSign ? -m1 : m1);
   double z = m1 + m2;
   if (flipSign) {
@@ -359,61 +359,61 @@ Rcpp::List calculate_lasso_dist_stats_c_v2(double a_val, double b_val, double c_
     double phi_inv = M_SQRT_2PI * exp(v1 * v1 / 2);
     z = z + phi_inv;
     m1 = phi_inv + m1;
-  } 
-  
+  }
+
   double m_plus = (b_val >= 0) ? m1 : m2;
   double m_minus = (b_val >= 0) ? m2 : m1;
   z = z*sigma;
-  
+
   double mu_plus = (b_val - c_val)/a_val;
   double mu_minus = (b_val + c_val)/a_val;
- 
+
   double r_plus = mu_plus/sigma;
   double r_minus = mu_minus/sigma;
-  
+
   double z_plus;
   if (m_plus!=0) {
     z_plus = 1/m_plus;
   } else {
     z_plus = zeta_c(1, r_plus);
   }
-  
+
   double z_minus;
   if (m_minus!=0) {
     z_minus = 1/m_minus;
   } else {
     z_minus = zeta_c(1,-r_minus);
   }
-  
+
   double w;
-  
+
   bool m_plus_inf = (!arma::is_finite(m_plus));
   bool m_minus_inf = (!arma::is_finite(m_plus));
   bool cond = (m_plus_inf || (m_plus==0) || m_minus_inf || (m_minus==0));
-  
+
   if (cond) {
     double log_pm = R::pnorm(-(b_val + c_val)*sigma, 0.0, 1.0, 1, 1);
     double log_pp = R::pnorm( (b_val - c_val)*sigma, 0.0, 1.0, 1, 1);
-    w = expit_c(log_pm - log_pp + 2*b_val*c_val*sigma2);  
+    w = expit_c(log_pm - log_pp + 2*b_val*c_val*sigma2);
   } else {
     w = 1.0/(m_plus/m_minus + 1.0);
   }
-  
-  return List::create(_["v1"] = v1, 
-                      _["v2"] = v2, 
-                      _["m1"] = m1, 
+
+  return List::create(_["v1"] = v1,
+                      _["v2"] = v2,
+                      _["m1"] = m1,
                       _["m2"] = m2,
-                      _["m_plus"] = m_plus, 
-                      _["m_minus"] = m_minus,                      
+                      _["m_plus"] = m_plus,
+                      _["m_minus"] = m_minus,
                       _["z"] = z,
-                      _["mu_plus"] = mu_plus, 
-                      _["mu_minus"] = mu_minus, 
-                      _["sigma2"] = sigma2, 
-                      _["sigma"] = sigma, 
-                      _["z_plus"] = z_plus, 
+                      _["mu_plus"] = mu_plus,
+                      _["mu_minus"] = mu_minus,
+                      _["sigma2"] = sigma2,
+                      _["sigma"] = sigma,
+                      _["z_plus"] = z_plus,
                       _["z_minus"] = z_minus,
-                      _["r_plus"] = r_plus, 
-                      _["r_minus"] = r_minus, 
+                      _["r_plus"] = r_plus,
+                      _["r_minus"] = r_minus,
                       _["w"] = w);
 }
 
@@ -431,40 +431,40 @@ double logSumExp_c(arma::vec vx) {
 // return the normalizing constant
 
 // [[Rcpp::export]]
-double zlasso_c_v1(double a_val, double b_val, double c_val, bool logarithm) 
+double zlasso_c_v1(double a_val, double b_val, double c_val, bool logarithm)
 {
   List res = calculate_lasso_dist_stats_c_v1(a_val, b_val, c_val);
   double r_plus = res["r_plus"];
   double r_minus = res["r_minus"];
   double sigma = res["sigma"];
-  
+
   double log_inv_z_plus  = R::pnorm5( r_plus, 0.0, 1.0, 1, 1) - R::dnorm4( r_plus, 0.0, 1.0, 1);
   double log_inv_z_minus = R::pnorm5(-r_minus,0.0, 1.0, 1, 1) - R::dnorm4(-r_minus,0.0, 1.0, 1);
-  
-  arma::vec vx(2);
+
+  vec vx(2);
   vx[0] = log_inv_z_plus;
   vx[1] = log_inv_z_minus;
   double val = log(sigma) + logSumExp_c(vx);
   if (logarithm) {
     return val;
-  } 
+  }
   val = exp(val);
   return val;
 }
 
 // [[Rcpp::export]]
-double zlasso_c_v2(double a_val, double b_val, double c_val, bool logarithm) 
+double zlasso(double a_val, double b_val, double c_val, bool logarithm)
 {
   int type=1;
   double z = zcalc_7sf(a_val, b_val, c_val, type);
-  
+
   if (!arma::is_finite(z)) {
     return zlasso_c_v1( a_val, b_val, c_val, logarithm);
   }
-  
+
   if (logarithm) {
     return log(z);
-  } 
+  }
   return z;
 }
 
@@ -473,14 +473,14 @@ double zlasso_c_v2(double a_val, double b_val, double c_val, bool logarithm)
 // Note: a>0, c>0
 
 // [[Rcpp::export]]
-arma::vec dlasso_c_v1(arma::vec vx, double a_val, double b_val, double c_val, bool logarithm) 
+vec dlasso_c_v1(vec vx, double a_val, double b_val, double c_val, bool logarithm)
 {
-  double log_Z = zlasso_c_v1(a_val, b_val, c_val, true); 
-  arma::vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx) - log_Z;
-  
+  double log_Z = zlasso_c_v1(a_val, b_val, c_val, true);
+  vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx) - log_Z;
+
   if (logarithm) {
-    return val;  
-  }  
+    return val;
+  }
   val = exp(val);
   return val;
 }
@@ -490,7 +490,7 @@ arma::vec dlasso_c_v1(arma::vec vx, double a_val, double b_val, double c_val, bo
 // Note: a>0, c>0
 
 // [[Rcpp::export]]
-arma::vec dlasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val, bool logarithm) 
+vec dlasso(vec vx, double a_val, double b_val, double c_val, bool logarithm)
 {
   int type = 2;
   double z = zcalc_7sf(a_val, b_val, c_val, type);
@@ -499,10 +499,10 @@ arma::vec dlasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val, bo
     return dlasso_c_v1( vx, a_val, b_val, c_val, logarithm);
     //stop("z is not finite");
   }
-  arma::vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx);
+  vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx);
   if (logarithm) {
-    return val - log(z);  
-  }  
+    return val - log(z);
+  }
   val = exp(val)/z;
   return val;
 }
@@ -510,7 +510,7 @@ arma::vec dlasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val, bo
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-arma::vec plasso_c_v1(arma::vec vx, double a_val, double b_val, double c_val) 
+vec plasso_c_v1(vec vx, double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v1(a_val, b_val, c_val);
   double w = res["w"];
@@ -519,14 +519,14 @@ arma::vec plasso_c_v1(arma::vec vx, double a_val, double b_val, double c_val)
   double r_minus = res["r_minus"];
   double r_plus = res["r_plus"];
   double sigma = res["sigma"];
-  
+
   int n = vx.n_elem;
-  arma::vec val = zeros(n);
-  
+  vec val = zeros(n);
+
   double con1 = R::pnorm5(-r_minus, 0.0, 1.0, 1, 1);
   double con2 = R::pnorm5(r_plus, 0.0, 1.0, 1, 1);
-  
-  for (int i = 0; i < n; ++i) 
+
+  for (int i = 0; i < n; ++i)
   {
     if (vx[i]<=0) {
       val[i] = w*exp( R::pnorm5((vx[i]-mu_minus)/sigma, 0.0, 1.0, 1, 1) - con1);
@@ -534,41 +534,41 @@ arma::vec plasso_c_v1(arma::vec vx, double a_val, double b_val, double c_val)
       val[i] = w + (1.0 - w)*(1.0 - exp( R::pnorm5((mu_plus - vx[i])/sigma, 0.0, 1.0, 1, 1) - con2));
     }
   }
-  
+
   return val;
 }
 
 // [[Rcpp::export]]
-arma::vec plasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val) 
+vec plasso(vec vx, double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v2(a_val, b_val, c_val);
   double w = res["w"];
   double mu_plus = res["mu_plus"];
   double mu_minus = res["mu_minus"];
   double m_plus = res["m_plus"];
-  double m_minus = res["m_minus"];  
+  double m_minus = res["m_minus"];
   double r_minus = res["r_minus"];
   double r_plus = res["r_plus"];
   double sigma = res["sigma"];
-  
+
   int n = vx.n_elem;
-  arma::vec val = zeros(n);
-  
+  vec val = zeros(n);
+
   double con1 = R::pnorm5(-r_minus, 0.0, 1.0, 1, 1);
   double con2 = R::pnorm5(r_plus, 0.0, 1.0, 1, 1);
-  
+
   //if (!arma::is_finite(x)) {
   //Rcout << "w:" << w << " \n";
   //Rcout << "mu_plus:" << mu_plus << " \n";
   //Rcout << "mu_minus:" << mu_minus << " \n";
   //Rcout << "m_plus:" << m_plus << " \n";
-  //Rcout << "m_minus:" << m_minus << " \n";  
+  //Rcout << "m_minus:" << m_minus << " \n";
   //Rcout << "r_minus:" << r_minus << " \n";
-  //Rcout << "r_plus:" << r_plus << " \n";    
+  //Rcout << "r_plus:" << r_plus << " \n";
   //  stop("qlasso_fast_c_v1 - returned value is not finite");
-  //}  
-  
-  for (int i = 0; i < n; ++i) 
+  //}
+
+  for (int i = 0; i < n; ++i)
   {
     if (vx[i]<=0) {
       val[i] = w*exp( R::pnorm5((vx[i]-mu_minus)/sigma, 0.0, 1.0, 1, 1) - con1);
@@ -576,7 +576,7 @@ arma::vec plasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val)
       val[i] = w + (1.0 - w)*(1.0 - exp( R::pnorm5((mu_plus - vx[i])/sigma, 0.0, 1.0, 1, 1) - con2));
     }
   }
-  
+
   return val;
 }
 
@@ -584,45 +584,44 @@ arma::vec plasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val)
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-double qlasso_fast_c_v1(double u, double a_val, double b_val, double c_val) 
+vec qlasso_fast_c_v1(vec u, double a_val, double b_val, double c_val)
 {
   double sigma2 = 1/a_val;
   double sigma = sqrt(sigma2);
-  
   double log_pm = R::pnorm5(-(b_val + c_val)*sigma, 0.0, 1.0, 1, 1);
   double log_pp = R::pnorm5( (b_val - c_val)*sigma, 0.0, 1.0, 1, 1);
   double w = expit_c(log_pm - log_pp + 2*b_val*c_val*sigma2);
-
-  double x;
+  double length = u.n_elem;
+  vec x(length);
   double p;
   double xi;
-  if (u<=w) {
-    xi = exp(log_pm);
-    p = xi*u/w;
-    x =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
-  } else {
-    xi = exp(log_pp);
-    p = xi*(1 - u)/(1-w);
-    x =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
+  for(int i = 0; i < length; ++i){
+    if (u[i]<=w) {
+      xi = exp(log_pm);
+      p = xi*u[i]/w;
+      x[i] =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
+    } else {
+      xi = exp(log_pp);
+      p = xi*(1 - u[i])/(1-w);
+      x[i] =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
+    }
   }
-  
   //if (!arma::is_finite(x)) {
   //  Rcout << "u:" << u << " \n";
   //  Rcout << "w:" << w << " \n";
   //  Rcout << "p:" << p << " \n";
   //  Rcout << "a_val:" << a_val << " \n";
   //  Rcout << "b_val:" << b_val << " \n";
-  //  Rcout << "c_val:" << c_val << " \n";    
+  //  Rcout << "c_val:" << c_val << " \n";
   //  stop("qlasso_fast_c_v1 - returned value is not finite");
   //}
-  
   return x;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-double qlasso_fast_c_v2(double u, double a_val, double b_val, double c_val) 
+vec qlasso(vec u, double a_val, double b_val, double c_val)
 {
   //////////////////////////////////////////////////////////////////////////////
 
@@ -630,7 +629,7 @@ double qlasso_fast_c_v2(double u, double a_val, double b_val, double c_val)
   // handle extreme values
   double sigma2 = 1 / a_val;
   double sigma = sqrt(sigma2);
-  double b_abs = fabs(b_val); 
+  double b_abs = fabs(b_val);
   double v1 = (c_val - b_abs) * sigma; // this wont overflow
   double v2 = (c_val + b_abs); // this might overflow
   if (!std::isinf(v2)) {
@@ -640,117 +639,130 @@ double qlasso_fast_c_v2(double u, double a_val, double b_val, double c_val)
     // this may underflow, and slower, so use as fallback
     v2 = c_val * sigma + b_abs * sigma;
   }
-  
+
   // deal with sign of v1
   bool flipSign = v1 < 0;
   v1 = fabs(v1);
-  
+
   // calculate two (right) mills ratios (prefer use SIMD)
   double m1 = 0.0;
   double m2 = 0.0;
   //if (type==1) {
   //  m1 = right_mills_7sf(v1);
   //  m2 = right_mills_7sf(v2);
-  //} 
-  //if (type==2) {
-    m1 = right_mills_12sf(v1);
-    m2 = right_mills_12sf(v2);
   //}
-  
+  //if (type==2) {
+  m1 = right_mills_12sf(v1);
+  m2 = right_mills_12sf(v2);
+  //}
+
   constexpr double M_SQRT_2PI = 2.506628274631000502415765;
   double phi_inv;
   double m3 = (flipSign ? -m1 : m1);
   if (flipSign) {
     phi_inv = M_SQRT_2PI * exp(v1 * v1 / 2);
     m1 = phi_inv + m3;
-  } 
-  
+  }
+
   double m_plus = (b_val >= 0) ? m1 : m2;
   double m_minus = (b_val >= 0) ? m2 : m1;
-  
+
   //////////////////////////////////////////////////////////////////////////////
- 
+
   double w = 1.0/(m_plus/m_minus + 1.0);
-  double x;
+  double length = u.n_elem;
+  vec x(length);
   double p;
   double log_p;
-  if (u<=w) {
-    double v3 = (c_val + b_val)*sigma;
-    
-    double phi_minus = exp(-v3 * v3 / 2)/M_SQRT_2PI;
-    
-    if (flipSign & (b_val < 0)) {
-      // Save us from overflow (I hope)
-      p = (exp(v1*v1/2 - v3*v3/2) + m3*phi_minus)*u/w;
+  for(int i = 0; i < length; ++i){
+    if (u[i]<=w) {
+      double v3 = (c_val + b_val)*sigma;
+
+      double phi_minus = exp(-v3 * v3 / 2)/M_SQRT_2PI;
+
+      if (flipSign & (b_val < 0)) {
+        // Save us from overflow (I hope)
+        p = (exp(v1*v1/2 - v3*v3/2) + m3*phi_minus)*u[i]/w;
+      } else {
+        p = m_minus*u[i]*phi_minus/w;
+      }
+
+      if (p>0) {
+        x[i] =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
+      } else {
+        // Save us from underflow
+        log_p = R::pnorm5(-(b_val + c_val)*sigma, 0.0, 1.0, 1, 1) + log(u[i]) - log(w);
+        x[i] =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
+      }
+
     } else {
-      p = m_minus*u*phi_minus/w;
-    }
-    
-    if (p>0) {
-      x =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
-    } else {
-      // Save us from underflow
-      log_p = R::pnorm5(-(b_val + c_val)*sigma, 0.0, 1.0, 1, 1) + log(u) - log(w);
-      x =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
+
+      double v4 = (c_val - b_val)*sigma;
+      double phi_plus = exp(-v4 * v4 / 2)/M_SQRT_2PI;
+
+
+
+      if (flipSign & (b_val > 0)) {
+        // Save us from overflow (I hope)
+        p = (exp(v1*v1/2 - v4*v4/2) + m3*phi_plus)*(1 - u[i])/(1 - w);
+      } else {
+        p = m_plus*(1-u[i])*phi_plus/(1 - w);
+      }
+
+
+      if (p>0) {
+        x[i] =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
+      } else {
+        // Save us from underflow
+        log_p = R::pnorm5( (b_val - c_val)*sigma, 0.0, 1.0, 1, 1) + log(1-u[i]) - log(1-w);
+        x[i] =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
+      }
     }
 
-  } else {
+    if (!arma::is_finite(x[i])) {
+      //  Rcout << "w:" << w << " \n";
+      //  Rcout << "u:" << u[i] << " \n";
+      //  Rcout << "p:" << p << " \n";
+      //  Rcout << "w:" << w << " \n";
+      //  Rcout << "u:" << u[i] << " \n";
+      //  Rcout << "p:" << p << " \n";
 
-    double v4 = (c_val - b_val)*sigma;
-    double phi_plus = exp(-v4 * v4 / 2)/M_SQRT_2PI;
-      
-    
-    
-    if (flipSign & (b_val > 0)) {
-      // Save us from overflow (I hope)
-      p = (exp(v1*v1/2 - v4*v4/2) + m3*phi_plus)*(1 - u)/(1 - w);
-    } else {
-      p = m_plus*(1-u)*phi_plus/(1 - w);  
-    }
-    
-    
-    if (p>0) {
-      x =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
-    } else {
-      // Save us from underflow
-      log_p = R::pnorm5( (b_val - c_val)*sigma, 0.0, 1.0, 1, 1) + log(1-u) - log(1-w);
-      x =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
+      //  Rcout << "a_val:" << a_val << " \n";
+      //  Rcout << "b_val:" << b_val << " \n";
+      //  Rcout << "c_val:" << c_val << " \n";
+      stop("The returned value is not finite");
     }
   }
-  
-  if (!arma::is_finite(x)) {
-    Rcout << "w:" << w << " \n";
-    Rcout << "u:" << u << " \n";
-    Rcout << "p:" << p << " \n";
-    Rcout << "w:" << w << " \n";
-    Rcout << "u:" << u << " \n";
-    Rcout << "p:" << p << " \n";
-    
-    Rcout << "a_val:" << a_val << " \n";
-    Rcout << "b_val:" << b_val << " \n";
-    Rcout << "c_val:" << c_val << " \n";    
-    stop("qlasso_fast_c_v1 - returned value is not finite");
-  }
-  
-  
+
+
   return x;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-double rlasso_fast_c_v1(double a_val, double b_val, double c_val) {
-  double u = R::runif(0.0, 1.0);
-  double x = qlasso_fast_c_v1(u, a_val, b_val, c_val);
+vec rlasso_fast_c_v1(double n, double a_val, double b_val, double c_val) {
+
+  vec x(n);
+  vec u(n);  // Create a n-element vector
+  for(int i =0; i < n; ++i){
+    u[i] = R::runif( 0.0, 1.0);
+  }
+  x = qlasso_fast_c_v1(u, a_val, b_val, c_val);
   return x;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-double rlasso_fast_c_v2(double a_val, double b_val, double c_val) {
-  double u = R::runif(0.0, 1.0);
-  double x = qlasso_fast_c_v2(u, a_val, b_val, c_val);
+vec rlasso(double n, double a_val, double b_val, double c_val) {
+
+  vec x(n);
+  vec u(n);  // Create a n-element vector
+  for(int i =0; i < n; ++i){
+    u[i] = R::runif(0.0, 1.0);
+  }
+  x = qlasso(u, a_val, b_val, c_val);
   return x;
 }
 
@@ -759,7 +771,7 @@ double rlasso_fast_c_v2(double a_val, double b_val, double c_val) {
 // return the expected value
 
 // [[Rcpp::export]]
-double elasso_c_v1(double a_val, double b_val, double c_val) 
+double elasso_c_v1(double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v1(a_val, b_val, c_val);
   double r_plus = res["r_plus"];
@@ -768,12 +780,12 @@ double elasso_c_v1(double a_val, double b_val, double c_val)
   double mu_minus = res["mu_minus"];
   double sigma = res["sigma"];
   double w = res["w"];
-  
+
   double z_plus = zeta_c(1, r_plus);
   double z_minus = zeta_c(1,-r_minus);
   double e_plus  =  mu_plus  + sigma*z_plus;
   double e_minus =  mu_minus - sigma*z_minus;
-  double val = w*e_minus + (1.0-w)*e_plus; 
+  double val = w*e_minus + (1.0-w)*e_plus;
   return val;
 }
 
@@ -782,7 +794,7 @@ double elasso_c_v1(double a_val, double b_val, double c_val)
 // return the expected value
 
 // [[Rcpp::export]]
-double elasso_c_v2(double a_val, double b_val, double c_val) 
+double elasso(double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v2(a_val, b_val, c_val);
 
@@ -792,12 +804,12 @@ double elasso_c_v2(double a_val, double b_val, double c_val)
   double m_minus = res["m_minus"];
   double sigma = res["sigma"];
   double w = res["w"];
-  
+
   double z_plus = 1/m_plus;
   double z_minus = 1/m_minus;
   double e_plus  =  mu_plus  + sigma*z_plus;
   double e_minus =  mu_minus - sigma*z_minus;
-  double val = w*e_minus + (1.0-w)*e_plus; 
+  double val = w*e_minus + (1.0-w)*e_plus;
   return val;
 }
 
@@ -806,7 +818,7 @@ double elasso_c_v2(double a_val, double b_val, double c_val)
 // return the variance
 
 // [[Rcpp::export]]
-double vlasso_c_v1(double a_val, double b_val, double c_val) 
+double vlasso_c_v1(double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v1(a_val, b_val, c_val);
   double r_plus = res["r_plus"];
@@ -816,23 +828,23 @@ double vlasso_c_v1(double a_val, double b_val, double c_val)
   double sigma = res["sigma"];
   double sigma2 = res["sigma2"];
   double w = res["w"];
-  
+
   double z_plus = zeta_c(1, r_plus);
   double z_minus = zeta_c(1,-r_minus);
   double e_plus = mu_plus  + sigma*z_plus;
   double e_minus = mu_minus - sigma*z_minus;
-  
+
   double v_plus  = sigma2*(1 + zeta_c(2, r_plus));
   double v_minus = sigma2*(1 + zeta_c(2,-r_minus));
-  
+
   double val = w*(v_minus + e_minus*e_minus)  + (1.0 - w)*(v_plus + e_plus*e_plus);
   val = val - pow( w*e_minus + (1-w)*e_plus, 2.0);
-  
+
   return val;
 }
 
 // [[Rcpp::export]]
-double vlasso_c_v2(double a_val, double b_val, double c_val) 
+double vlasso(double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v2(a_val, b_val, c_val);
   double r_plus = res["r_plus"];
@@ -840,30 +852,30 @@ double vlasso_c_v2(double a_val, double b_val, double c_val)
   double m_plus = res["m_plus"];
   double m_minus = res["m_minus"];
   double mu_plus = res["mu_plus"];
-  double mu_minus = res["mu_minus"];  
-  
+  double mu_minus = res["mu_minus"];
+
   double sigma = res["sigma"];
   double sigma2 = res["sigma2"];
   double w = res["w"];
-  
+
   double z1_plus = 1/m_plus;
   double z1_minus = 1/m_minus;
-  
+
 
   double e_plus = mu_plus  + sigma*z1_plus;
   double e_minus = mu_minus - sigma*z1_minus;
-  
+
   double z2_plus = -r_plus*z1_plus - z1_plus*z1_plus;
   double z2_minus = r_minus*z1_minus - z1_minus*z1_minus;
-  
- 
-  
+
+
+
   double v_plus  = sigma2*(1 + z2_plus);
   double v_minus = sigma2*(1 + z2_minus);
-  
+
   double val = w*(v_minus + e_minus*e_minus)  + (1.0 - w)*(v_plus + e_plus*e_plus);
   val = val - pow( w*e_minus + (1-w)*e_plus, 2.0);
-  
+
   return val;
 }
 
@@ -872,12 +884,18 @@ double vlasso_c_v2(double a_val, double b_val, double c_val)
 // Return the mode of the lasso distribution
 
 // [[Rcpp::export]]
-double mlasso_c(double a_val, double b_val, double c_val) {
-  arma::vec vx(2);
-  vx[0] = abs(b_val) - c_val;
-  vx[1] = 0.0;
-  double val = max(vx)*sign(b_val)/a_val;
-  return val;
+vec mlasso(vec a_val, vec b_val, vec c_val)
+{
+  int n = a_val.n_elem;
+  vec vmode = zeros(n);
+  vec vx(2);
+  for (int i = 0; i < n; ++i)
+  {
+    vx[0] = abs(b_val[i]) - c_val[i];
+    vx[1] = 0.0;
+    vmode[i] = max(vx)*sign(b_val[i])/a_val[i];
+  }
+  return vmode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
