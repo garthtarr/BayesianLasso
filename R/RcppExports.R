@@ -117,60 +117,60 @@ zlasso_c_v1 <- function(a_val, b_val, c_val, logarithm) {
     .Call(`_BayesianLasso_zlasso_c_v1`, a_val, b_val, c_val, logarithm)
 }
 
-zlasso_c_v2 <- function(a_val, b_val, c_val, logarithm) {
-    .Call(`_BayesianLasso_zlasso_c_v2`, a_val, b_val, c_val, logarithm)
+zlasso <- function(a_val, b_val, c_val, logarithm) {
+    .Call(`_BayesianLasso_zlasso`, a_val, b_val, c_val, logarithm)
 }
 
 dlasso_c_v1 <- function(vx, a_val, b_val, c_val, logarithm) {
     .Call(`_BayesianLasso_dlasso_c_v1`, vx, a_val, b_val, c_val, logarithm)
 }
 
-dlasso_c_v2 <- function(vx, a_val, b_val, c_val, logarithm) {
-    .Call(`_BayesianLasso_dlasso_c_v2`, vx, a_val, b_val, c_val, logarithm)
+dlasso <- function(vx, a_val, b_val, c_val, logarithm) {
+    .Call(`_BayesianLasso_dlasso`, vx, a_val, b_val, c_val, logarithm)
 }
 
 plasso_c_v1 <- function(vx, a_val, b_val, c_val) {
     .Call(`_BayesianLasso_plasso_c_v1`, vx, a_val, b_val, c_val)
 }
 
-plasso_c_v2 <- function(vx, a_val, b_val, c_val) {
-    .Call(`_BayesianLasso_plasso_c_v2`, vx, a_val, b_val, c_val)
+plasso <- function(vx, a_val, b_val, c_val) {
+    .Call(`_BayesianLasso_plasso`, vx, a_val, b_val, c_val)
 }
 
 qlasso_fast_c_v1 <- function(u, a_val, b_val, c_val) {
     .Call(`_BayesianLasso_qlasso_fast_c_v1`, u, a_val, b_val, c_val)
 }
 
-qlasso_fast_c_v2 <- function(u, a_val, b_val, c_val) {
-    .Call(`_BayesianLasso_qlasso_fast_c_v2`, u, a_val, b_val, c_val)
+qlasso <- function(u, a_val, b_val, c_val) {
+    .Call(`_BayesianLasso_qlasso`, u, a_val, b_val, c_val)
 }
 
-rlasso_fast_c_v1 <- function(a_val, b_val, c_val) {
-    .Call(`_BayesianLasso_rlasso_fast_c_v1`, a_val, b_val, c_val)
+rlasso_fast_c_v1 <- function(n, a_val, b_val, c_val) {
+    .Call(`_BayesianLasso_rlasso_fast_c_v1`, n, a_val, b_val, c_val)
 }
 
-rlasso_fast_c_v2 <- function(a_val, b_val, c_val) {
-    .Call(`_BayesianLasso_rlasso_fast_c_v2`, a_val, b_val, c_val)
+rlasso <- function(n, a_val, b_val, c_val) {
+    .Call(`_BayesianLasso_rlasso`, n, a_val, b_val, c_val)
 }
 
 elasso_c_v1 <- function(a_val, b_val, c_val) {
     .Call(`_BayesianLasso_elasso_c_v1`, a_val, b_val, c_val)
 }
 
-elasso_c_v2 <- function(a_val, b_val, c_val) {
-    .Call(`_BayesianLasso_elasso_c_v2`, a_val, b_val, c_val)
+elasso <- function(a_val, b_val, c_val) {
+    .Call(`_BayesianLasso_elasso`, a_val, b_val, c_val)
 }
 
 vlasso_c_v1 <- function(a_val, b_val, c_val) {
     .Call(`_BayesianLasso_vlasso_c_v1`, a_val, b_val, c_val)
 }
 
-vlasso_c_v2 <- function(a_val, b_val, c_val) {
-    .Call(`_BayesianLasso_vlasso_c_v2`, a_val, b_val, c_val)
+vlasso <- function(a_val, b_val, c_val) {
+    .Call(`_BayesianLasso_vlasso`, a_val, b_val, c_val)
 }
 
-mlasso_c <- function(a_val, b_val, c_val) {
-    .Call(`_BayesianLasso_mlasso_c`, a_val, b_val, c_val)
+mlasso <- function(a_val, b_val, c_val) {
+    .Call(`_BayesianLasso_mlasso`, a_val, b_val, c_val)
 }
 
 lasso_gibbs_Bc <- function(mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init, sigma2_init, verbose) {

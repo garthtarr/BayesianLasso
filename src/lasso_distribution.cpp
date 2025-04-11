@@ -441,7 +441,7 @@ double zlasso_c_v1(double a_val, double b_val, double c_val, bool logarithm)
   double log_inv_z_plus  = R::pnorm5( r_plus, 0.0, 1.0, 1, 1) - R::dnorm4( r_plus, 0.0, 1.0, 1);
   double log_inv_z_minus = R::pnorm5(-r_minus,0.0, 1.0, 1, 1) - R::dnorm4(-r_minus,0.0, 1.0, 1);
 
-  vec vx(2);
+  arma::vec vx(2);
   vx[0] = log_inv_z_plus;
   vx[1] = log_inv_z_minus;
   double val = log(sigma) + logSumExp_c(vx);
@@ -473,10 +473,10 @@ double zlasso(double a_val, double b_val, double c_val, bool logarithm)
 // Note: a>0, c>0
 
 // [[Rcpp::export]]
-vec dlasso_c_v1(vec vx, double a_val, double b_val, double c_val, bool logarithm)
+arma::vec dlasso_c_v1(arma::vec vx, double a_val, double b_val, double c_val, bool logarithm)
 {
   double log_Z = zlasso_c_v1(a_val, b_val, c_val, true);
-  vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx) - log_Z;
+  arma::vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx) - log_Z;
 
   if (logarithm) {
     return val;
@@ -490,7 +490,7 @@ vec dlasso_c_v1(vec vx, double a_val, double b_val, double c_val, bool logarithm
 // Note: a>0, c>0
 
 // [[Rcpp::export]]
-vec dlasso(vec vx, double a_val, double b_val, double c_val, bool logarithm)
+arma::vec dlasso(arma::vec vx, double a_val, double b_val, double c_val, bool logarithm)
 {
   int type = 2;
   double z = zcalc_7sf(a_val, b_val, c_val, type);
@@ -499,7 +499,7 @@ vec dlasso(vec vx, double a_val, double b_val, double c_val, bool logarithm)
     return dlasso_c_v1( vx, a_val, b_val, c_val, logarithm);
     //stop("z is not finite");
   }
-  vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx);
+  arma::vec val =  -0.5*a_val*vx%vx + b_val*vx - c_val*abs(vx);
   if (logarithm) {
     return val - log(z);
   }
@@ -510,7 +510,7 @@ vec dlasso(vec vx, double a_val, double b_val, double c_val, bool logarithm)
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-vec plasso_c_v1(vec vx, double a_val, double b_val, double c_val)
+arma::vec plasso_c_v1(arma::vec vx, double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v1(a_val, b_val, c_val);
   double w = res["w"];
@@ -521,7 +521,7 @@ vec plasso_c_v1(vec vx, double a_val, double b_val, double c_val)
   double sigma = res["sigma"];
 
   int n = vx.n_elem;
-  vec val = zeros(n);
+  arma::vec val = zeros(n);
 
   double con1 = R::pnorm5(-r_minus, 0.0, 1.0, 1, 1);
   double con2 = R::pnorm5(r_plus, 0.0, 1.0, 1, 1);
@@ -539,7 +539,7 @@ vec plasso_c_v1(vec vx, double a_val, double b_val, double c_val)
 }
 
 // [[Rcpp::export]]
-vec plasso(vec vx, double a_val, double b_val, double c_val)
+arma::vec plasso(arma::vec vx, double a_val, double b_val, double c_val)
 {
   List res = calculate_lasso_dist_stats_c_v2(a_val, b_val, c_val);
   double w = res["w"];
@@ -552,7 +552,7 @@ vec plasso(vec vx, double a_val, double b_val, double c_val)
   double sigma = res["sigma"];
 
   int n = vx.n_elem;
-  vec val = zeros(n);
+  arma::vec val = zeros(n);
 
   double con1 = R::pnorm5(-r_minus, 0.0, 1.0, 1, 1);
   double con2 = R::pnorm5(r_plus, 0.0, 1.0, 1, 1);
@@ -584,7 +584,7 @@ vec plasso(vec vx, double a_val, double b_val, double c_val)
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-vec qlasso_fast_c_v1(vec u, double a_val, double b_val, double c_val)
+arma::vec qlasso_fast_c_v1(arma::vec u, double a_val, double b_val, double c_val)
 {
   double sigma2 = 1/a_val;
   double sigma = sqrt(sigma2);
@@ -592,7 +592,7 @@ vec qlasso_fast_c_v1(vec u, double a_val, double b_val, double c_val)
   double log_pp = R::pnorm5( (b_val - c_val)*sigma, 0.0, 1.0, 1, 1);
   double w = expit_c(log_pm - log_pp + 2*b_val*c_val*sigma2);
   double length = u.n_elem;
-  vec x(length);
+  arma::vec x(length);
   double p;
   double xi;
   for(int i = 0; i < length; ++i){
@@ -621,7 +621,7 @@ vec qlasso_fast_c_v1(vec u, double a_val, double b_val, double c_val)
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-vec qlasso(vec u, double a_val, double b_val, double c_val)
+arma::vec qlasso(arma::vec u, double a_val, double b_val, double c_val)
 {
   //////////////////////////////////////////////////////////////////////////////
 
@@ -671,7 +671,7 @@ vec qlasso(vec u, double a_val, double b_val, double c_val)
 
   double w = 1.0/(m_plus/m_minus + 1.0);
   double length = u.n_elem;
-  vec x(length);
+  arma::vec x(length);
   double p;
   double log_p;
   for(int i = 0; i < length; ++i){
@@ -741,10 +741,10 @@ vec qlasso(vec u, double a_val, double b_val, double c_val)
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-vec rlasso_fast_c_v1(double n, double a_val, double b_val, double c_val) {
+arma::vec rlasso_fast_c_v1(double n, double a_val, double b_val, double c_val) {
 
-  vec x(n);
-  vec u(n);  // Create a n-element vector
+  arma::vec x(n);
+  arma::vec u(n);  // Create a n-element vector
   for(int i =0; i < n; ++i){
     u[i] = R::runif( 0.0, 1.0);
   }
@@ -755,10 +755,10 @@ vec rlasso_fast_c_v1(double n, double a_val, double b_val, double c_val) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // [[Rcpp::export]]
-vec rlasso(double n, double a_val, double b_val, double c_val) {
+arma::vec rlasso(double n, double a_val, double b_val, double c_val) {
 
-  vec x(n);
-  vec u(n);  // Create a n-element vector
+  arma::vec x(n);
+  arma::vec u(n);  // Create a n-element vector
   for(int i =0; i < n; ++i){
     u[i] = R::runif(0.0, 1.0);
   }
@@ -884,11 +884,11 @@ double vlasso(double a_val, double b_val, double c_val)
 // Return the mode of the lasso distribution
 
 // [[Rcpp::export]]
-vec mlasso(vec a_val, vec b_val, vec c_val)
+arma::vec mlasso(arma::vec a_val, arma::vec b_val, arma::vec c_val)
 {
   int n = a_val.n_elem;
-  vec vmode = zeros(n);
-  vec vx(2);
+  arma::vec vmode = zeros(n);
+  arma::vec vx(2);
   for (int i = 0; i < n; ++i)
   {
     vx[0] = abs(b_val[i]) - c_val[i];

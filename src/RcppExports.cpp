@@ -414,9 +414,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// zlasso_c_v2
-double zlasso_c_v2(double a_val, double b_val, double c_val, bool logarithm);
-RcppExport SEXP _BayesianLasso_zlasso_c_v2(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP, SEXP logarithmSEXP) {
+// zlasso
+double zlasso(double a_val, double b_val, double c_val, bool logarithm);
+RcppExport SEXP _BayesianLasso_zlasso(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP, SEXP logarithmSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -424,7 +424,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
     Rcpp::traits::input_parameter< bool >::type logarithm(logarithmSEXP);
-    rcpp_result_gen = Rcpp::wrap(zlasso_c_v2(a_val, b_val, c_val, logarithm));
+    rcpp_result_gen = Rcpp::wrap(zlasso(a_val, b_val, c_val, logarithm));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -443,9 +443,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dlasso_c_v2
-arma::vec dlasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val, bool logarithm);
-RcppExport SEXP _BayesianLasso_dlasso_c_v2(SEXP vxSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP, SEXP logarithmSEXP) {
+// dlasso
+arma::vec dlasso(arma::vec vx, double a_val, double b_val, double c_val, bool logarithm);
+RcppExport SEXP _BayesianLasso_dlasso(SEXP vxSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP, SEXP logarithmSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -454,7 +454,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
     Rcpp::traits::input_parameter< bool >::type logarithm(logarithmSEXP);
-    rcpp_result_gen = Rcpp::wrap(dlasso_c_v2(vx, a_val, b_val, c_val, logarithm));
+    rcpp_result_gen = Rcpp::wrap(dlasso(vx, a_val, b_val, c_val, logarithm));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -472,9 +472,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// plasso_c_v2
-arma::vec plasso_c_v2(arma::vec vx, double a_val, double b_val, double c_val);
-RcppExport SEXP _BayesianLasso_plasso_c_v2(SEXP vxSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
+// plasso
+arma::vec plasso(arma::vec vx, double a_val, double b_val, double c_val);
+RcppExport SEXP _BayesianLasso_plasso(SEXP vxSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -482,17 +482,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(plasso_c_v2(vx, a_val, b_val, c_val));
+    rcpp_result_gen = Rcpp::wrap(plasso(vx, a_val, b_val, c_val));
     return rcpp_result_gen;
 END_RCPP
 }
 // qlasso_fast_c_v1
-double qlasso_fast_c_v1(double u, double a_val, double b_val, double c_val);
+arma::vec qlasso_fast_c_v1(arma::vec u, double a_val, double b_val, double c_val);
 RcppExport SEXP _BayesianLasso_qlasso_fast_c_v1(SEXP uSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type u(uSEXP);
     Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
@@ -500,43 +500,45 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// qlasso_fast_c_v2
-double qlasso_fast_c_v2(double u, double a_val, double b_val, double c_val);
-RcppExport SEXP _BayesianLasso_qlasso_fast_c_v2(SEXP uSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
+// qlasso
+arma::vec qlasso(arma::vec u, double a_val, double b_val, double c_val);
+RcppExport SEXP _BayesianLasso_qlasso(SEXP uSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type u(uSEXP);
     Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(qlasso_fast_c_v2(u, a_val, b_val, c_val));
+    rcpp_result_gen = Rcpp::wrap(qlasso(u, a_val, b_val, c_val));
     return rcpp_result_gen;
 END_RCPP
 }
 // rlasso_fast_c_v1
-double rlasso_fast_c_v1(double a_val, double b_val, double c_val);
-RcppExport SEXP _BayesianLasso_rlasso_fast_c_v1(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
+arma::vec rlasso_fast_c_v1(double n, double a_val, double b_val, double c_val);
+RcppExport SEXP _BayesianLasso_rlasso_fast_c_v1(SEXP nSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type n(nSEXP);
     Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(rlasso_fast_c_v1(a_val, b_val, c_val));
+    rcpp_result_gen = Rcpp::wrap(rlasso_fast_c_v1(n, a_val, b_val, c_val));
     return rcpp_result_gen;
 END_RCPP
 }
-// rlasso_fast_c_v2
-double rlasso_fast_c_v2(double a_val, double b_val, double c_val);
-RcppExport SEXP _BayesianLasso_rlasso_fast_c_v2(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
+// rlasso
+arma::vec rlasso(double n, double a_val, double b_val, double c_val);
+RcppExport SEXP _BayesianLasso_rlasso(SEXP nSEXP, SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type n(nSEXP);
     Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(rlasso_fast_c_v2(a_val, b_val, c_val));
+    rcpp_result_gen = Rcpp::wrap(rlasso(n, a_val, b_val, c_val));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -553,16 +555,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// elasso_c_v2
-double elasso_c_v2(double a_val, double b_val, double c_val);
-RcppExport SEXP _BayesianLasso_elasso_c_v2(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
+// elasso
+double elasso(double a_val, double b_val, double c_val);
+RcppExport SEXP _BayesianLasso_elasso(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(elasso_c_v2(a_val, b_val, c_val));
+    rcpp_result_gen = Rcpp::wrap(elasso(a_val, b_val, c_val));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -579,29 +581,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// vlasso_c_v2
-double vlasso_c_v2(double a_val, double b_val, double c_val);
-RcppExport SEXP _BayesianLasso_vlasso_c_v2(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
+// vlasso
+double vlasso(double a_val, double b_val, double c_val);
+RcppExport SEXP _BayesianLasso_vlasso(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
     Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
     Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(vlasso_c_v2(a_val, b_val, c_val));
+    rcpp_result_gen = Rcpp::wrap(vlasso(a_val, b_val, c_val));
     return rcpp_result_gen;
 END_RCPP
 }
-// mlasso_c
-double mlasso_c(double a_val, double b_val, double c_val);
-RcppExport SEXP _BayesianLasso_mlasso_c(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
+// mlasso
+arma::vec mlasso(arma::vec a_val, arma::vec b_val, arma::vec c_val);
+RcppExport SEXP _BayesianLasso_mlasso(SEXP a_valSEXP, SEXP b_valSEXP, SEXP c_valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type a_val(a_valSEXP);
-    Rcpp::traits::input_parameter< double >::type b_val(b_valSEXP);
-    Rcpp::traits::input_parameter< double >::type c_val(c_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(mlasso_c(a_val, b_val, c_val));
+    Rcpp::traits::input_parameter< arma::vec >::type a_val(a_valSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b_val(b_valSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type c_val(c_valSEXP);
+    rcpp_result_gen = Rcpp::wrap(mlasso(a_val, b_val, c_val));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -776,20 +778,20 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BayesianLasso_calculate_lasso_dist_stats_c_v2", (DL_FUNC) &_BayesianLasso_calculate_lasso_dist_stats_c_v2, 3},
     {"_BayesianLasso_logSumExp_c", (DL_FUNC) &_BayesianLasso_logSumExp_c, 1},
     {"_BayesianLasso_zlasso_c_v1", (DL_FUNC) &_BayesianLasso_zlasso_c_v1, 4},
-    {"_BayesianLasso_zlasso_c_v2", (DL_FUNC) &_BayesianLasso_zlasso_c_v2, 4},
+    {"_BayesianLasso_zlasso", (DL_FUNC) &_BayesianLasso_zlasso, 4},
     {"_BayesianLasso_dlasso_c_v1", (DL_FUNC) &_BayesianLasso_dlasso_c_v1, 5},
-    {"_BayesianLasso_dlasso_c_v2", (DL_FUNC) &_BayesianLasso_dlasso_c_v2, 5},
+    {"_BayesianLasso_dlasso", (DL_FUNC) &_BayesianLasso_dlasso, 5},
     {"_BayesianLasso_plasso_c_v1", (DL_FUNC) &_BayesianLasso_plasso_c_v1, 4},
-    {"_BayesianLasso_plasso_c_v2", (DL_FUNC) &_BayesianLasso_plasso_c_v2, 4},
+    {"_BayesianLasso_plasso", (DL_FUNC) &_BayesianLasso_plasso, 4},
     {"_BayesianLasso_qlasso_fast_c_v1", (DL_FUNC) &_BayesianLasso_qlasso_fast_c_v1, 4},
-    {"_BayesianLasso_qlasso_fast_c_v2", (DL_FUNC) &_BayesianLasso_qlasso_fast_c_v2, 4},
-    {"_BayesianLasso_rlasso_fast_c_v1", (DL_FUNC) &_BayesianLasso_rlasso_fast_c_v1, 3},
-    {"_BayesianLasso_rlasso_fast_c_v2", (DL_FUNC) &_BayesianLasso_rlasso_fast_c_v2, 3},
+    {"_BayesianLasso_qlasso", (DL_FUNC) &_BayesianLasso_qlasso, 4},
+    {"_BayesianLasso_rlasso_fast_c_v1", (DL_FUNC) &_BayesianLasso_rlasso_fast_c_v1, 4},
+    {"_BayesianLasso_rlasso", (DL_FUNC) &_BayesianLasso_rlasso, 4},
     {"_BayesianLasso_elasso_c_v1", (DL_FUNC) &_BayesianLasso_elasso_c_v1, 3},
-    {"_BayesianLasso_elasso_c_v2", (DL_FUNC) &_BayesianLasso_elasso_c_v2, 3},
+    {"_BayesianLasso_elasso", (DL_FUNC) &_BayesianLasso_elasso, 3},
     {"_BayesianLasso_vlasso_c_v1", (DL_FUNC) &_BayesianLasso_vlasso_c_v1, 3},
-    {"_BayesianLasso_vlasso_c_v2", (DL_FUNC) &_BayesianLasso_vlasso_c_v2, 3},
-    {"_BayesianLasso_mlasso_c", (DL_FUNC) &_BayesianLasso_mlasso_c, 3},
+    {"_BayesianLasso_vlasso", (DL_FUNC) &_BayesianLasso_vlasso, 3},
+    {"_BayesianLasso_mlasso", (DL_FUNC) &_BayesianLasso_mlasso, 3},
     {"_BayesianLasso_lasso_gibbs_Bc", (DL_FUNC) &_BayesianLasso_lasso_gibbs_Bc, 11},
     {"_BayesianLasso_lasso_gibbs_Bc2", (DL_FUNC) &_BayesianLasso_lasso_gibbs_Bc2, 11},
     {"_BayesianLasso_rrinvgauss", (DL_FUNC) &_BayesianLasso_rrinvgauss, 2},

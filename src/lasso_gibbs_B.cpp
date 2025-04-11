@@ -86,22 +86,28 @@ List lasso_gibbs_Bc(arma::mat mX, arma::vec vy, double a, double b, double u, do
     if (n>p) {
       arma::vec XTy_hat = XTX * vbeta;
       for (int j=0; j<p; ++j) {
+        arma::vec single_val_vec(1);
+        single_val_vec[0] = vu[j];
+        
         arma::vec vx_j = XTX.col(j);
         XTy_hat = XTy_hat - vx_j*vbeta[j]; // This might not be exactly right
         num = XTy[j] - XTy_hat[j];
         vb_vals[j] = num/sigma2;
         denom = dgXTX[j] + lambda2*vb[j];
-        vbeta[j] =  qlasso_fast_c_v2(vu[j], va_vals[j], vb_vals[j], vc_vals[j]);
+        vbeta[j] =  qlasso(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
         XTy_hat = XTy_hat + vx_j*vbeta[j];
       }
     } else {
       arma::vec vy_hat = mX * vbeta;
       for (int j=0; j<p; ++j) {
+        arma::vec single_val_vec(1);
+        single_val_vec[0] = vu[j];
+        
         arma::vec vx_j = mX.col(j);
         arma::vec vy_hat_mj = vy_hat - vx_j*vbeta[j];
         num = XTy[j] -  as_scalar(vx_j.t() * vy_hat_mj);
         vb_vals[j] = num/sigma2;
-        vbeta[j] = qlasso_fast_c_v1(vu[j], va_vals[j], vb_vals[j], vc_vals[j]);
+        vbeta[j] = qlasso_fast_c_v1(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
         vy_hat = vy_hat_mj +  vx_j*vbeta[j];
       }
     }
@@ -234,22 +240,28 @@ List lasso_gibbs_Bc2(arma::mat mX, arma::vec vy, double a, double b, double u, d
     if (n>p) {
       arma::vec XTy_hat = XTX * vbeta;
       for (int j=0; j<p; ++j) {
+        arma::vec single_val_vec(1);
+        single_val_vec[0] = vu[j];
+        
         arma::vec vx_j = XTX.col(j);
         XTy_hat = XTy_hat - vx_j*vbeta[j]; // This might not be exactly right
         num = XTy[j] - XTy_hat[j];
         vb_vals[j] = num/sigma2;
         denom = dgXTX[j] + lambda2*vb[j];
-        vbeta[j] =  qlasso_fast_c_v2(vu[j], va_vals[j], vb_vals[j], vc_vals[j]);
+        vbeta[j] =  qlasso(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
         XTy_hat = XTy_hat + vx_j*vbeta[j];
       }
     } else {
       arma::vec vy_hat = mX * vbeta;
       for (int j=0; j<p; ++j) {
+        arma::vec single_val_vec(1);
+        single_val_vec[0] = vu[j];
+        
         arma::vec vx_j = mX.col(j);
         arma::vec vy_hat_mj = vy_hat - vx_j*vbeta[j];
         num = XTy[j] -  as_scalar(vx_j.t() * vy_hat_mj);
         vb_vals[j] = num/sigma2;
-        vbeta[j] = qlasso_fast_c_v2(vu[j], va_vals[j], vb_vals[j], vc_vals[j]);
+        vbeta[j] = qlasso(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
         // if(i==7){
         //  Rcout << j << vbeta[j] << "B"<<  "\n";
         // }
