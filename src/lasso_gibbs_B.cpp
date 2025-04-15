@@ -170,7 +170,7 @@ List lasso_gibbs_Bc(arma::mat mX, arma::vec vy, double a, double b, double u, do
 
 
 // [[Rcpp::export]]
-List lasso_gibbs_Bc2(arma::mat mX, arma::vec vy, double a, double b, double u, double v,  
+List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double u, double v,  
                      int nsamples, arma::vec vbeta_init, double lambda_init, double sigma2_init,
                      int verbose)
 {

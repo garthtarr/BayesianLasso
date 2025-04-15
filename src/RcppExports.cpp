@@ -628,9 +628,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// lasso_gibbs_Bc2
-List lasso_gibbs_Bc2(arma::mat mX, arma::vec vy, double a, double b, double u, double v, int nsamples, arma::vec vbeta_init, double lambda_init, double sigma2_init, int verbose);
-RcppExport SEXP _BayesianLasso_lasso_gibbs_Bc2(SEXP mXSEXP, SEXP vySEXP, SEXP aSEXP, SEXP bSEXP, SEXP uSEXP, SEXP vSEXP, SEXP nsamplesSEXP, SEXP vbeta_initSEXP, SEXP lambda_initSEXP, SEXP sigma2_initSEXP, SEXP verboseSEXP) {
+// Modified_Hans_Gibbs
+List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double u, double v, int nsamples, arma::vec vbeta_init, double lambda_init, double sigma2_init, int verbose);
+RcppExport SEXP _BayesianLasso_Modified_Hans_Gibbs(SEXP mXSEXP, SEXP vySEXP, SEXP aSEXP, SEXP bSEXP, SEXP uSEXP, SEXP vSEXP, SEXP nsamplesSEXP, SEXP vbeta_initSEXP, SEXP lambda_initSEXP, SEXP sigma2_initSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -645,7 +645,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda_init(lambda_initSEXP);
     Rcpp::traits::input_parameter< double >::type sigma2_init(sigma2_initSEXP);
     Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(lasso_gibbs_Bc2(mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init, sigma2_init, verbose));
+    rcpp_result_gen = Rcpp::wrap(Modified_Hans_Gibbs(mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init, sigma2_init, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -793,7 +793,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BayesianLasso_vlasso", (DL_FUNC) &_BayesianLasso_vlasso, 3},
     {"_BayesianLasso_mlasso", (DL_FUNC) &_BayesianLasso_mlasso, 3},
     {"_BayesianLasso_lasso_gibbs_Bc", (DL_FUNC) &_BayesianLasso_lasso_gibbs_Bc, 11},
-    {"_BayesianLasso_lasso_gibbs_Bc2", (DL_FUNC) &_BayesianLasso_lasso_gibbs_Bc2, 11},
+    {"_BayesianLasso_Modified_Hans_Gibbs", (DL_FUNC) &_BayesianLasso_Modified_Hans_Gibbs, 11},
     {"_BayesianLasso_rrinvgauss", (DL_FUNC) &_BayesianLasso_rrinvgauss, 2},
     {"_BayesianLasso_rinvgaussian_c", (DL_FUNC) &_BayesianLasso_rinvgaussian_c, 2},
     {"_BayesianLasso_rinvgaussian_slice", (DL_FUNC) &_BayesianLasso_rinvgaussian_slice, 4},
