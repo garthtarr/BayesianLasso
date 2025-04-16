@@ -50,7 +50,8 @@ In addition, Mills ratio, mean, and variance of the Lasso distribution are provi
 <span><span class="fu">rlasso</span><span class="op">(</span><span class="va">n</span>, <span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span><span class="op">)</span></span>
 <span><span class="fu">elasso</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span><span class="op">)</span></span>
 <span><span class="fu">vlasso</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span><span class="op">)</span></span>
-<span><span class="fu">mlasso</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">mlasso</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span><span class="op">)</span></span>
+<span><span class="fu">MillsRatio</span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -84,6 +85,10 @@ In addition, Mills ratio, mean, and variance of the Lasso distribution are provi
 <dt id="arg-logarithm">logarithm<a class="anchor" aria-label="anchor" href="#arg-logarithm"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, probabilities are returned on the log scale.</p></dd>
 
+
+<dt id="arg-d">d<a class="anchor" aria-label="anchor" href="#arg-d"></a></dt>
+<dd><p>A scalar numeric value. Represents the point at which the Mills ratio is evaluated.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -96,6 +101,7 @@ In addition, Mills ratio, mean, and variance of the Lasso distribution are provi
 <li><p><code>elasso</code>: expected value.</p></li>
 <li><p><code>vlasso</code>: variance.</p></li>
 <li><p><code>mlasso</code>: mode.</p></li>
+<li><p><code>MillsRatio</code>: computes the Mills ratio \((1 - \Phi(d)) / \phi(d)\) for a given scalar input.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -133,7 +139,8 @@ where \(x \in \mathbb{R}\), \(a &gt; 0\), \(b \in \mathbb{R}\), \(c &gt; 0\), an
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    0</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">MillsRatio</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4213692</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># The Modified_Hans_Gibbs() function uses the Lasso distribution to draw </span></span></span>
 <span class="r-in"><span><span class="co"># samples from the full conditional distribution of the regression coefficients.</span></span></span>
