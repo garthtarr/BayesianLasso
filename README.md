@@ -14,14 +14,14 @@ remotes::install_github("garthtarr/BayesianLasso")
 ```
 
 ## Usage
-zlasso(a, b, c, logarithm)
-dlasso(x, a, b, c, logarithm)
-plasso(q, a, b, c)
-qlasso(p, a, b, c)
-rlasso(n, a, b, c)
-elasso(a, b, c)
-vlasso(a, b, c)
-mlasso(a, b, c)
+zlasso(a, b, c, logarithm);
+dlasso(x, a, b, c, logarithm);
+plasso(q, a, b, c);
+qlasso(p, a, b, c);
+rlasso(n, a, b, c);
+elasso(a, b, c);
+vlasso(a, b, c);
+mlasso(a, b, c);
 MillsRatio(d)
 
 ### Lasso distribution
@@ -29,11 +29,11 @@ Normalizing constant Z, probability density function, cumulative distribution fu
 quantile function, and random generation for the Lasso distribution with parameters \code{a}, \code{b}, and \code{c}.
 In addition, Mills ratio, mean, and variance of the Lasso distribution are provided.
 
-If \eqn{X \sim \text{Lasso}(a, b, c)} then its density function is:
-\deqn{
-p(x;a,b,c) = Z^{-1} \exp\left(-\frac{1}{2} a x^2 + bx - c|x| \right)
-}
-where \eqn{x \in \mathbb{R}}, \eqn{a > 0}, \eqn{b \in \mathbb{R}}, \eqn{c > 0}, and \eqn{Z} is the normalizing constant.
+If X ~ Lasso(a, b, c) then its density function is:
+
+$p(x;a,b,c) = Z^{-1} \exp\left(-\frac{1}{2} a x^2 + bx - c|x| \right)$
+
+where $x \in \mathbb{R}$, $a > 0$, $b \in \mathbb{R}$, $c > 0$, and $Z$ is the normalizing constant.
 
 More details are included for the CDF, quantile function, and normalizing constant in the original documentation.
 
