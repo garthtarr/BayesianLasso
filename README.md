@@ -16,7 +16,9 @@ remotes::install_github("garthtarr/BayesianLasso")
 ## Usage
 
 ### Lasso distribution
-
+Normalizing constant Z, probability density function, cumulative distribution function,
+quantile function, and random generation for the Lasso distribution with parameters \code{a}, \code{b}, and \code{c}.
+In addition, Mills ratio, mean, and variance of the Lasso distribution are provided.
 Coming soon.
 
 ### Bayesian Lasso
