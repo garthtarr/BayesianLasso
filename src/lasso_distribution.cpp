@@ -169,6 +169,35 @@ double right_mills_12sf(double x)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
+ * Calculate the Mail's Ratio the regular way for x<0 and uses function 
+ * right_mills_12sf(double x) for x>0
+ */
+
+// Standard normal PDF
+inline double phi(double x) {
+  return std::exp(-0.5 * x * x) / std::sqrt(2.0 * M_PI);
+}
+
+// Standard normal CDF using R's built-in pnorm
+inline double Phi(double x) {
+  return R::pnorm(x, 0.0, 1.0, 1, 0);  // lower.tail = TRUE, log.p = FALSE
+}
+
+// [[Rcpp::export]]
+double MillsRatio(double x) {
+  if (x > 0.0) {
+    return right_mills_12sf(x);
+  } else {
+    double phi_val = phi(x);
+    double Phi_val = 1.0 - Phi(x);  // same as upper tail
+    if (phi_val == 0.0) return NA_REAL; // avoid divide by 0
+    return Phi_val / phi_val;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 
 int check_abc(double a_val, double b_val, double c_val)
 {

@@ -15,6 +15,7 @@
 #' elasso(a, b, c)
 #' vlasso(a, b, c)
 #' mlasso(a, b, c)
+#' MillsRatio(d)
 #'
 #' @details
 #' If \eqn{X \sim \text{Lasso}(a, b, c)} then its density function is:
@@ -32,7 +33,7 @@
 #' @param c  Vector of tuning parameter which must be non-negative values.
 #' @param n Number of observations.
 #' @param logarithm Logical. If \code{TRUE}, probabilities are returned on the log scale.
-#'
+#' @param d A scalar numeric value. Represents the point at which the Mills ratio is evaluated.
 #' @return
 #' \itemize{
 #'   \item \code{zlasso}: the normalizing constant Z.
@@ -43,6 +44,7 @@
 #'   \item \code{elasso}: expected value.
 #'   \item \code{vlasso}: variance.
 #'   \item \code{mlasso}: mode.
+#'   \item \code{MillsRatio}: computes the Mills ratio \eqn{(1 - \Phi(d)) / \phi(d)} for a given scalar input.
 #' }
 #'
 #' @examples
@@ -60,7 +62,7 @@
 #' vlasso(a, b, c)
 #' mlasso(a, b, c)
 #' 
-#' 
+#' MillsRatio(2)
 #' 
 #' # The Modified_Hans_Gibbs() function uses the Lasso distribution to draw 
 #' # samples from the full conditional distribution of the regression coefficients.

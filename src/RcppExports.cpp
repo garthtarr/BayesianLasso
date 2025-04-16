@@ -349,6 +349,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// MillsRatio
+double MillsRatio(double x);
+RcppExport SEXP _BayesianLasso_MillsRatio(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(MillsRatio(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // zcalc_7sf
 double zcalc_7sf(double a, double b, double c, int type);
 RcppExport SEXP _BayesianLasso_zcalc_7sf(SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP typeSEXP) {
@@ -773,6 +784,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BayesianLasso_sq_inv_mills_7sf", (DL_FUNC) &_BayesianLasso_sq_inv_mills_7sf, 1},
     {"_BayesianLasso_right_mills_7sf", (DL_FUNC) &_BayesianLasso_right_mills_7sf, 1},
     {"_BayesianLasso_right_mills_12sf", (DL_FUNC) &_BayesianLasso_right_mills_12sf, 1},
+    {"_BayesianLasso_MillsRatio", (DL_FUNC) &_BayesianLasso_MillsRatio, 1},
     {"_BayesianLasso_zcalc_7sf", (DL_FUNC) &_BayesianLasso_zcalc_7sf, 4},
     {"_BayesianLasso_calculate_lasso_dist_stats_c_v1", (DL_FUNC) &_BayesianLasso_calculate_lasso_dist_stats_c_v1, 3},
     {"_BayesianLasso_calculate_lasso_dist_stats_c_v2", (DL_FUNC) &_BayesianLasso_calculate_lasso_dist_stats_c_v2, 3},

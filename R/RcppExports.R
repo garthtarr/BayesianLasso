@@ -97,6 +97,10 @@ right_mills_12sf <- function(x) {
     .Call(`_BayesianLasso_right_mills_12sf`, x)
 }
 
+MillsRatio <- function(x) {
+    .Call(`_BayesianLasso_MillsRatio`, x)
+}
+
 zcalc_7sf <- function(a, b, c, type) {
     .Call(`_BayesianLasso_zcalc_7sf`, a, b, c, type)
 }
