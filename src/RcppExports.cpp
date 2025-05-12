@@ -640,8 +640,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // Modified_Hans_Gibbs
-List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double u, double v, int nsamples, arma::vec vbeta_init, double lambda_init, double sigma2_init, int verbose);
-RcppExport SEXP _BayesianLasso_Modified_Hans_Gibbs(SEXP mXSEXP, SEXP vySEXP, SEXP aSEXP, SEXP bSEXP, SEXP uSEXP, SEXP vSEXP, SEXP nsamplesSEXP, SEXP vbeta_initSEXP, SEXP lambda_initSEXP, SEXP sigma2_initSEXP, SEXP verboseSEXP) {
+List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double u, double v, int nsamples, arma::vec beta_init, double lambda_init, double sigma2_init, int verbose);
+RcppExport SEXP _BayesianLasso_Modified_Hans_Gibbs(SEXP mXSEXP, SEXP vySEXP, SEXP aSEXP, SEXP bSEXP, SEXP uSEXP, SEXP vSEXP, SEXP nsamplesSEXP, SEXP beta_initSEXP, SEXP lambda_initSEXP, SEXP sigma2_initSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -652,11 +652,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type u(uSEXP);
     Rcpp::traits::input_parameter< double >::type v(vSEXP);
     Rcpp::traits::input_parameter< int >::type nsamples(nsamplesSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type vbeta_init(vbeta_initSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type beta_init(beta_initSEXP);
     Rcpp::traits::input_parameter< double >::type lambda_init(lambda_initSEXP);
     Rcpp::traits::input_parameter< double >::type sigma2_init(sigma2_initSEXP);
     Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(Modified_Hans_Gibbs(mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init, sigma2_init, verbose));
+    rcpp_result_gen = Rcpp::wrap(Modified_Hans_Gibbs(mX, vy, a, b, u, v, nsamples, beta_init, lambda_init, sigma2_init, verbose));
     return rcpp_result_gen;
 END_RCPP
 }

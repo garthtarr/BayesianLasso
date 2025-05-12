@@ -171,7 +171,7 @@ List lasso_gibbs_Bc(arma::mat mX, arma::vec vy, double a, double b, double u, do
 
 // [[Rcpp::export]]
 List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double u, double v,  
-                     int nsamples, arma::vec vbeta_init, double lambda_init, double sigma2_init,
+                     int nsamples, arma::vec beta_init, double lambda_init, double sigma2_init,
                      int verbose)
 {
   int n = mX.n_rows;
@@ -209,7 +209,7 @@ List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double 
   const double u_til = u + 0.5*p;
   
   // Assign initial values
-  arma::vec vbeta = vbeta_init;
+  arma::vec vbeta = beta_init;
   double sigma2 = sigma2_init;
   double sigma = sqrt(sigma2);
   double lambda = lambda_init;

@@ -181,8 +181,8 @@ lasso_gibbs_Bc <- function(mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init
     .Call(`_BayesianLasso_lasso_gibbs_Bc`, mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init, sigma2_init, verbose)
 }
 
-Modified_Hans_Gibbs <- function(mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init, sigma2_init, verbose) {
-    .Call(`_BayesianLasso_Modified_Hans_Gibbs`, mX, vy, a, b, u, v, nsamples, vbeta_init, lambda_init, sigma2_init, verbose)
+Modified_Hans_Gibbs <- function(mX, vy, a, b, u, v, nsamples, beta_init, lambda_init, sigma2_init, verbose) {
+    .Call(`_BayesianLasso_Modified_Hans_Gibbs`, mX, vy, a, b, u, v, nsamples, beta_init, lambda_init, sigma2_init, verbose)
 }
 
 rrinvgauss <- function(vmu, vlambda) {
