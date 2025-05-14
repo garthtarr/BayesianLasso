@@ -32,6 +32,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -45,34 +46,114 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="a-better-bayesian-lasso">A better Bayesian Lasso<a class="anchor" aria-label="anchor" href="#a-better-bayesian-lasso"></a>
+<div class="page-header"><h1 id="bayesianlasso">BayesianLasso<a class="anchor" aria-label="anchor" href="#bayesianlasso"></a>
 </h1></div>
-<p>This package will grow over time. It currently includes functions for the Lasso Distribution.</p>
-<p>The corresponding paper is [NOT YET] available on <a href="">arXiv</a>.</p>
+<!-- badges: start -->
+<!-- badges: end -->
+<p>BayesianLasso is an R package for efficient Bayesian inference in sparse linear regression models using the Bayesian Lasso. It includes optimized Gibbs sampling algorithms and utilities for working with the Lasso distribution.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The <code>BayesianLasso</code> package can be installed from GitHub using</p>
-<pre><code><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"garthtarr/BayesianLasso"</span><span class="op">)</span></span></code></pre>
+<p>You can install the development version of BayesianLasso from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"garthtarr/BayesianLasso"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
 </h2>
-<p>zlasso(a, b, c, logarithm); dlasso(x, a, b, c, logarithm); plasso(q, a, b, c); qlasso(p, a, b, c); rlasso(n, a, b, c); elasso(a, b, c); vlasso(a, b, c); mlasso(a, b, c); MillsRatio(d)</p>
-<div class="section level3">
-<h3 id="lasso-distribution">Lasso distribution<a class="anchor" aria-label="anchor" href="#lasso-distribution"></a>
-</h3>
-<p>Normalizing constant Z, probability density function, cumulative distribution function, quantile function, and random generation for the Lasso distribution with parameters , , and . In addition, Mills ratio, mean, and variance of the Lasso distribution are provided.</p>
-<p>If X ~ Lasso(a, b, c) then its density function is:</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mi>Z</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>a</mi><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>b</mi><mi>x</mi><mo>−</mo><mi>c</mi><mrow><mo stretchy="true" form="prefix">|</mo><mi>x</mi><mo stretchy="true" form="postfix">|</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(x;a,b,c) = Z^{-1} \exp\left(-\frac{1}{2} a x^2 + bx - c|x| \right)</annotation></semantics></math></p>
-<p>where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>∈</mo><mi>ℝ</mi></mrow><annotation encoding="application/x-tex">x \in \mathbb{R}</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">a &gt; 0</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>∈</mo><mi>ℝ</mi></mrow><annotation encoding="application/x-tex">b \in \mathbb{R}</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c &gt; 0</annotation></semantics></math>, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Z</mi><annotation encoding="application/x-tex">Z</annotation></semantics></math> is the normalizing constant.</p>
-<p>More details are included for the CDF, quantile function, and normalizing constant in the original documentation.</p>
+<ul>
+<li><p>Efficient Gibbs samplers for Bayesian Lasso (e.g., Modified_Hans_Gibbs, Modified_PC_Gibbs)</p></li>
+<li><p>Support for drawing from the Lasso distribution</p></li>
+<li><p>Utilities for computing moments and densities</p></li>
+</ul>
 </div>
-<div class="section level3">
-<h3 id="bayesian-lasso">Bayesian Lasso<a class="anchor" aria-label="anchor" href="#bayesian-lasso"></a>
-</h3>
-<p>To see how this can be used to fit Bayesian Lasso models see the vignette.</p>
+<div class="section level2">
+<h2 id="example-usage">Example Usage<a class="anchor" aria-label="anchor" href="#example-usage"></a>
+</h2>
+<p>These are basic examples which show you how to solve a common problem:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://garthtarr.github.io/BayesianLasso/">BayesianLasso</a></span><span class="op">)</span></span>
+<span><span class="co">## basic example code</span></span>
+<span></span>
+<span><span class="co"># Simulated data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="fl">20</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span></span>
+<span><span class="va">beta_init</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run modified Hans Gibbs sampler</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">Modified_Hans_Gibbs</span><span class="op">(</span></span>
+<span>  mX <span class="op">=</span> <span class="va">X</span>,</span>
+<span>  vy <span class="op">=</span> <span class="va">y</span>,</span>
+<span>  a <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  b <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  u <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  v <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  nsamples <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  beta_init <span class="op">=</span> <span class="va">beta_init</span>,</span>
+<span>  lambda_init <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  sigma2_init <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 6</span></span>
+<span><span class="co">#&gt;  $ mBeta   : num [1:100, 1:5] 0.2441 0.2277 0.2478 -0.1356 -0.0692 ...</span></span>
+<span><span class="co">#&gt;  $ vsigma2 : num [1:100, 1] 0.913 0.767 0.704 0.747 0.623 ...</span></span>
+<span><span class="co">#&gt;  $ vlambda2: num [1:100, 1] 34.96 87.38 9.41 53.49 68.44 ...</span></span>
+<span><span class="co">#&gt;  $ mA      : num [1:100, 1:5] 18.4 20.1 24 26.1 24.6 ...</span></span>
+<span><span class="co">#&gt;  $ mB      : num [1:100, 1:5] 5.67 3.15 3 2.11 2.49 ...</span></span>
+<span><span class="co">#&gt;  $ mC      : num [1:100, 1:5] 0.1 6.19 10.68 3.66 8.46 ...</span></span></code></pre></div>
+<p>The <code>Modified_Hans_Gibbs()</code> function returns a list with the following components:</p>
+<ul>
+<li>
+<code>mBeta</code>: MCMC samples of the regression coefficients <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>, stored as a matrix with <code>nsamples</code> rows and <code>p</code> columns.</li>
+<li>
+<code>vsigma2</code>: MCMC samples of the error variance <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>.</li>
+<li>
+<code>vlambda2</code>: MCMC samples of the global shrinkage parameter <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>λ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\lambda^2</annotation></semantics></math>.</li>
+<li>
+<code>mA</code>, <code>mB</code>, <code>mC</code>: Matrices containing the MCMC samples of the Lasso distribution parameters <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>A</mi><mi>j</mi></msub><annotation encoding="application/x-tex">A_j</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mi>j</mi></msub><annotation encoding="application/x-tex">B_j</annotation></semantics></math>, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>j</mi></msub><annotation encoding="application/x-tex">C_j</annotation></semantics></math> for each coefficient <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\beta_j</annotation></semantics></math>, where each row corresponds to one MCMC iteration and each column to a regression coefficient.</li>
+</ul>
 </div>
+<div class="section level2">
+<h2 id="lasso-distribution-functions">Lasso Distribution Functions<a class="anchor" aria-label="anchor" href="#lasso-distribution-functions"></a>
+</h2>
+<p>The package provides functions for working with the Lasso distribution:</p>
+<ul>
+<li><p>zlasso(): Normalizing constant</p></li>
+<li><p>dlasso(): Density function</p></li>
+<li><p>plasso(): CDF</p></li>
+<li><p>qlasso(): Quantile function</p></li>
+<li><p>rlasso(): Random generation</p></li>
+<li><p>elasso(): Expected value</p></li>
+<li><p>vlasso(): Variance</p></li>
+<li><p>mlasso(): Mode</p></li>
+<li><p>MillsRatio(): Mills ratio</p></li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use this package in your work, please cite it appropriately. Citation information can be found using:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"BayesianLasso"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; To cite package 'BayesianLasso' in publications use:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Davoudabadi M, Ormerod J, Tarr G, Mueller S, Tidswell J (2024).</span></span>
+<span><span class="co">#&gt;   _BayesianLasso: A better Bayesian Lasso_. R package version 0.1.0,</span></span>
+<span><span class="co">#&gt;   &lt;https://garthtarr.github.io/BayesianLasso/&gt;.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   @Manual{,</span></span>
+<span><span class="co">#&gt;     title = {BayesianLasso: A better Bayesian Lasso},</span></span>
+<span><span class="co">#&gt;     author = {Mohammad Javad Davoudabadi and John Ormerod and Garth Tarr and Samuel Mueller and Jonathon Tidswell},</span></span>
+<span><span class="co">#&gt;     year = {2024},</span></span>
+<span><span class="co">#&gt;     note = {R package version 0.1.0},</span></span>
+<span><span class="co">#&gt;     url = {https://garthtarr.github.io/BayesianLasso/},</span></span>
+<span><span class="co">#&gt;   }</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -93,8 +174,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Mohammad Javad Davoudabadi <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-7312-1530" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>John Ormerod <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-4650-7507" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Mohammad Javad Davoudabadi <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-7312-1530" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Garth Tarr <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-6605-7478" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Samuel Mueller <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3087-8127" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Jonathon Tidswell <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0000-0000-0000" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
@@ -108,7 +189,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Mohammad Javad Davoudabadi, John Ormerod, Garth Tarr, Samuel Mueller, Jonathon Tidswell.</p>
+  <p>Developed by John Ormerod, Mohammad Javad Davoudabadi, Garth Tarr, Samuel Mueller, Jonathon Tidswell.</p>
 </div>
 
 <div class="pkgdown-footer-right">
