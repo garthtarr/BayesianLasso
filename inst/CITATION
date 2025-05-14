@@ -1,0 +1,16 @@
+citHeader("To cite package 'BayesianLasso' in publications use:")
+
+bibentry(
+  "Manual",
+  title = "BayesianLasso: A better Bayesian Lasso",
+  author = c(
+    person("John", "Ormerod"),
+    person("Mohammad Javad", "Davoudabadi"),
+    person("Garth", "Tarr"),
+    person("Samuel", "Mueller"),
+    person("Jonathon", "Tidswell")
+  ),
+  year = "2024",
+  note = "R package version 0.1.0",
+  url = "https://garthtarr.github.io/BayesianLasso/"
+)

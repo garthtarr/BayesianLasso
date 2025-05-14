@@ -3,8 +3,8 @@ Type: Package
 Title: A better Bayesian Lasso
 Version: 0.1.0
 Date: 2024-08-02
-Authors@R: c(person("Mohammad Javad", "Davoudabadi", role = c("aut","cre"), email = "mohammad.davoudabadi@sydney.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
-             person("John", "Ormerod", role = "aut", email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
+Authors@R: c(person("John", "Ormerod", role = "aut", email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
+             person("Mohammad Javad", "Davoudabadi", role = c("aut","cre"), email = "mohammad.davoudabadi@sydney.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
              person("Garth", "Tarr", role = c("aut"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")),
              person("Samuel", "Mueller", role = "aut", email = "samuel.mueller@sydney.edu.au", comment = c(ORCID = "0000-0002-3087-8127")),
              person("Jonathon", "Tidswell", role = c("aut"), email = "jonathon.tidswell@sydney.edu.au", comment = c(ORCID = "0000-0000-0000-0000")))
@@ -20,3 +20,6 @@ LinkingTo: Rcpp,
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 URL: https://garthtarr.github.io/BayesianLasso/
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

@@ -1,42 +1,131 @@
-# A better Bayesian Lasso
 
-This package will grow over time. It currently includes functions for the 
-Lasso Distribution.
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-The corresponding paper is [NOT YET] available on [arXiv]().
+# BayesianLasso
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+BayesianLasso is an R package for efficient Bayesian inference in sparse
+linear regression models using the Bayesian Lasso. It includes optimized
+Gibbs sampling algorithms and utilities for working with the Lasso
+distribution.
 
 ## Installation
 
-The `BayesianLasso` package can be installed from GitHub using
+You can install the development version of BayesianLasso from
+[GitHub](https://github.com/) with:
 
+``` r
+# install.packages("pak")
+pak::pak("garthtarr/BayesianLasso")
 ```
-remotes::install_github("garthtarr/BayesianLasso")
+
+## Features
+
+- Efficient Gibbs samplers for Bayesian Lasso (e.g.,
+  Modified_Hans_Gibbs, Modified_PC_Gibbs)
+
+- Support for drawing from the Lasso distribution
+
+- Utilities for computing moments and densities
+
+## Example Usage
+
+These are basic examples which show you how to solve a common problem:
+
+``` r
+library(BayesianLasso)
+## basic example code
+
+# Simulated data
+set.seed(123)
+X <- matrix(rnorm(100), 20, 5)
+y <- rnorm(20)
+beta_init <- rep(1, 5)
+
+# Run modified Hans Gibbs sampler
+result <- Modified_Hans_Gibbs(
+  mX = X,
+  vy = y,
+  a = 0.01,
+  b = 0.01,
+  u = 0.01,
+  v = 0.01,
+  nsamples = 100,
+  beta_init = beta_init,
+  lambda_init = 0.1,
+  sigma2_init = 1,
+  verbose = 0
+)
+
+str(result)
+#> List of 6
+#>  $ mBeta   : num [1:100, 1:5] 0.2441 0.2277 0.2478 -0.1356 -0.0692 ...
+#>  $ vsigma2 : num [1:100, 1] 0.913 0.767 0.704 0.747 0.623 ...
+#>  $ vlambda2: num [1:100, 1] 34.96 87.38 9.41 53.49 68.44 ...
+#>  $ mA      : num [1:100, 1:5] 18.4 20.1 24 26.1 24.6 ...
+#>  $ mB      : num [1:100, 1:5] 5.67 3.15 3 2.11 2.49 ...
+#>  $ mC      : num [1:100, 1:5] 0.1 6.19 10.68 3.66 8.46 ...
 ```
 
-## Usage
-zlasso(a, b, c, logarithm);
-dlasso(x, a, b, c, logarithm);
-plasso(q, a, b, c);
-qlasso(p, a, b, c);
-rlasso(n, a, b, c);
-elasso(a, b, c);
-vlasso(a, b, c);
-mlasso(a, b, c);
-MillsRatio(d)
+The `Modified_Hans_Gibbs()` function returns a list with the following
+components:
 
-### Lasso distribution
-Normalizing constant Z, probability density function, cumulative distribution function,
-quantile function, and random generation for the Lasso distribution with parameters \code{a}, \code{b}, and \code{c}.
-In addition, Mills ratio, mean, and variance of the Lasso distribution are provided.
+- `mBeta`: MCMC samples of the regression coefficients
+  $\boldsymbol{\beta}$, stored as a matrix with `nsamples` rows and `p`
+  columns.
+- `vsigma2`: MCMC samples of the error variance $\sigma^2$.
+- `vlambda2`: MCMC samples of the global shrinkage parameter
+  $\lambda^2$.
+- `mA`, `mB`, `mC`: Matrices containing the MCMC samples of the Lasso
+  distribution parameters $A_j$, $B_j$, and $C_j$ for each coefficient
+  $\beta_j$, where each row corresponds to one MCMC iteration and each
+  column to a regression coefficient.
 
-If X ~ Lasso(a, b, c) then its density function is:
+## Lasso Distribution Functions
 
-$p(x;a,b,c) = Z^{-1} \exp\left(-\frac{1}{2} a x^2 + bx - c|x| \right)$
+The package provides functions for working with the Lasso distribution:
 
-where $x \in \mathbb{R}$, $a > 0$, $b \in \mathbb{R}$, $c > 0$, and $Z$ is the normalizing constant.
+- zlasso(): Normalizing constant
 
-More details are included for the CDF, quantile function, and normalizing constant in the original documentation.
+- dlasso(): Density function
 
-### Bayesian Lasso
+- plasso(): CDF
 
-To see how this can be used to fit Bayesian Lasso models see the vignette.
+- qlasso(): Quantile function
+
+- rlasso(): Random generation
+
+- elasso(): Expected value
+
+- vlasso(): Variance
+
+- mlasso(): Mode
+
+- MillsRatio(): Mills ratio
+
+## Citation
+
+If you use this package in your work, please cite it appropriately.
+Citation information can be found using:
+
+``` r
+citation("BayesianLasso")
+#> To cite package 'BayesianLasso' in publications use:
+#> 
+#>   Davoudabadi M, Ormerod J, Tarr G, Mueller S, Tidswell J (2024).
+#>   _BayesianLasso: A better Bayesian Lasso_. R package version 0.1.0,
+#>   <https://garthtarr.github.io/BayesianLasso/>.
+#> 
+#> A BibTeX entry for LaTeX users is
+#> 
+#>   @Manual{,
+#>     title = {BayesianLasso: A better Bayesian Lasso},
+#>     author = {Mohammad Javad Davoudabadi and John Ormerod and Garth Tarr and Samuel Mueller and Jonathon Tidswell},
+#>     year = {2024},
+#>     note = {R package version 0.1.0},
+#>     url = {https://garthtarr.github.io/BayesianLasso/},
+#>   }
+```
