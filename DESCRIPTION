@@ -24,7 +24,8 @@ LinkingTo: Rcpp,
   RcppClock
 RoxygenNote: 7.3.2
 Encoding: UTF-8
-URL: https://garthtarr.github.io/BayesianLasso/
+URL: https://garthtarr.github.io/BayesianLasso/, https://github.com/garthtarr/BayesianLasso
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+BugReports: https://github.com/garthtarr/BayesianLasso/issues
