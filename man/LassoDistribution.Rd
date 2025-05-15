@@ -61,7 +61,7 @@ Modified_PC_Gibbs(X, y, a1, b1, u1, v1,
 
 \item{sigma2_init}{Initial value for the error variance \eqn{\sigma^2}.}
 
-\item{verbose}{Logical; if TRUE, print progress during sampling.}
+\item{verbose}{Integer. If greater than 0, progress is printed every \code{verbose} iterations during sampling. Set to 0 to suppress output.}
 }
 \value{
 \itemize{

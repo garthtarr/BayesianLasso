@@ -26,7 +26,7 @@ typedef Map<VectorXd> MapVec;
 // [[Rcpp::export]]
 List bayesian_lasso_gibbs_c(arma::mat mX, arma::vec vy, double lambda, double sigma2_hat, 
                             double a, double b, double u, double v, int nsamples, 
-                            bool verbose) {
+                            int verbose) {
   int n = mX.n_rows;
   int p = mX.n_cols;
   
@@ -94,9 +94,9 @@ List bayesian_lasso_gibbs_c(arma::mat mX, arma::vec vy, double lambda, double si
     // Update q(va) 
     vmu = sqrt(sigma2/(lambda2*(pow(vbeta,2.0))));
     va = rinvgaussian_c(vmu, vlambda);
- 
-    if (verbose) {
-      if ((i%10000)==0) {
+    
+    if (verbose!=0) {
+      if ((i%verbose)==0) {
         Rcout << "iter: " << i << "\n";
       }
     }
@@ -127,7 +127,7 @@ List bayesian_lasso_gibbs_c(arma::mat mX, arma::vec vy, double lambda, double si
 // [[Rcpp::export]]
 List Modified_PC_Gibbs(arma::mat mX, arma::vec vy,double a, double b, double u, double v, 
                        int nsamples, double lambda_init, double sigma2_init, 
-                       bool verbose) {
+                       int verbose) {
   int n = mX.n_rows;
   int p = mX.n_cols;
   
@@ -190,8 +190,8 @@ List Modified_PC_Gibbs(arma::mat mX, arma::vec vy,double a, double b, double u, 
     vmu = sqrt(sigma2/(lambda2*(pow(vbeta,2.0))));
     va = rinvgaussian_c(vmu, vlambda);
     
-    if (verbose) {
-      if ((i%1000)==1) {
+    if (verbose!=0) {
+      if ((i%verbose)==0) {
         Rcout << "iter: " << i << "\n";
       }
     }

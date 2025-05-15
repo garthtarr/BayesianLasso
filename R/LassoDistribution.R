@@ -51,7 +51,7 @@
 #' @param nsamples Number of Gibbs samples to draw.
 #' @param lambda_init Initial value for the shrinkage parameter \eqn{\lambda^2}.
 #' @param sigma2_init Initial value for the error variance \eqn{\sigma^2}.
-#' @param verbose Logical; if TRUE, print progress during sampling.
+#' @param verbose Integer. If greater than 0, progress is printed every \code{verbose} iterations during sampling. Set to 0 to suppress output.
 #'
 #' @return
 #' \itemize{
