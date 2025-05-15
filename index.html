@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>A better Bayesian Lasso • BayesianLasso</title>
+<title>Bayesian Lasso Regression and Tools for the Lasso Distribution • BayesianLasso</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="A better Bayesian Lasso">
-<meta name="description" content="TBA">
-<meta property="og:description" content="TBA">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bayesian Lasso Regression and Tools for the Lasso Distribution">
+<meta name="description" content="Implements Bayesian Lasso regression using efficient Gibbs sampling algorithms, including modified versions of the Hans and Park–Casella (PC) samplers. Includes functions for working with the Lasso distribution, such as its density, cumulative distribution, quantile, and random generation functions, along with moment calculations. Also includes a function to compute the Mills ratio. Designed for sparse linear models and suitable for high-dimensional regression problems.">
+<meta property="og:description" content="Implements Bayesian Lasso regression using efficient Gibbs sampling algorithms, including modified versions of the Hans and Park–Casella (PC) samplers. Includes functions for working with the Lasso distribution, such as its density, cumulative distribution, quantile, and random generation functions, along with moment calculations. Also includes a function to compute the Mills ratio. Designed for sparse linear models and suitable for high-dimensional regression problems.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -174,11 +174,11 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>John Ormerod <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-4650-7507" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Mohammad Javad Davoudabadi <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-7312-1530" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Garth Tarr <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-6605-7478" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Samuel Mueller <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3087-8127" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Jonathon Tidswell <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0000-0000-0000" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>John Ormerod <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0002-4650-7507" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Mohammad Javad Davoudabadi <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0001-7312-1530" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Garth Tarr <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0002-6605-7478" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Samuel Mueller <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0002-3087-8127" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Jonathon Tidswell <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0000-0000-0000" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
