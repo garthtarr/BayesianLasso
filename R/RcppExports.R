@@ -29,8 +29,8 @@ bayesian_lasso_gibbs_c <- function(mX, vy, lambda, sigma2_hat, a, b, u, v, nsamp
     .Call(`_BayesianLasso_bayesian_lasso_gibbs_c`, mX, vy, lambda, sigma2_hat, a, b, u, v, nsamples, verbose)
 }
 
-bayesian_lasso_gibbs_tune_c <- function(mX, vy, lambda, sigma2_hat, a, b, u, v, nburn, nsamples, verbose) {
-    .Call(`_BayesianLasso_bayesian_lasso_gibbs_tune_c`, mX, vy, lambda, sigma2_hat, a, b, u, v, nburn, nsamples, verbose)
+Modified_PC_Gibbs <- function(mX, vy, a, b, u, v, nsamples, lambda_init, sigma2_init, verbose) {
+    .Call(`_BayesianLasso_Modified_PC_Gibbs`, mX, vy, a, b, u, v, nsamples, lambda_init, sigma2_init, verbose)
 }
 
 bayesian_lasso_gibbs_tune_pgtn_c <- function(mX, vy, vbeta_init, lambda_init, sigma2_init, a, b, u, v, nsamples, verbose, trunc) {

@@ -125,9 +125,9 @@ List bayesian_lasso_gibbs_c(arma::mat mX, arma::vec vy, double lambda, double si
 
 
 // [[Rcpp::export]]
-List bayesian_lasso_gibbs_tune_c(arma::mat mX, arma::vec vy, double lambda, double sigma2_hat, 
-                            double a, double b, double u, double v,
-                            int nburn, int nsamples, bool verbose) {
+List Modified_PC_Gibbs(arma::mat mX, arma::vec vy,double a, double b, double u, double v, 
+                       int nsamples, double lambda_init, double sigma2_init, 
+                       bool verbose) {
   int n = mX.n_rows;
   int p = mX.n_cols;
   
@@ -136,7 +136,7 @@ List bayesian_lasso_gibbs_tune_c(arma::mat mX, arma::vec vy, double lambda, doub
   arma::vec XTy = mX.t()*vy;
   //double yTy = vy.t()*vy;
   
-  int maxiter = nburn + nsamples;
+  int maxiter = nsamples;
   
   // Initialise storage of samples
   arma::mat mBeta(maxiter,p);
@@ -153,8 +153,8 @@ List bayesian_lasso_gibbs_tune_c(arma::mat mX, arma::vec vy, double lambda, doub
   
   // Initialisation
   arma::vec va = ones(p); // expected value of auxiliary variables under q
-  double sigma2 = sigma2_hat;
-  double lambda2 = lambda*lambda;
+  double sigma2 = sigma2_init;
+  double lambda2 = lambda_init*lambda_init;
   double a_til = a + 0.5*(n + p);
   double b_til;
   double u_til = u + 0.5*p;

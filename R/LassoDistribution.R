@@ -2,9 +2,12 @@
 #' @name LassoDistribution
 #' @aliases zlasso dlasso plasso qlasso rlasso elasso vlasso mlasso
 #' @description
-#' Normalizing constant Z, probability density function, cumulative distribution function,
-#' quantile function, and random generation for the Lasso distribution with parameters \code{a}, \code{b}, and \code{c}.
-#' In addition, Mills ratio, mean, and variance of the Lasso distribution are provided.
+#' Provides functions related to the Lasso distribution, including the normalizing constant,
+#' probability density function, cumulative distribution function, quantile function, and
+#' random number generation for given parameters \code{a}, \code{b}, and \code{c}.
+#' Additional utilities include the Mills ratio, expected value, and variance of the distribution.
+#' The package also implements modified versions of the Hans and Park–Casella Gibbs sampling algorithms
+#' for Bayesian Lasso regression.
 #' 
 #' @usage
 #' zlasso(a, b, c, logarithm)
@@ -16,6 +19,11 @@
 #' vlasso(a, b, c)
 #' mlasso(a, b, c)
 #' MillsRatio(d)
+#' Modified_Hans_Gibbs(X, y, a1, b1, u1, v1,
+#'               nsamples, beta_init, lambda_init, sigma2_init, verbose)
+#' Modified_PC_Gibbs(X, y, a1, b1, u1, v1, 
+#'               nsamples, lambda_init, sigma2_init, verbose)
+#'          
 #'
 #' @details
 #' If \eqn{X \sim \text{Lasso}(a, b, c)} then its density function is:
@@ -34,17 +42,45 @@
 #' @param n Number of observations.
 #' @param logarithm Logical. If \code{TRUE}, probabilities are returned on the log scale.
 #' @param d A scalar numeric value. Represents the point at which the Mills ratio is evaluated.
+#' @param X Design matrix (numeric matrix).
+#' @param y Response vector (numeric vector).
+#' @param a1 Shape parameter of the prior on \eqn{\lambda^2}.
+#' @param b1 Rate parameter of the prior on \eqn{\lambda^2}.
+#' @param u1 Shape parameter of the prior on \eqn{\sigma^2}.
+#' @param v1 Rate parameter of the prior on \eqn{\sigma^2}.
+#' @param nsamples Number of Gibbs samples to draw.
+#' @param lambda_init Initial value for the shrinkage parameter \eqn{\lambda^2}.
+#' @param sigma2_init Initial value for the error variance \eqn{\sigma^2}.
+#' @param verbose Logical; if TRUE, print progress during sampling.
+#'
 #' @return
 #' \itemize{
-#'   \item \code{zlasso}: the normalizing constant Z.
-#'   \item \code{dlasso}: density function.
-#'   \item \code{plasso}: cumulative distribution function.
-#'   \item \code{qlasso}: quantile function.
-#'   \item \code{rlasso}: random generation.
-#'   \item \code{elasso}: expected value.
-#'   \item \code{vlasso}: variance.
-#'   \item \code{mlasso}: mode.
-#'   \item \code{MillsRatio}: computes the Mills ratio \eqn{(1 - \Phi(d)) / \phi(d)} for a given scalar input.
+#'
+#'   \item \code{zlasso}, \code{dlasso}, \code{plasso}, \code{qlasso}, \code{rlasso}, \code{elasso}, \code{vlasso}, \code{mlasso}, \code{MillsRatio}: 
+#'   return the corresponding scalar or vector values related to the Lasso distribution.
+#'
+#'   \item \code{Modified_Hans_Gibbs}: returns a list containing:
+#'     \describe{
+#'       \item{\code{mBeta}}{Matrix of MCMC samples for the regression coefficients \eqn{\beta}, with \code{nsamples} rows and \code{p} columns.}
+#'       \item{\code{vsigma2}}{Vector of MCMC samples for the error variance \eqn{\sigma^2}.}
+#'       \item{\code{vlambda2}}{Vector of MCMC samples for the shrinkage parameter \eqn{\lambda^2}.}
+#'       \item{\code{mA}}{Matrix of sampled values for parameter \eqn{a_j} of the Lasso distribution for each \eqn{\beta_j}.}
+#'       \item{\code{mB}}{Matrix of sampled values for parameter \eqn{b_j} of the Lasso distribution for each \eqn{\beta_j}.}
+#'       \item{\code{mC}}{Matrix of sampled values for parameter \eqn{c_j} of the Lasso distribution for each \eqn{\beta_j}.}
+#'     }
+#'
+#'   \item \code{Modified_PC_Gibbs}: returns a list containing:
+#'     \describe{
+#'       \item{\code{mBeta}}{Matrix of MCMC samples for the regression coefficients \eqn{\beta}.}
+#'       \item{\code{vsigma2}}{Vector of MCMC samples for the error variance \eqn{\sigma^2}.}
+#'       \item{\code{vlambda2}}{Vector of MCMC samples for the shrinkage parameter \eqn{\lambda^2}.}
+#'       \item{\code{mM}}{Matrix of estimated means of the full conditional distributions of each \eqn{\beta_j}.}
+#'       \item{\code{mV}}{Matrix of estimated variances of the full conditional distributions of each \eqn{\beta_j}.}
+#'       \item{\code{va_til}}{Vector of estimated shape parameters for the full conditional inverse-gamma distribution of \eqn{\sigma^2}.}
+#'       \item{\code{vb_til}}{Vector of estimated rate parameters for the full conditional inverse-gamma distribution of \eqn{\sigma^2}.}
+#'       \item{\code{vu_til}}{Vector of estimated shape parameters for the full conditional inverse-gamma distribution of \eqn{\lambda^2}.}
+#'       \item{\code{vv_til}}{Vector of estimated rate parameters for the full conditional inverse-gamma distribution of \eqn{\lambda^2}.}
+#'     }
 #' }
 #'
 #' @examples
@@ -79,13 +115,20 @@
 #' nsamples <- 1000
 #' verbose <- 100
 #' 
-#' Output <- Modified_Hans_Gibbs(
-#'   X, y, a1, b1, u1, v1,
-#'   nsamples, beta_init, lambda_init, sigma2_init, verbose
+#' Output_Hans <- Modified_Hans_Gibbs(
+#'                 X, y, a1, b1, u1, v1,
+#'                 nsamples, beta_init, lambda_init, sigma2_init, verbose
 #' )
 #' 
-#' colMeans(Output$mBeta)
-#' mean(Output$vlambda2)
+#' colMeans(Output_Hans$mBeta)
+#' mean(Output_Hans$vlambda2)
+#' 
+#' Output_PC <- Modified_PC_Gibbs(
+#'                X, y, a1, b1, u1, v1, 
+#'                nsamples, lambda_init, sigma2_init, verbose)
+#' 
+#' colMeans(Output_PC$mBeta)
+#' mean(Output_PC$vlambda2)
 #' 
 #' @export zlasso
 #' @export dlasso

@@ -120,24 +120,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// bayesian_lasso_gibbs_tune_c
-List bayesian_lasso_gibbs_tune_c(arma::mat mX, arma::vec vy, double lambda, double sigma2_hat, double a, double b, double u, double v, int nburn, int nsamples, bool verbose);
-RcppExport SEXP _BayesianLasso_bayesian_lasso_gibbs_tune_c(SEXP mXSEXP, SEXP vySEXP, SEXP lambdaSEXP, SEXP sigma2_hatSEXP, SEXP aSEXP, SEXP bSEXP, SEXP uSEXP, SEXP vSEXP, SEXP nburnSEXP, SEXP nsamplesSEXP, SEXP verboseSEXP) {
+// Modified_PC_Gibbs
+List Modified_PC_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double u, double v, int nsamples, double lambda_init, double sigma2_init, bool verbose);
+RcppExport SEXP _BayesianLasso_Modified_PC_Gibbs(SEXP mXSEXP, SEXP vySEXP, SEXP aSEXP, SEXP bSEXP, SEXP uSEXP, SEXP vSEXP, SEXP nsamplesSEXP, SEXP lambda_initSEXP, SEXP sigma2_initSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type mX(mXSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type vy(vySEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type sigma2_hat(sigma2_hatSEXP);
     Rcpp::traits::input_parameter< double >::type a(aSEXP);
     Rcpp::traits::input_parameter< double >::type b(bSEXP);
     Rcpp::traits::input_parameter< double >::type u(uSEXP);
     Rcpp::traits::input_parameter< double >::type v(vSEXP);
-    Rcpp::traits::input_parameter< int >::type nburn(nburnSEXP);
     Rcpp::traits::input_parameter< int >::type nsamples(nsamplesSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_init(lambda_initSEXP);
+    Rcpp::traits::input_parameter< double >::type sigma2_init(sigma2_initSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(bayesian_lasso_gibbs_tune_c(mX, vy, lambda, sigma2_hat, a, b, u, v, nburn, nsamples, verbose));
+    rcpp_result_gen = Rcpp::wrap(Modified_PC_Gibbs(mX, vy, a, b, u, v, nsamples, lambda_init, sigma2_init, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -770,7 +769,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BayesianLasso_calc_penreg_stats", (DL_FUNC) &_BayesianLasso_calc_penreg_stats, 5},
     {"_BayesianLasso_lasso_gibbs_Fc", (DL_FUNC) &_BayesianLasso_lasso_gibbs_Fc, 15},
     {"_BayesianLasso_bayesian_lasso_gibbs_c", (DL_FUNC) &_BayesianLasso_bayesian_lasso_gibbs_c, 10},
-    {"_BayesianLasso_bayesian_lasso_gibbs_tune_c", (DL_FUNC) &_BayesianLasso_bayesian_lasso_gibbs_tune_c, 11},
+    {"_BayesianLasso_Modified_PC_Gibbs", (DL_FUNC) &_BayesianLasso_Modified_PC_Gibbs, 10},
     {"_BayesianLasso_bayesian_lasso_gibbs_tune_pgtn_c", (DL_FUNC) &_BayesianLasso_bayesian_lasso_gibbs_tune_pgtn_c, 12},
     {"_BayesianLasso_bayesian_lasso_gibbs_default_c", (DL_FUNC) &_BayesianLasso_bayesian_lasso_gibbs_default_c, 12},
     {"_BayesianLasso_bayesian_lasso_gibbs_approx_c", (DL_FUNC) &_BayesianLasso_bayesian_lasso_gibbs_approx_c, 13},

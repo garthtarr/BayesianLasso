@@ -10,11 +10,11 @@ Authors@R: c(person("John", "Ormerod", role = c("aut", "cph"), email = "john.orm
              person("Jonathon", "Tidswell", role = c("aut", "cph"), email = "jonathon.tidswell@sydney.edu.au", comment = c(ORCID = "0000-0000-0000-0000")))
 Maintainer: Mohammad Javad Davoudabadi <mohammad.davoudabadi@sydney.edu.au>
 Description: Implements Bayesian Lasso regression using efficient Gibbs sampling
-algorithms, including modified versions of the Hans and Park–Casella (PC) samplers.
-Includes functions for working with the Lasso distribution, such as its density,
-cumulative distribution, quantile, and random generation functions, along with moment
-calculations. Also includes a function to compute the Mills ratio. Designed for sparse
-linear models and suitable for high-dimensional regression problems.
+               algorithms, including modified versions of the Hans and Park–Casella (PC) samplers.
+               Includes functions for working with the Lasso distribution, such as its density,
+               cumulative distribution, quantile, and random generation functions, along with moment
+               calculations. Also includes a function to compute the Mills ratio. Designed for sparse
+               linear models and suitable for high-dimensional regression problems.
 License: GPL-3
 Imports: Rcpp (>= 1.0.12)
 LinkingTo: Rcpp,
