@@ -170,7 +170,7 @@ List lasso_gibbs_Bc(arma::mat mX, arma::vec vy, double a, double b, double u, do
 
 
 // [[Rcpp::export]]
-List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double u, double v,  
+List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a1, double b1, double u1, double v1,  
                      int nsamples, arma::vec beta_init, double lambda_init, double sigma2_init,
                      int verbose)
 {
@@ -206,7 +206,7 @@ List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double 
   // Set the current values of the parameters 
   arma::vec vb = ones(p); // expected value of auxiliary variables under q
   arma::vec vnu = ones(p);
-  const double u_til = u + 0.5*p;
+  const double u_til = u1 + 0.5*p;
   
   // Assign initial values
   arma::vec vbeta = beta_init;
@@ -216,8 +216,8 @@ List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double 
   double lambda2 = lambda_init*lambda_init;
   
   // Constant values 
-  const double a_til = a + 0.5*(n + p);
-  double b_til = b;
+  const double a_til = a1 + 0.5*(n + p);
+  double b_til = b1;
   
   
  
@@ -286,7 +286,7 @@ List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double 
     lambda = sqrt(lambda2);
     
     double a_val = (a_til-1);
-    double b_val = b + 0.5*RSS;
+    double b_val = b1 + 0.5*RSS;
     double c_val = lambda*sum_abs_vbeta;
     // Slice sampler for tau and then invert.
     double tau = 1/sigma2;
@@ -297,7 +297,7 @@ List Modified_Hans_Gibbs(arma::mat mX, arma::vec vy, double a, double b, double 
     ////////////////////////////////////////////////////////////////////////////
     
     a_val = u_til - 1;
-    b_val = v;
+    b_val = v1;
     c_val = sum_abs_vbeta/sigma;
     
     // Slice sampler for lambda2

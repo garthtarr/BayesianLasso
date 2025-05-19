@@ -25,7 +25,12 @@ LinkingTo: Rcpp,
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 URL: https://garthtarr.github.io/BayesianLasso/, https://github.com/garthtarr/BayesianLasso
+VignetteBuilder: knitr
 Suggests: 
-    testthat (>= 3.0.0)
+    knitr, rmarkdown, 
+    monomvn, bayeslm, 
+    rstan, bayesreg, 
+    lars, Ecdat,
+    testthat (>= 3.0.0), MASS
 Config/testthat/edition: 3
 BugReports: https://github.com/garthtarr/BayesianLasso/issues

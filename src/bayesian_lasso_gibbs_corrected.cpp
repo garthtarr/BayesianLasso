@@ -125,7 +125,7 @@ List bayesian_lasso_gibbs_c(arma::mat mX, arma::vec vy, double lambda, double si
 
 
 // [[Rcpp::export]]
-List Modified_PC_Gibbs(arma::mat mX, arma::vec vy,double a, double b, double u, double v, 
+List Modified_PC_Gibbs(arma::mat mX, arma::vec vy,double a1, double b1, double u1, double v1, 
                        int nsamples, double lambda_init, double sigma2_init, 
                        int verbose) {
   int n = mX.n_rows;
@@ -155,9 +155,9 @@ List Modified_PC_Gibbs(arma::mat mX, arma::vec vy,double a, double b, double u, 
   arma::vec va = ones(p); // expected value of auxiliary variables under q
   double sigma2 = sigma2_init;
   double lambda2 = lambda_init*lambda_init;
-  double a_til = a + 0.5*(n + p);
+  double a_til = a1 + 0.5*(n + p);
   double b_til;
-  double u_til = u + 0.5*p;
+  double u_til = u1 + 0.5*p;
   double v_til;
   
   arma::mat vmu_til;
@@ -179,11 +179,11 @@ List Modified_PC_Gibbs(arma::mat mX, arma::vec vy,double a, double b, double u, 
     vbeta = mvnrnd(vmu_til, mSigma_til, 1);
     
     // Sample from sigma2|rest
-    b_til = b + 0.5*(sum(pow(vy-mX*vbeta,2.0)) + lambda2*sum(va%pow(vbeta,2.0)));
+    b_til = b1 + 0.5*(sum(pow(vy-mX*vbeta,2.0)) + lambda2*sum(va%pow(vbeta,2.0)));
     sigma2 = 1/randg(distr_param(a_til,1/b_til));
     
     // Sample from lambda2|rest
-    v_til = v + 0.5*sum(va%pow(vbeta,2.0))/sigma2;
+    v_til = v1 + 0.5*sum(va%pow(vbeta,2.0))/sigma2;
     lambda2 = randg(distr_param(u_til,1/v_til));
     
     // Update q(va) 
