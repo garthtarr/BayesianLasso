@@ -1,6 +1,6 @@
 #' @title The Lasso Distribution
 #' @name LassoDistribution
-#' @aliases zlasso dlasso plasso qlasso rlasso elasso vlasso mlasso
+#' @aliases zlasso dlasso plasso qlasso rlasso elasso vlasso mlasso MillsRatio Modified_Hans_Gibbs Modified_PC_Gibbs
 #' @description
 #' Provides functions related to the Lasso distribution, including the normalizing constant,
 #' probability density function, cumulative distribution function, quantile function, and
@@ -22,7 +22,7 @@
 #' Modified_Hans_Gibbs(X, y, a1, b1, u1, v1,
 #'               nsamples, beta_init, lambda_init, sigma2_init, verbose)
 #' Modified_PC_Gibbs(X, y, a1, b1, u1, v1, 
-#'               nsamples, lambda_init, sigma2_init, verbose)
+#'               nsamples, lambda_init, sigma2_init, verbose)               
 #'          
 #'
 #' @details
@@ -49,16 +49,15 @@
 #' @param u1 Shape parameter of the prior on \eqn{\sigma^2}.
 #' @param v1 Rate parameter of the prior on \eqn{\sigma^2}.
 #' @param nsamples Number of Gibbs samples to draw.
+#' @param beta_init Initial value for the model parameter \eqn{\beta}.
 #' @param lambda_init Initial value for the shrinkage parameter \eqn{\lambda^2}.
 #' @param sigma2_init Initial value for the error variance \eqn{\sigma^2}.
 #' @param verbose Integer. If greater than 0, progress is printed every \code{verbose} iterations during sampling. Set to 0 to suppress output.
-#'
 #' @return
 #' \itemize{
 #'
 #'   \item \code{zlasso}, \code{dlasso}, \code{plasso}, \code{qlasso}, \code{rlasso}, \code{elasso}, \code{vlasso}, \code{mlasso}, \code{MillsRatio}: 
-#'   return the corresponding scalar or vector values related to the Lasso distribution.
-#'
+#'   return the corresponding scalar or vector values related to the Lasso distribution and a numeric value representing the Mills ratio.
 #'   \item \code{Modified_Hans_Gibbs}: returns a list containing:
 #'     \describe{
 #'       \item{\code{mBeta}}{Matrix of MCMC samples for the regression coefficients \eqn{\beta}, with \code{nsamples} rows and \code{p} columns.}
@@ -68,8 +67,7 @@
 #'       \item{\code{mB}}{Matrix of sampled values for parameter \eqn{b_j} of the Lasso distribution for each \eqn{\beta_j}.}
 #'       \item{\code{mC}}{Matrix of sampled values for parameter \eqn{c_j} of the Lasso distribution for each \eqn{\beta_j}.}
 #'     }
-#'
-#'   \item \code{Modified_PC_Gibbs}: returns a list containing:
+#'     \item \code{Modified_PC_Gibbs}: returns a list containing:
 #'     \describe{
 #'       \item{\code{mBeta}}{Matrix of MCMC samples for the regression coefficients \eqn{\beta}.}
 #'       \item{\code{vsigma2}}{Vector of MCMC samples for the error variance \eqn{\sigma^2}.}
@@ -81,7 +79,10 @@
 #'       \item{\code{vu_til}}{Vector of estimated shape parameters for the full conditional inverse-gamma distribution of \eqn{\lambda^2}.}
 #'       \item{\code{vv_til}}{Vector of estimated rate parameters for the full conditional inverse-gamma distribution of \eqn{\lambda^2}.}
 #'     }
+#'     
 #' }
+#' 
+#' @seealso \code{\link{normalize}} for preprocessing input data before applying the samplers.
 #'
 #' @examples
 #' a <- 2; b <- 1; c <- 3
@@ -97,16 +98,16 @@
 #' elasso(a, b, c)
 #' vlasso(a, b, c)
 #' mlasso(a, b, c)
-#' 
 #' MillsRatio(2)
+#' 
+#' 
+#' 
 #' 
 #' # The Modified_Hans_Gibbs() function uses the Lasso distribution to draw 
 #' # samples from the full conditional distribution of the regression coefficients.
 #' 
-#' 
-#' 
 #' y <- 1:20
-#' X <- matrix(c(1:20,12:31,7:26),20,3,byrow = T)
+#' X <- matrix(c(1:20,12:31,7:26),20,3,byrow = TRUE)
 #' 
 #' a1 <- b1 <- u1 <- v1 <- 0.01
 #' sigma2_init <- 1
@@ -123,6 +124,7 @@
 #' colMeans(Output_Hans$mBeta)
 #' mean(Output_Hans$vlambda2)
 #' 
+#' 
 #' Output_PC <- Modified_PC_Gibbs(
 #'                X, y, a1, b1, u1, v1, 
 #'                nsamples, lambda_init, sigma2_init, verbose)
@@ -130,7 +132,10 @@
 #' colMeans(Output_PC$mBeta)
 #' mean(Output_PC$vlambda2)
 #' 
-#' @export zlasso
+#' @useDynLib BayesianLasso, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+#' 
+#' @rdname LassoDistribution
 #' @export dlasso
 #' @export plasso
 #' @export qlasso
@@ -138,4 +143,7 @@
 #' @export elasso
 #' @export vlasso
 #' @export mlasso
-NULL
+#' @export Modified_Hans_Gibbs
+#' @export Modified_PC_Gibbs
+#' @export MillsRatio
+NULL  # no function definition here

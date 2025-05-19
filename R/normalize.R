@@ -22,9 +22,10 @@
 #' set.seed(1)
 #' X <- matrix(rnorm(100 * 10), 100, 10)
 #' beta <- c(2, -3, rep(0, 8))
-#' y <- X %*% beta + rnorm(100)
+#' y <- as.vector(X %*% beta + rnorm(100))
 #' norm_result <- normalize(y, X)
 #'
+#' @importFrom stats var
 #' @export
 normalize <- function(y, X, scale=TRUE) 
 {
