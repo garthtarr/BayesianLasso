@@ -85,7 +85,7 @@
 <span><span class="va">beta_init</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run modified Hans Gibbs sampler</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">Modified_Hans_Gibbs</span><span class="op">(</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
 <span>  mX <span class="op">=</span> <span class="va">X</span>,</span>
 <span>  vy <span class="op">=</span> <span class="va">y</span>,</span>
 <span>  a <span class="op">=</span> <span class="fl">0.01</span>,</span>
@@ -107,7 +107,7 @@
 <span><span class="co">#&gt;  $ mA      : num [1:100, 1:5] 18.4 20.1 24 26.1 24.6 ...</span></span>
 <span><span class="co">#&gt;  $ mB      : num [1:100, 1:5] 5.67 3.15 3 2.11 2.49 ...</span></span>
 <span><span class="co">#&gt;  $ mC      : num [1:100, 1:5] 0.1 6.19 10.68 3.66 8.46 ...</span></span></code></pre></div>
-<p>The <code>Modified_Hans_Gibbs()</code> function returns a list with the following components:</p>
+<p>The <code><a href="reference/LassoDistribution.html">Modified_Hans_Gibbs()</a></code> function returns a list with the following components:</p>
 <ul>
 <li>
 <code>mBeta</code>: MCMC samples of the regression coefficients <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>, stored as a matrix with <code>nsamples</code> rows and <code>p</code> columns.</li>

@@ -134,6 +134,10 @@ for Bayesian Lasso regression.</p>
 <dd><p>Number of Gibbs samples to draw.</p></dd>
 
 
+<dt id="arg-beta-init">beta_init<a class="anchor" aria-label="anchor" href="#arg-beta-init"></a></dt>
+<dd><p>Initial value for the model parameter \(\beta\).</p></dd>
+
+
 <dt id="arg-lambda-init">lambda_init<a class="anchor" aria-label="anchor" href="#arg-lambda-init"></a></dt>
 <dd><p>Initial value for the shrinkage parameter \(\lambda^2\).</p></dd>
 
@@ -150,7 +154,7 @@ for Bayesian Lasso regression.</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
 
 <ul><li><p><code>zlasso</code>, <code>dlasso</code>, <code>plasso</code>, <code>qlasso</code>, <code>rlasso</code>, <code>elasso</code>, <code>vlasso</code>, <code>mlasso</code>, <code>MillsRatio</code>:
-  return the corresponding scalar or vector values related to the Lasso distribution.</p></li>
+  return the corresponding scalar or vector values related to the Lasso distribution and a numeric value representing the Mills ratio.</p></li>
 <li><p><code>Modified_Hans_Gibbs</code>: returns a list containing:</p><dl><dt><code>mBeta</code></dt>
 <dd><p>Matrix of MCMC samples for the regression coefficients \(\beta\), with <code>nsamples</code> rows and <code>p</code> columns.</p></dd>
 
@@ -210,6 +214,10 @@ $$
 where \(x \in \mathbb{R}\), \(a &gt; 0\), \(b \in \mathbb{R}\), \(c &gt; 0\), and \(Z\) is the normalizing constant.</p>
 <p>More details are included for the CDF, quantile function, and normalizing constant in the original documentation.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="normalize.html">normalize</a></code> for preprocessing input data before applying the samplers.</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -236,17 +244,17 @@ where \(x \in \mathbb{R}\), \(a &gt; 0\), \(b \in \mathbb{R}\), \(c &gt; 0\), an
 <span class="r-in"><span><span class="fu">mlasso</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    0</span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">MillsRatio</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4213692</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># The Modified_Hans_Gibbs() function uses the Lasso distribution to draw </span></span></span>
 <span class="r-in"><span><span class="co"># samples from the full conditional distribution of the regression coefficients.</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span></span></span>
-<span class="r-in"><span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>,<span class="fl">12</span><span class="op">:</span><span class="fl">31</span>,<span class="fl">7</span><span class="op">:</span><span class="fl">26</span><span class="op">)</span>,<span class="fl">20</span>,<span class="fl">3</span>,byrow <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>,<span class="fl">12</span><span class="op">:</span><span class="fl">31</span>,<span class="fl">7</span><span class="op">:</span><span class="fl">26</span><span class="op">)</span>,<span class="fl">20</span>,<span class="fl">3</span>,byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">a1</span> <span class="op">&lt;-</span> <span class="va">b1</span> <span class="op">&lt;-</span> <span class="va">u1</span> <span class="op">&lt;-</span> <span class="va">v1</span> <span class="op">&lt;-</span> <span class="fl">0.01</span></span></span>
 <span class="r-in"><span><span class="va">sigma2_init</span> <span class="op">&lt;-</span> <span class="fl">1</span></span></span>
@@ -274,6 +282,7 @@ where \(x \in \mathbb{R}\), \(a &gt; 0\), \(b \in \mathbb{R}\), \(c &gt; 0\), an
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.3472431 -0.2546945  0.5260358</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Output_Hans</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 70.99966</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Output_PC</span> <span class="op">&lt;-</span> <span class="fu">Modified_PC_Gibbs</span><span class="op">(</span></span></span>
 <span class="r-in"><span>               <span class="va">X</span>, <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>, </span></span>
