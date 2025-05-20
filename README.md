@@ -47,12 +47,12 @@ beta_init <- rep(1, 5)
 
 # Run modified Hans Gibbs sampler
 result <- Modified_Hans_Gibbs(
-  mX = X,
-  vy = y,
-  a = 0.01,
-  b = 0.01,
-  u = 0.01,
-  v = 0.01,
+  X = X,
+  y = y,
+  a1 = 0.01,
+  b1 = 0.01,
+  u1 = 0.01,
+  v1 = 0.01,
   nsamples = 100,
   beta_init = beta_init,
   lambda_init = 0.1,

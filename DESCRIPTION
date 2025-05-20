@@ -7,7 +7,7 @@ Authors@R: c(person("John", "Ormerod", role = c("aut", "cph"), email = "john.orm
              person("Mohammad Javad", "Davoudabadi", role = c("aut","cre", "cph"), email = "mohammad.davoudabadi@sydney.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
              person("Garth", "Tarr", role = c("aut", "cph"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")),
              person("Samuel", "Mueller", role = c("aut", "cph"), email = "samuel.mueller@sydney.edu.au", comment = c(ORCID = "0000-0002-3087-8127")),
-             person("Jonathon", "Tidswell", role = c("aut", "cph"), email = "jonathon.tidswell@sydney.edu.au", comment = c(ORCID = "0000-0000-0000-0000")))
+             person("Jonathon", "Tidswell", role = c("aut", "cph"), email = "jonathon.tidswell@sydney.edu.au"))
 Maintainer: Mohammad Javad Davoudabadi <mohammad.davoudabadi@sydney.edu.au>
 Description: Implements Bayesian Lasso regression using efficient Gibbs sampling
                algorithms, including modified versions of the Hans and Park–Casella (PC) samplers.
