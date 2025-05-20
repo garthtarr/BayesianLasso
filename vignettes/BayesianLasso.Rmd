@@ -36,13 +36,13 @@ y <- X %*% beta + rnorm(n)
 
 # Run the modified Hans sampler
 output_Hans <- Modified_Hans_Gibbs(
-               X, y, a1=2, b1=1, u1=2, v1=1, 
+               X = X, y = y, a1=2, b1=1, u1=2, v1=1, 
                nsamples=1000, beta_init= rep(1,10), lambda_init=1, sigma2_init=1, verbose=100)
 colMeans(output_Hans$mBeta)
 
 # Run the modified PC sampler
 output_PC <- Modified_PC_Gibbs(
-               X, y, a1=2, b1=1, u1=2, v1=1, 
+               X = X, y = y, a1=2, b1=1, u1=2, v1=1, 
                nsamples=1000, lambda_init=1, sigma2_init=1, verbose=100)
 colMeans(output_PC$mBeta)
 
@@ -198,7 +198,7 @@ results_PC <- NULL  # to be initialized after the first run
 for (i in 1:5) {
   time_val <- system.time({
     res_PC <- Modified_PC_Gibbs(
-      x, y, a1, b1, u1, v1,
+      X = x, y = y, a1, b1, u1, v1,
       nsamples,
       lambda_init = lambda_init,
       sigma2_init = sigma2_init,
@@ -262,7 +262,7 @@ results_Hans <- NULL  # to be initialized after the first run
 for (i in 1:5) {
   time_val <- system.time({
     res_Hans <- Modified_Hans_Gibbs(
-      x, y, a1, b1, u1, v1,
+      X = x, y = y, a1, b1, u1, v1,
       nsamples,
       beta_init = as.vector(colMeans(mBeta)),
       lambda_init = lambda_init,
