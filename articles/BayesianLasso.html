@@ -85,7 +85,7 @@ demonstrates how to apply the samplers to real and simulated data.</p>
 <span></span>
 <span><span class="co"># Run the modified Hans sampler</span></span>
 <span><span class="va">output_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
-<span>               <span class="va">X</span>, <span class="va">y</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>, </span>
+<span>               X <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">y</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>, </span>
 <span>               nsamples<span class="op">=</span><span class="fl">1000</span>, beta_init<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">10</span><span class="op">)</span>, lambda_init<span class="op">=</span><span class="fl">1</span>, sigma2_init<span class="op">=</span><span class="fl">1</span>, verbose<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
 <span><span class="co">#&gt; iter: 0 lambda2: 4.91771 sigma2: 0.960406</span></span>
 <span><span class="co">#&gt; iter: 100 lambda2: 3.58811 sigma2: 0.997586</span></span>
@@ -103,7 +103,7 @@ demonstrates how to apply the samplers to real and simulated data.</p>
 <span></span>
 <span><span class="co"># Run the modified PC sampler</span></span>
 <span><span class="va">output_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_PC_Gibbs</a></span><span class="op">(</span></span>
-<span>               <span class="va">X</span>, <span class="va">y</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>, </span>
+<span>               X <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">y</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>, </span>
 <span>               nsamples<span class="op">=</span><span class="fl">1000</span>, lambda_init<span class="op">=</span><span class="fl">1</span>, sigma2_init<span class="op">=</span><span class="fl">1</span>, verbose<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
 <span><span class="co">#&gt; iter: 0</span></span>
 <span><span class="co">#&gt; iter: 100</span></span>
@@ -279,7 +279,7 @@ Crime datasets.</p>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>    <span class="va">res_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_PC_Gibbs</a></span><span class="op">(</span></span>
-<span>      <span class="va">x</span>, <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
+<span>      X <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
 <span>      <span class="va">nsamples</span>,</span>
 <span>      lambda_init <span class="op">=</span> <span class="va">lambda_init</span>,</span>
 <span>      sigma2_init <span class="op">=</span> <span class="va">sigma2_init</span>,</span>
@@ -343,7 +343,7 @@ Crime datasets.</p>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>    <span class="va">res_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
-<span>      <span class="va">x</span>, <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
+<span>      X <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
 <span>      <span class="va">nsamples</span>,</span>
 <span>      beta_init <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">mBeta</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>      lambda_init <span class="op">=</span> <span class="va">lambda_init</span>,</span>
