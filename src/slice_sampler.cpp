@@ -36,7 +36,7 @@ double h_fun_c(double x, double a_val, double b_val, double c_val) {
   return val;
 }
 
-// [[Rcpp::export]]
+
 double slice_sampler_precision_c(double x, double a_val, double b_val, double c_val) 
 {
   double TOL = 1.0E-8;

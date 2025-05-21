@@ -20,27 +20,6 @@ typedef Map<VectorXd> MapVec;
 
 ////////////////////////////////////////////////////////////////////////////////
   
-  // [[Rcpp::export]]
-arma::vec rrinvgauss(arma::vec vmu, arma::vec vlambda)
-{
-  int n = vmu.n_rows;
-  arma::vec random_vector(n);
-  double z,y,x,u;
-  
-  for (int i=0; i<n; ++i)
-  {
-    z = R::rnorm(0,1);
-    y = z*z;
-    x = vmu[i] + 0.5*vmu[i]*vmu[i]*y/vlambda[i] - 0.5*(vmu[i]/vlambda[i])*sqrt(4*vmu[i]*vlambda[i]*y + vmu[i]*vmu[i]*y*y);
-    u = R::runif(0,1);
-    if (u <= vmu[i]/(vmu[i]+x)) {
-      random_vector[i] = x;
-    } else {
-      random_vector[i] = vmu[i]*vmu[i]/x;
-    };
-  }
-  return(random_vector);
-}
 
 
 arma::vec rinvgauss_c(arma::vec vmu, arma::vec vlambda) 
@@ -90,7 +69,7 @@ arma::vec rinvgauss_c(arma::vec vmu, arma::vec vlambda)
 Draw from inverse-Gaussian distribution while avoiding potential numerical problems
 **/
 
-// [[Rcpp::export]]
+
 arma::vec rinvgaussian_c(arma::vec vmu, arma::vec vlambda) {
   arma::vec vm = vmu / sqrt(vmu % vlambda);
   arma::vec vl = vlambda / sqrt(vmu % vlambda);
@@ -118,7 +97,7 @@ double h_fun_invgauss_c(double x, double a_val, double b_val, double c_val) {
   return val;
 }
 
-// [[Rcpp::export]]
+
 double rinvgaussian_slice(double x, double a_val, double b_val, double c_val) 
 {
   double TOL = 1.0E-8;
@@ -206,7 +185,7 @@ double rinvgaussian_slice(double x, double a_val, double b_val, double c_val)
   return x_new;
 }
 
-// [[Rcpp::export]]
+
 arma::vec rinvgaussian_slice_c(arma::vec vx, arma::vec vmu, arma::vec vlambda) 
 {
   int n = vmu.n_rows;

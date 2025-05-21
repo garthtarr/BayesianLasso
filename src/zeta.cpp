@@ -32,7 +32,7 @@ typedef Map<VectorXd> MapVec;
 /* Global Variables */
 #define TINY   1.0E-30
 
-// [[Rcpp::export]]
+
 double  zetaOneLentz_c(double x, double tol, int maxiter)
 {
   int j;
@@ -78,7 +78,7 @@ double  zetaOneLentz_c(double x, double tol, int maxiter)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
+
 double zetaOne_c(double x) 
 {
   double f;
@@ -100,7 +100,7 @@ double zetaOne_c(double x)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
+
 double zeta_c(int k, double x) 
 {
   double z1 = zetaOne_c(x); 

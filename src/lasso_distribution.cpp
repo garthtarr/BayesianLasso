@@ -23,7 +23,7 @@ using namespace std;
 
 // The inverse logit function
 
-// [[Rcpp::export]]
+
 double expit_c(double x) {
   double val = 1/(1 + exp(-x));
   return val;
@@ -40,7 +40,7 @@ double expit_c(double x) {
 
 // Note that this function came about because of a missunderstanding between JO and JT
 
-// [[Rcpp::export]]
+
 double sq_inv_mills_7sf(double d)
 {
   if (std::isnan(d)) {
@@ -112,7 +112,7 @@ double sq_inv_mills_7sf(double d)
  * Copyright Jonathon Tidswell 2023
  */
 
-// [[Rcpp::export]]
+
 double right_mills_7sf(double d)
 {
   constexpr double ic0 = 0.7978845608028653558798921; // sqrt (2/ pi )
@@ -147,7 +147,7 @@ double right_mills_7sf(double d)
  * Copyright Jonathon Tidswell 2023
  */
 
-// [[Rcpp::export]]
+
 double right_mills_12sf(double d)
 {
   static const double p[] = {46697.7602201933, 69339.6909002865, 50590.6980372328,
@@ -254,7 +254,7 @@ int check_abc(double a, double b, double c)
  * m_minus - the mills ratio (Phi(-x)/phi(x)) evaludated at x = (c + b)/sqrt(a)
  */
 
-// [[Rcpp::export]]
+
 double zcalc_7sf( double a, double b, double c, int type)
 {
   //Rcout << "a: " << a << "\n";
@@ -309,7 +309,7 @@ double zcalc_7sf( double a, double b, double c, int type)
 }
 
 
-// [[Rcpp::export]]
+
 Rcpp::List calculate_lasso_dist_stats_c_v1(double a, double b, double c)
 {
   double mu_plus = (b - c)/a;
@@ -341,7 +341,7 @@ Rcpp::List calculate_lasso_dist_stats_c_v1(double a, double b, double c)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
+
 Rcpp::List calculate_lasso_dist_stats_c_v2(double a, double b, double c)
 {
   int error_type = check_abc( a, b, c);
@@ -448,7 +448,7 @@ Rcpp::List calculate_lasso_dist_stats_c_v2(double a, double b, double c)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
+
 double logSumExp_c(arma::vec vx) {
   double M = max(vx);
   double val = M + log(sum(exp(vx - M)));
@@ -459,7 +459,7 @@ double logSumExp_c(arma::vec vx) {
 
 // return the normalizing constant
 
-// [[Rcpp::export]]
+
 double zlasso_c_v1(double a, double b, double c, bool logarithm)
 {
   List res = calculate_lasso_dist_stats_c_v1(a, b, c);
@@ -501,7 +501,7 @@ double zlasso(double a, double b, double c, bool logarithm)
 
 // Note: a>0, c>0
 
-// [[Rcpp::export]]
+
 arma::vec dlasso_c_v1(arma::vec x, double a, double b, double c, bool logarithm)
 {
   double log_Z = zlasso_c_v1(a, b, c, true);
@@ -538,7 +538,7 @@ arma::vec dlasso(arma::vec x, double a, double b, double c, bool logarithm)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
+
 arma::vec plasso_c_v1(arma::vec q, double a, double b, double c)
 {
   List res = calculate_lasso_dist_stats_c_v1(a, b, c);
@@ -612,7 +612,7 @@ arma::vec plasso(arma::vec q, double a, double b, double c)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
+
 arma::vec qlasso_fast_c_v1(arma::vec p, double a, double b, double c)
 {
   double sigma2 = 1/a;
@@ -769,7 +769,7 @@ arma::vec qlasso(arma::vec p, double a, double b, double c)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
+
 arma::vec rlasso_fast_c_v1(double n, double a, double b, double c) {
 
   arma::vec x(n);
@@ -799,7 +799,7 @@ arma::vec rlasso(double n, double a, double b, double c) {
 
 // return the expected value
 
-// [[Rcpp::export]]
+
 double elasso_c_v1(double a, double b, double c)
 {
   List res = calculate_lasso_dist_stats_c_v1(a, b, c);
@@ -846,7 +846,7 @@ double elasso(double a, double b, double c)
 
 // return the variance
 
-// [[Rcpp::export]]
+
 double vlasso_c_v1(double a, double b, double c)
 {
   List res = calculate_lasso_dist_stats_c_v1(a, b, c);
