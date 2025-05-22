@@ -115,17 +115,17 @@ Citation information can be found using:
 citation("BayesianLasso")
 #> To cite package 'BayesianLasso' in publications use:
 #> 
-#>   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2024).
-#>   _BayesianLasso: A better Bayesian Lasso_. R package version 0.1.0,
-#>   <https://garthtarr.github.io/BayesianLasso/>.
+#>   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2025).
+#>   _Bayesian Lasso Regression and Tools for the Lasso Distribution_. R
+#>   package version 0.3.0, <https://garthtarr.github.io/BayesianLasso/>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
 #>   @Manual{,
-#>     title = {BayesianLasso: A better Bayesian Lasso},
+#>     title = {Bayesian Lasso Regression and Tools for the Lasso Distribution},
 #>     author = {John Ormerod and Mohammad Javad Davoudabadi and Garth Tarr and Samuel Mueller and Jonathon Tidswell},
-#>     year = {2024},
-#>     note = {R package version 0.1.0},
+#>     year = {2025},
+#>     note = {R package version 0.3.0},
 #>     url = {https://garthtarr.github.io/BayesianLasso/},
 #>   }
 ```
