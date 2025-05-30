@@ -1,9 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   BayesianLasso: BayesianLasso.html
-last_built: 2025-05-22T01:20Z
+last_built: 2025-05-30T23:01Z
 urls:
   reference: https://garthtarr.github.io/BayesianLasso/reference
   article: https://garthtarr.github.io/BayesianLasso/articles
