@@ -136,6 +136,7 @@
 #' @importFrom Rcpp sourceCpp
 #' 
 #' @rdname LassoDistribution
+#' @export zlasso
 #' @export dlasso
 #' @export plasso
 #' @export qlasso

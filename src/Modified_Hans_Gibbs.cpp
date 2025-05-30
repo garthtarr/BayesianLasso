@@ -1,4 +1,5 @@
 
+#define ARMA_DONT_USE_WRAPPER
 #include <RcppArmadillo.h>
 #include <RcppNumerical.h>
 #include "rinvgaussian.h"
@@ -99,7 +100,7 @@ List Modified_Hans_Gibbs(arma::mat X, arma::vec y, double a1, double b1, double 
         num = XTy[j] - XTy_hat[j];
         vb_vals[j] = num/sigma2;
         denom = dgXTX[j] + lambda2*vb[j];
-        vbeta[j] =  qlasso(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
+        vbeta[j] =  qlasso_internal(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
         XTy_hat = XTy_hat + vx_j*vbeta[j];
       }
     } else {
@@ -112,7 +113,7 @@ List Modified_Hans_Gibbs(arma::mat X, arma::vec y, double a1, double b1, double 
         arma::vec vy_hat_mj = vy_hat - vx_j*vbeta[j];
         num = XTy[j] -  as_scalar(vx_j.t() * vy_hat_mj);
         vb_vals[j] = num/sigma2;
-        vbeta[j] = qlasso(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
+        vbeta[j] = qlasso_internal(single_val_vec, va_vals[j], vb_vals[j], vc_vals[j])[0];
         // if(i==7){
         //  Rcout << j << vbeta[j] << "B"<<  "\n";
         // }

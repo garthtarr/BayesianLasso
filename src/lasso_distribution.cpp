@@ -1,4 +1,5 @@
 
+#define ARMA_DONT_USE_WRAPPER
 #include <RcppArmadillo.h>
 #include <RcppNumerical.h>
 
@@ -518,8 +519,8 @@ arma::vec dlasso_c_v1(arma::vec x, double a, double b, double c, bool logarithm)
 
 // Note: a>0, c>0
 
-// [[Rcpp::export]]
-arma::vec dlasso(arma::vec x, double a, double b, double c, bool logarithm)
+
+arma::vec dlasso_internal(arma::vec x, double a, double b, double c, bool logarithm)
 {
   int type = 2;
   double z = zcalc_7sf(a, b, c, type);
@@ -534,6 +535,14 @@ arma::vec dlasso(arma::vec x, double a, double b, double c, bool logarithm)
   }
   val = exp(val)/z;
   return val;
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector dlasso(NumericVector x, double a, double b, double c, bool logarithm) {
+  arma::vec x_arma = Rcpp::as<arma::vec>(x);
+  arma::vec result = dlasso_internal(x_arma, a, b, c,logarithm);
+  Rcpp::NumericVector out(result.begin(), result.end());  
+  return out;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -567,8 +576,8 @@ arma::vec plasso_c_v1(arma::vec q, double a, double b, double c)
   return val;
 }
 
-// [[Rcpp::export]]
-arma::vec plasso(arma::vec q, double a, double b, double c)
+
+arma::vec plasso_internal(arma::vec q, double a, double b, double c)
 {
   List res = calculate_lasso_dist_stats_c_v2(a, b, c);
   double w = res["w"];
@@ -610,6 +619,14 @@ arma::vec plasso(arma::vec q, double a, double b, double c)
 }
 
 
+// [[Rcpp::export]]
+Rcpp::NumericVector plasso(NumericVector q, double a, double b, double c) {
+  arma::vec q_arma = Rcpp::as<arma::vec>(q);
+  arma::vec result = plasso_internal(q_arma, a, b, c);
+  Rcpp::NumericVector out(result.begin(), result.end());  
+  return out;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -649,8 +666,8 @@ arma::vec qlasso_fast_c_v1(arma::vec p, double a, double b, double c)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
-arma::vec qlasso(arma::vec p, double a, double b, double c)
+
+arma::vec qlasso_internal(arma::vec p, double a, double b, double c)
 {
   //////////////////////////////////////////////////////////////////////////////
 
@@ -767,6 +784,15 @@ arma::vec qlasso(arma::vec p, double a, double b, double c)
   return x;
 }
 
+
+// [[Rcpp::export]]
+Rcpp::NumericVector qlasso(NumericVector p, double a, double b, double c) {
+  arma::vec p_arma = Rcpp::as<arma::vec>(p);
+  arma::vec result = qlasso_internal(p_arma, a, b, c);
+  Rcpp::NumericVector out(result.begin(), result.end());  
+  return out;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -783,16 +809,24 @@ arma::vec rlasso_fast_c_v1(double n, double a, double b, double c) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// [[Rcpp::export]]
-arma::vec rlasso(double n, double a, double b, double c) {
+
+arma::vec rlasso_internal(double n, double a, double b, double c) {
 
   arma::vec x(n);
   arma::vec p(n);  // Create a n-element vector
   for(int i =0; i < n; ++i){
     p[i] = R::runif(0.0, 1.0);
   }
-  x = qlasso(p, a, b, c);
+  x = qlasso_internal(p, a, b, c);
   return x;
+}
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector rlasso(double n, double a, double b, double c) {
+  arma::vec result = rlasso_internal(n, a, b, c);
+  Rcpp::NumericVector out(result.begin(), result.end());  
+  return out;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -912,8 +946,8 @@ double vlasso(double a, double b, double c)
 
 // Return the mode of the lasso distribution
 
-// [[Rcpp::export]]
-arma::vec mlasso(arma::vec a, arma::vec b, arma::vec c)
+
+arma::vec mlasso_internal(arma::vec a, arma::vec b, arma::vec c)
 {
   int n = a.n_elem;
   arma::vec vmode = zeros(n);
@@ -926,6 +960,17 @@ arma::vec mlasso(arma::vec a, arma::vec b, arma::vec c)
   }
   return vmode;
 }
+
+// [[Rcpp::export]]
+Rcpp::NumericVector mlasso(NumericVector a, NumericVector b, NumericVector c) {
+  arma::vec a_arma = Rcpp::as<arma::vec>(a);
+  arma::vec b_arma = Rcpp::as<arma::vec>(b);
+  arma::vec c_arma = Rcpp::as<arma::vec>(c);
+  arma::vec result = mlasso_internal(a_arma, b_arma, c_arma);
+  Rcpp::NumericVector out(result.begin(), result.end());  
+  return out;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 

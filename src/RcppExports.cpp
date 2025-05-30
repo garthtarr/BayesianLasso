@@ -79,12 +79,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // dlasso
-arma::vec dlasso(arma::vec x, double a, double b, double c, bool logarithm);
+Rcpp::NumericVector dlasso(NumericVector x, double a, double b, double c, bool logarithm);
 RcppExport SEXP _BayesianLasso_dlasso(SEXP xSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP logarithmSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< double >::type a(aSEXP);
     Rcpp::traits::input_parameter< double >::type b(bSEXP);
     Rcpp::traits::input_parameter< double >::type c(cSEXP);
@@ -94,12 +94,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // plasso
-arma::vec plasso(arma::vec q, double a, double b, double c);
+Rcpp::NumericVector plasso(NumericVector q, double a, double b, double c);
 RcppExport SEXP _BayesianLasso_plasso(SEXP qSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type q(qSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type q(qSEXP);
     Rcpp::traits::input_parameter< double >::type a(aSEXP);
     Rcpp::traits::input_parameter< double >::type b(bSEXP);
     Rcpp::traits::input_parameter< double >::type c(cSEXP);
@@ -108,12 +108,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // qlasso
-arma::vec qlasso(arma::vec p, double a, double b, double c);
+Rcpp::NumericVector qlasso(NumericVector p, double a, double b, double c);
 RcppExport SEXP _BayesianLasso_qlasso(SEXP pSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type p(pSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< double >::type a(aSEXP);
     Rcpp::traits::input_parameter< double >::type b(bSEXP);
     Rcpp::traits::input_parameter< double >::type c(cSEXP);
@@ -122,7 +122,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rlasso
-arma::vec rlasso(double n, double a, double b, double c);
+Rcpp::NumericVector rlasso(double n, double a, double b, double c);
 RcppExport SEXP _BayesianLasso_rlasso(SEXP nSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -162,14 +162,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // mlasso
-arma::vec mlasso(arma::vec a, arma::vec b, arma::vec c);
+Rcpp::NumericVector mlasso(NumericVector a, NumericVector b, NumericVector c);
 RcppExport SEXP _BayesianLasso_mlasso(SEXP aSEXP, SEXP bSEXP, SEXP cSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type a(aSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type c(cSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type a(aSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type b(bSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type c(cSEXP);
     rcpp_result_gen = Rcpp::wrap(mlasso(a, b, c));
     return rcpp_result_gen;
 END_RCPP

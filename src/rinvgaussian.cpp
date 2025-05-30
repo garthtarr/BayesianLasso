@@ -1,4 +1,5 @@
 
+#define ARMA_DONT_USE_WRAPPER
 #include <RcppArmadillo.h>
 #include <RcppNumerical.h>
 
