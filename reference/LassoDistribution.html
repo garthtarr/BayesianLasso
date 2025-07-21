@@ -17,7 +17,7 @@ for Bayesian Lasso regression."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">BayesianLasso</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -264,21 +264,21 @@ where \(x \in \mathbb{R}\), \(a &gt; 0\), \(b \in \mathbb{R}\), \(c &gt; 0\), an
 <span class="r-in"><span>                <span class="va">X</span>, <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span></span>
 <span class="r-in"><span>                <span class="va">nsamples</span>, <span class="va">beta_init</span>, <span class="va">lambda_init</span>, <span class="va">sigma2_init</span>, <span class="va">verbose</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 0 lambda2: 111.787 sigma2: 135.243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 100 lambda2: 10.8956 sigma2: 25.884</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 200 lambda2: 61.9234 sigma2: 20.4167</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 300 lambda2: 94.7265 sigma2: 39.2217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 400 lambda2: 72.3648 sigma2: 15.074</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 500 lambda2: 50.5227 sigma2: 15.9175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 600 lambda2: 135.66 sigma2: 20.0574</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 700 lambda2: 38.0999 sigma2: 30.6545</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 800 lambda2: 2.58036 sigma2: 22.0707</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 900 lambda2: 25.2982 sigma2: 45.5914</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 0 lambda2: 111.808 sigma2: 87.5523</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 100 lambda2: 78.3137 sigma2: 31.5026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 200 lambda2: 82.2531 sigma2: 22.8744</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 300 lambda2: 43.4028 sigma2: 16.3699</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 400 lambda2: 93.2793 sigma2: 21.5296</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 500 lambda2: 16.2335 sigma2: 25.1914</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 600 lambda2: 74.3442 sigma2: 10.7202</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 700 lambda2: 43.4173 sigma2: 20.7042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 800 lambda2: 13.0825 sigma2: 26.2766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> iter: 900 lambda2: 8.89624 sigma2: 15.0216</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">Output_Hans</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.3472431 -0.2546945  0.5260358</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.300507310 0.003085177 0.321644003</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Output_Hans</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 70.99966</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 71.41197</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Output_PC</span> <span class="op">&lt;-</span> <span class="fu">Modified_PC_Gibbs</span><span class="op">(</span></span></span>
@@ -296,9 +296,9 @@ where \(x \in \mathbb{R}\), \(a &gt; 0\), \(b \in \mathbb{R}\), \(c &gt; 0\), an
 <span class="r-out co"><span class="r-pr">#&gt;</span> iter: 900</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">Output_PC</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.32005246 -0.09033226  0.38869904</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.31996577 -0.09120189  0.38965795</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Output_PC</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 69.80043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 69.64793</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
