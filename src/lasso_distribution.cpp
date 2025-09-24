@@ -218,9 +218,9 @@ int check_abc(double a, double b, double c)
     error_type = 1;
   }
 
-  bool a_inf = (!arma::is_finite(a)),
-    b_inf = (!arma::is_finite(b)),
-    c_inf = (!arma::is_finite(c));
+  bool a_inf = (!std::isfinite(a)),
+    b_inf = (!std::isfinite(b)),
+    c_inf = (!std::isfinite(c));
 
   if ((a_inf?1:0) + (b_inf?1:0)  + (c_inf?1:0) > 1) {
     stop("a, b, or c is a infinite.");
@@ -417,8 +417,8 @@ Rcpp::List calculate_lasso_dist_stats_c_v2(double a, double b, double c)
 
   double w;
 
-  bool m_plus_inf = (!arma::is_finite(m_plus));
-  bool m_minus_inf = (!arma::is_finite(m_plus));
+  bool m_plus_inf = (!std::isfinite(m_plus));
+  bool m_minus_inf = (!std::isfinite(m_plus));
   bool cond = (m_plus_inf || (m_plus==0) || m_minus_inf || (m_minus==0));
 
   if (cond) {
@@ -488,7 +488,7 @@ double zlasso(double a, double b, double c, bool logarithm)
   int type=1;
   double z = zcalc_7sf(a, b, c, type);
 
-  if (!arma::is_finite(z)) {
+  if (!std::isfinite(z)) {
     return zlasso_c_v1( a, b, c, logarithm);
   }
 
@@ -525,7 +525,7 @@ arma::vec dlasso_internal(arma::vec x, double a, double b, double c, bool logari
   int type = 2;
   double z = zcalc_7sf(a, b, c, type);
 
-  if (!arma::is_finite(z)) {
+  if (!std::isfinite(z)) {
     return dlasso_c_v1( x, a, b, c, logarithm);
     //stop("z is not finite");
   }
@@ -765,7 +765,7 @@ arma::vec qlasso_internal(arma::vec p, double a, double b, double c)
       }
     }
 
-    if (!arma::is_finite(x[i])) {
+    if (!std::isfinite(x[i])) {
       //  Rcout << "w:" << w << " \n";
       //  Rcout << "p:" << p[i] << " \n";
       //  Rcout << "p_new:" << p_new << " \n";
