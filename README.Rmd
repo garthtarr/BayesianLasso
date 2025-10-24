@@ -13,8 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# BayesianLasso
-
+# BayesianLasso <img src="man/figures/logo.png" align="right" width="195"/>
 
 <!-- badges: start -->
 <!-- badges: end -->

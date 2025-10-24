@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# BayesianLasso
+# BayesianLasso <img src="man/figures/logo.png" align="right" width="195"/>
 
 <!-- badges: start -->
 
@@ -115,9 +115,9 @@ Citation information can be found using:
 citation("BayesianLasso")
 #> To cite package 'BayesianLasso' in publications use:
 #> 
-#>   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2025).
-#>   _Bayesian Lasso Regression and Tools for the Lasso Distribution_. R
-#>   package version 0.3.0, <https://garthtarr.github.io/BayesianLasso/>.
+#>   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2025). _Bayesian Lasso Regression and
+#>   Tools for the Lasso Distribution_. R package version 0.3.0,
+#>   <https://garthtarr.github.io/BayesianLasso/>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
