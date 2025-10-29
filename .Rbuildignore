@@ -7,3 +7,8 @@
 ^cran-comments\.md$
 ^README\.Rmd$
 ^CRAN-SUBMISSION$
+^README\.html$
+^pic\.png$
+^tools-raw$
+^inst/media$
+

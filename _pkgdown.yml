@@ -1,4 +1,10 @@
 url: https://garthtarr.github.io/BayesianLasso/
+
 template:
   bootstrap: 5
-
+  params:
+    bootswatch: cosmo        # optional: pick a Bootswatch theme
+  opengraph:
+    image:
+      src: man/figures/logo.png
+      alt: BayesianLasso hex logo

@@ -2,7 +2,7 @@ Package: BayesianLasso
 Type: Package
 Title: Bayesian Lasso Regression and Tools for the Lasso Distribution
 Version: 0.3.6
-Date: 2025-07-21
+Date: 2025-10-29
 Authors@R: c(person("John", "Ormerod", role = c("aut", "cph"), email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
              person("Mohammad Javad", "Davoudabadi", role = c("aut","cre", "cph"), email = "mohammad.davoudabadi@sydney.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
              person("Garth", "Tarr", role = c("aut", "cph"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")),
