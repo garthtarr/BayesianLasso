@@ -3,8 +3,6 @@
 #include <RcppArmadillo.h>
 #include <RcppNumerical.h>
 
-//[[Rcpp::depends(RcppClock)]]
-#include <RcppClock.h>
 
 // [[Rcpp::depends(RcppArmadillo)]] 
 // [[Rcpp::depends(RcppEigen)]]
