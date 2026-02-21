@@ -1,3 +1,5 @@
+# BayesianLasso 0.3.7
+
 # BayesianLasso 0.3.6
 
 # BayesianLasso 0.3.5
