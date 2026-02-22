@@ -96,7 +96,7 @@ List Modified_Hans_Gibbs(arma::mat X, arma::vec y, double a1, double b1, double 
         single_val_vec[0] = vu[j];
         
         arma::vec vx_j = XTX.col(j);
-        XTy_hat = XTy_hat - vx_j*vbeta[j]; // This might not be exactly right
+        XTy_hat = XTy_hat - vx_j*vbeta[j]; 
         num = XTy[j] - XTy_hat[j];
         vb_vals[j] = num/sigma2;
         denom = dgXTX[j] + lambda2*vb[j];
@@ -131,7 +131,7 @@ List Modified_Hans_Gibbs(arma::mat X, arma::vec y, double a1, double b1, double 
     //Rcout << "iter: " << i << "\n";
     double bT_XTX_b = sum(vbeta%XTX_b);
     double bT_XTy = sum(vbeta%XTy);
-    double RSS  =  yTy - 2*bT_XTy + bT_XTX_b;//sum(pow(vy-mX*vbeta,2.0));
+    double RSS  =  yTy - 2*bT_XTy + bT_XTX_b;
 
     
     // Slice sample from sigma2|rest
