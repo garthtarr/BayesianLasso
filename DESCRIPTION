@@ -27,7 +27,7 @@ URL: https://garthtarr.github.io/BayesianLasso/, https://github.com/garthtarr/Ba
 VignetteBuilder: knitr
 Suggests: 
     knitr, rmarkdown, 
-    monomvn, bayeslm, 
+    monomvn, 
     rstan, bayesreg, 
     lars, Ecdat,
     testthat (>= 3.0.0), MASS
