@@ -1,3 +1,19 @@
+// ================================================================
+// Lasso distribution implementation
+//
+// Includes:
+//   - PDF (dlasso)
+//   - CDF (plasso)
+//   - Inverse CDF (qlasso)  <-- inverse-CDF sampler
+//   - Random generator (rlasso)
+//   - Mills ratio
+//   and other functions related to Lasso distribution
+//
+// The inverse-CDF sampler is implemented in qlasso_internal()
+// and evaluates the piecewise closed-form inverse CDF derived
+// in Section 4.4 of the manuscript.
+// ================================================================
+
 
 #define ARMA_DONT_USE_WRAPPER
 #include <RcppArmadillo.h>
@@ -667,6 +683,16 @@ arma::vec qlasso_fast_c_v1(arma::vec p, double a, double b, double c)
 ////////////////////////////////////////////////////////////////////////////////
 
 
+
+// ------------------------------------------------------------------
+// Inverse-CDF sampler (quantile function) for the Lasso distribution
+//
+// This implements the piecewise inverse CDF P^{-1}(u) in Section 4.4.
+// The exported R interface is qlasso(), which calls qlasso_internal().
+// Normal CDF/quantile are evaluated via R::pnorm5 / R::qnorm5 (R mathlib;
+// uses piecewise rational approximations with tail handling).
+// ------------------------------------------------------------------
+
 arma::vec qlasso_internal(arma::vec p, double a, double b, double c)
 {
   //////////////////////////////////////////////////////////////////////////////
@@ -784,6 +810,9 @@ arma::vec qlasso_internal(arma::vec p, double a, double b, double c)
   return x;
 }
 
+
+// User-facing quantile function. Calls the inverse-CDF sampler implemented
+// in qlasso_internal().
 
 // [[Rcpp::export]]
 Rcpp::NumericVector qlasso(NumericVector p, double a, double b, double c) {
