@@ -1,0 +1,487 @@
+---
+title: "Benchmark blasso n>p lasso prior"
+output: rmarkdown::html_vignette
+params:
+  dataset_name: NULL
+  results_dir: "results"
+vignette: >
+  %\VignetteIndexEntry{Benchmark blasso n>p lasso prior}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 5)
+```
+
+```{r load-package, include=FALSE}
+library(LassoHiDFastGibbs)
+library(here)
+```
+
+```{r load-pkg, include=FALSE}
+pkg_root <- normalizePath(file.path(dirname(knitr::current_input()), ".."))
+devtools::load_all(pkg_root)
+```
+
+
+
+```{r load-helpers, include=FALSE}
+helpers_dir <- file.path(dirname(knitr::current_input()), "helpers")
+
+helper_files <- c(
+  "benchmark_3bg.R",
+  "benchmark_4bg.R",
+  "benchmark_blasso_bayeslm.R",
+  "benchmark_blasso_bayesreg.R",
+  "benchmark_blasso_hans.R",
+  "benchmark_blasso_monomvn.R",
+  "benchmark_blasso_rstan.R",
+  "benchmark_EHS.R",
+  "benchmark_horseshoe.R",
+  "benchmark_horseshoe_bayeslm.R",
+  "benchmark_horseshoe_bayesreg.R",
+  "benchmark_horseshoe_brms.R",
+  "effective_sample_size.R",
+  "generate_data.R",
+  "mcmc_stats.R",
+  "plot_densities.R"
+)
+
+# ---- actually load them ----
+helper_paths <- file.path(helpers_dir, helper_files)
+
+missing <- helper_paths[!file.exists(helper_paths)]
+if (length(missing) > 0) {
+  stop("Missing helper file(s):\n", paste(missing, collapse = "\n"))
+}
+
+invisible(lapply(helper_paths, source, local = knitr::knit_global()))
+
+```
+
+
+```{r dataset, include=FALSE}
+dataset_name <- params$dataset_name
+results_dir  <- params$results_dir
+if (is.null(results_dir) || !nzchar(results_dir)) results_dir <- "results"
+dir.create(results_dir, showWarnings = FALSE, recursive = TRUE)
+
+if (is.null(dataset_name) || !nzchar(dataset_name)) {
+  stop("params$dataset_name is missing/empty")
+}
+
+# Enforce that ONLY paper datasets are allowed
+allowed_ngtp <- c("BostonHousing2", "diabetes2", "Hitters2", "Crime", "energy2", "Kakadu2")
+allowed_pgtn <- c("eyedata", "cookie", "riboflavin", "covid", "qtl")
+
+this_file <- basename(knitr::current_input())
+if (grepl("ngtp", this_file, fixed = TRUE)) {
+  if (!(dataset_name %in% allowed_ngtp)) stop("Dataset not in paper (ngtp): ", dataset_name)
+} else if (grepl("pgtn", this_file, fixed = TRUE)) {
+  if (!(dataset_name %in% allowed_pgtn)) stop("Dataset not in paper (pgtn): ", dataset_name)
+}
+
+message("Dataset: ", dataset_name)
+message("Results dir: ", results_dir)
+
+
+```
+
+
+# Load R scripts
+
+Note that each of the benchamrking functions the inputs are
+
+* vy
+* mX
+* nburn
+* nsamples
+* a, b, u, v - prior hyperparameters
+* trials - the number of times each MCMC sampler is run
+* beta_inds - an index set of beta coefficients for plotting - if NA will calculate these.
+
+The outputs are:
+
+* Median efficiencies for beta, sigma2, lambda2 over the number of trials
+* beta_inds
+* (x,y) grid for plotting the top 10 average betas
+* (x,y) grid for plotting posterior for sigma2 and lambda2
+* rhat values for sigma2 and lambda2
+* sigma2 and lambda2 samples
+
+
+# Select a dataset name
+
+Note that for fitting the models to a specific data set uncomment the dataset_name for that data set and comment the rest of the data sets in the following chunk.
+
+```{r}
+
+# if (!requireNamespace("mlbench", quietly = TRUE)) {
+#   knitr::knit_exit()
+# }
+# dataset_name <- "BostonHousing2"
+
+
+# dataset_name <- "Crime"
+
+# if (!requireNamespace("lars", quietly = TRUE)) {
+#   knitr::knit_exit()
+# }
+# dataset_name <- "diabetes2"
+
+
+# dataset_name <- "energy2"
+
+# if (!requireNamespace("ISLR", quietly = TRUE)) {
+#   knitr::knit_exit()
+# }
+#dataset_name <- "Hitters2"
+
+
+#dataset_name <- "Kakadu2"
+
+
+#dataset_name <- "Crime2"
+
+
+# if (!requireNamespace("ISLR", quietly = TRUE)) {
+#   knitr::knit_exit()
+# }
+#dataset_name <- "Hitters"
+
+
+# if (!requireNamespace("lars", quietly = TRUE)) {
+#   knitr::knit_exit()
+# }
+#dataset_name <- "diabetes"
+
+
+#dataset_name <- "sim1"
+
+
+#dataset_name <- "sim2"
+
+
+#dataset_name <- "energy3"
+
+
+#dataset_name <- "Kakadu3"
+```
+
+# Set options
+
+```{r}
+
+# library(LassoHiDFastGibbs)
+
+
+# Set prior hyperparameter constants
+a = 1.0E-2  # Prior shape for sigma2
+b = 1.0E-2  # Prior scale for sigma2
+u = 1.0E-2  # Prior shape for lambda2
+v = 1.0E-2  # Prior scale for lambda2
+
+# Initial values for lambda2 and sigma2
+lambda2_init  = 10
+lambda_init = sqrt(lambda2_init)
+sigma2_init = 1
+
+# Number of samples to run the MCMC
+nburn = 1000
+nsamples = 11000
+inds_use = (nburn + 1):nsamples
+
+# How many times to run each sampler
+trials = 1  # 20
+if (dataset_name=="energy2") {
+  trials = 5
+}
+```
+
+# Generate and normalize dataset
+
+```{r}
+res = generate_data(dataset_name)
+
+mX = res$mX
+vy = res$vy
+p = res$p
+n = res$n
+
+rm(res)
+```
+
+
+ 
+
+# The modified Park and Casella Gibbs sampler
+
+
+
+```{r tiny-example, eval=TRUE}
+res_4BG = benchmark_4bg(vy, mX, "lasso", lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=NA) 
+# print(res_4BG)
+```
+
+```{r}
+plot_densities(res_4BG)
+```
+
+```{r}
+res_3BG = benchmark_3bg(vy, mX, "lasso", lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_3BG)
+```
+
+
+```{r, eval=interactive()}
+plot_density_pairs(res_4BG, res_3BG)
+```
+
+# The two-block Gibbs sampler with 3/1 grouping
+
+ 
+
+```{r}
+res_ng1 = benchmark_nested_gibbs(vy,
+                                mX,
+                                penalty_type="lasso",
+                                lambda_init=1,
+                                sigma2_init=1,
+                                a, b, u, v,
+                                nburn, nsamples,
+                                s_beta=1,
+                                trials,
+                                beta_inds=res_4BG$beta_inds) 
+```
+
+
+
+```{r, eval=interactive()}
+plot_density_pairs(res_ng1, res_4BG)
+```
+
+```{r}
+res_ng5 = benchmark_nested_gibbs(vy,
+                                mX,
+                                penalty_type="lasso",
+                                lambda_init=1,
+                                sigma2_init=1,
+                                a, b, u, v,
+                                nburn, nsamples,
+                                s_beta=5,
+                                trials,
+                                beta_inds=res_4BG$beta_inds) 
+```
+
+
+```{r, eval=interactive()}
+plot_density_pairs(res_ng5, res_4BG)
+```
+
+
+
+
+```{r}
+res_ng10 = benchmark_nested_gibbs(vy,
+                                mX,
+                                penalty_type="lasso",
+                                lambda_init=1,
+                                sigma2_init=1,
+                                a, b, u, v,
+                                nburn, nsamples,
+                                s_beta=10,
+                                trials,
+                                beta_inds=res_4BG$beta_inds) 
+```
+
+
+```{r, eval=interactive()}
+plot_density_pairs(res_ng10, res_4BG)
+```
+
+# Modified Hans sampler
+
+
+```{r}
+res_hans = benchmark_blasso_hans(vy, mX,lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_hans)
+```
+
+```{r, eval=interactive()}
+plot_density_pairs(res_hans, res_3BG)
+```
+
+
+# The two two-block Gibbs samplers with 2/2 grouping
+
+```{r}
+res_2BG_bs = benchmark_blasso_2BG_beta_sigma2(vy, mX,lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_2BG_bs)
+```
+
+```{r, eval=interactive()}
+plot_density_pairs(res_3BG, res_2BG_bs)
+```
+
+```{r}
+res_2BG_bl = benchmark_blasso_2BG_beta_lambda2(vy, mX,lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_2BG_bl)
+```
+
+```{r, eval=interactive()}
+plot_density_pairs(res_3BG, res_2BG_bl)
+```
+
+
+
+# The partially collapsed Gibbs samplers
+
+
+```{r}
+res_pcg_ls = benchmark_pcg_lambda2_col_sigma2(vy, mX, "lasso", lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_pcg_ls)
+```
+
+```{r, eval=interactive()}
+plot_density_pairs(res_4BG, res_pcg_ls)
+```
+
+```{r}
+res_pcg_sl = benchmark_pcg_sigma2_col_lambda2(vy, mX, "lasso", lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_pcg_sl)
+```
+
+```{r, eval=interactive()}
+plot_density_pairs(res_4BG, res_pcg_sl)
+```
+
+```{r}
+res_pcg_la = benchmark_blasso_pcg_lambda2_col_va(vy, mX,lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_pcg_la)
+```
+
+```{r, eval=interactive()}
+plot_density_pairs(res_4BG, res_pcg_la)
+```
+
+
+```{r}
+res_pcg_sa = benchmark_blasso_pcg_sigma2_col_va(vy, mX,lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_pcg_sa)
+```
+
+```{r, eval=interactive()}
+plot_density_pairs(res_4BG, res_pcg_sa)
+```
+
+```{r}
+res_pcg_bs = benchmark_pcg_vbeta_col_sigma2(vy, mX, "lasso", lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_pcg_bs)
+```
+
+
+```{r, eval=interactive()}
+plot_density_pairs(res_4BG, res_pcg_bs)
+```
+
+
+```{r}
+res_pcg_sb = benchmark_pcg_sigma2_col_vbeta(vy, mX, "lasso", lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=res_4BG$beta_inds) 
+# print(res_pcg_sb)
+```
+
+
+
+```{r, eval=interactive()}
+plot_density_pairs(res_4BG, res_pcg_sb)
+```
+ 
+
+ 
+ 
+```{r}
+
+res_monomvn <- NULL
+
+if (requireNamespace("monomvn", quietly = TRUE)) {
+res_monomvn = benchmark_blasso_monomvn(vy, mX,
+                                       lambda_init, sigma2_init, a, b, u, v, 
+                                       nburn, nsamples, trials=1, 
+                                       beta_inds=res_4BG$beta_inds) 
+}
+
+# print(res_monomvn)
+```
+
+```{r}
+
+res_bayeslm <- NULL
+
+if (requireNamespace("bayeslm", quietly = TRUE)) {
+res_bayeslm = benchmark_blasso_bayeslm(vy, mX,
+                                       lambda_init, sigma2_init, a, b, u, v, 
+                                       nburn, nsamples, trials, 
+                                       beta_inds=res_4BG$beta_inds) 
+}
+
+# print(res_bayeslm)
+```
+
+```{r}
+
+res_rstan <- NULL
+
+if (requireNamespace("rstan", quietly = TRUE)) {
+res_rstan = benchmark_blasso_rstan(vy, mX,
+                                       lambda_init, sigma2_init, a, b, u, v, 
+                                       nburn, nsamples, trials=1, 
+                                       beta_inds=res_4BG$beta_inds)
+}else {
+  stop("Skipping rstan benchmark: package 'rstan' is not installed.")
+}
+# print(res_rstan)
+```
+
+```{r}
+
+res_bayesreg <- NULL
+
+if (requireNamespace("bayesreg", quietly = TRUE)) {
+res_bayesreg = benchmark_blasso_bayesreg(vy, mX,
+                                       lambda_init, sigma2_init, a, b, u, v, 
+                                       nburn, nsamples, trials, 
+                                       beta_inds=res_4BG$beta_inds) 
+}
+
+# print(res_bayesreg)
+```
+
+
+```{r}
+save(res_4BG,
+     res_3BG,
+     res_2BG_bl,
+     res_2BG_bs,
+     res_hans,
+     res_ng1,
+     res_ng5,
+     res_ng10,
+     res_pcg_ls,
+     res_pcg_sl,
+     res_pcg_la,
+     res_pcg_sa,
+     res_pcg_bs,
+     res_pcg_sb,
+     res_bayeslm,
+     res_bayesreg,
+     res_monomvn,
+     res_rstan,
+     file = file.path(results_dir, paste0(dataset_name,"_results_ngtp.Rdata")))
+```
+
+

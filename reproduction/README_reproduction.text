@@ -1,0 +1,22 @@
+Reproducibility Instructions for JSS Review
+
+This archive contains the source package and all scripts required
+to reproduce the results reported in the manuscript.
+
+STEP 1: Install the package from the source file
+
+  R CMD INSTALL LassoHiDFastGibbs_0.1.4.tar.gz
+
+STEP 2: Navigate to the reproduction directory inside the package source
+
+  cd LassoHiDFastGibbs/reproduction
+
+(or set the working directory in R to this folder)
+
+STEP 3: Run the main script
+
+  source("reproduce_all.R")
+
+IMPORTANT:
+Full reproduction uses 11000 MCMC iterations and may take several
+days on a standard desktop machine.
