@@ -60,7 +60,7 @@ benchmark_blasso_bayesreg <- function(
     mStat = rbind(mStat,stats)
   }
 
-  colname_vals = c("eff_beta", "mix_beta", "eff_sigma2", "mix_sigma2", "eff_lambda2", "mix_lambda2", "time")
+  colname_vals = c("mix_beta", "eff_beta", "mix_sigma2", "eff_sigma2", "mix_lambda2", "eff_lambda2", "time")
   colnames(mStat) <- colname_vals
 
   return(mcmc_diagnostics(t(res_mcmc$beta), res_mcmc$sigma2, res_mcmc$tau2, beta_inds, mStat, doplots = FALSE))

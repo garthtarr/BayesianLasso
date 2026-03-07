@@ -15,9 +15,13 @@
 // ================================================================
 
 
-#define ARMA_DONT_USE_WRAPPER
+// #define ARMA_DONT_USE_WRAPPER
 #include <RcppArmadillo.h>
-#include <RcppNumerical.h>
+// #include <RcppNumerical.h>
+#include <Rcpp.h>
+
+
+using namespace Rcpp;
 
 #include <R.h>
 #include <Rmath.h>
@@ -28,12 +32,12 @@
 #include "zeta.h"
 
 // [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::depends(RcppNumerical)]]
+//  // [[Rcpp::depends(RcppEigen)]]
+// // [[Rcpp::depends(RcppNumerical)]]
 
 using namespace Rcpp;
 using namespace arma;
-using namespace Numer;
+// using namespace Numer;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -693,29 +697,29 @@ arma::vec qlasso_fast_c_v1(arma::vec p, double a, double b, double c)
 // uses piecewise rational approximations with tail handling).
 // ------------------------------------------------------------------
 
-arma::vec qlasso_internal(arma::vec p, double a, double b, double c)
+double qlasso_fast_c_v2(double u, double a_val, double b_val, double c_val)
 {
   //////////////////////////////////////////////////////////////////////////////
-
+  
   // calculate v1 and v2
   // handle extreme values
-  double sigma2 = 1 / a;
+  double sigma2 = 1 / a_val;
   double sigma = sqrt(sigma2);
-  double b_abs = fabs(b);
-  double v1 = (c - b_abs) * sigma; // this wont overflow
-  double v2 = (c + b_abs); // this might overflow
+  double b_abs = fabs(b_val);
+  double v1 = (c_val - b_abs) * sigma; // this wont overflow
+  double v2 = (c_val + b_abs); // this might overflow
   if (!std::isinf(v2)) {
     v2 = v2 * sigma;
   }
   else {
     // this may underflow, and slower, so use as fallback
-    v2 = c * sigma + b_abs * sigma;
+    v2 = c_val * sigma + b_abs * sigma;
   }
-
+  
   // deal with sign of v1
   bool flipSign = v1 < 0;
   v1 = fabs(v1);
-
+  
   // calculate two (right) mills ratios (prefer use SIMD)
   double m1 = 0.0;
   double m2 = 0.0;
@@ -727,7 +731,7 @@ arma::vec qlasso_internal(arma::vec p, double a, double b, double c)
   m1 = right_mills_12sf(v1);
   m2 = right_mills_12sf(v2);
   //}
-
+  
   constexpr double M_SQRT_2PI = 2.506628274631000502415765;
   double phi_inv;
   double m3 = (flipSign ? -m1 : m1);
@@ -735,90 +739,98 @@ arma::vec qlasso_internal(arma::vec p, double a, double b, double c)
     phi_inv = M_SQRT_2PI * exp(v1 * v1 / 2);
     m1 = phi_inv + m3;
   }
-
-  double m_plus = (b >= 0) ? m1 : m2;
-  double m_minus = (b >= 0) ? m2 : m1;
-
+  
+  double m_plus = (b_val >= 0) ? m1 : m2;
+  double m_minus = (b_val >= 0) ? m2 : m1;
+  
   //////////////////////////////////////////////////////////////////////////////
-
+  
   double w = 1.0/(m_plus/m_minus + 1.0);
-  double length = p.n_elem;
-  arma::vec x(length);
-  double p_new;
+  double x;
+  double p;
   double log_p;
-  for(int i = 0; i < length; ++i){
-    if (p[i]<=w) {
-      double v3 = (c + b)*sigma;
-
-      double phi_minus = exp(-v3 * v3 / 2)/M_SQRT_2PI;
-
-      if (flipSign & (b < 0)) {
-        // Save us from overflow (I hope)
-        p_new = (exp(v1*v1/2 - v3*v3/2) + m3*phi_minus)*p[i]/w;
-      } else {
-        p_new = m_minus*p[i]*phi_minus/w;
-      }
-
-      if (p_new>0) {
-        x[i] =  (b + c)*sigma2 + sigma*R::qnorm5( p_new, 0.0, 1.0, 1, 0);
-      } else {
-        // Save us from underflow
-        log_p = R::pnorm5(-(b + c)*sigma, 0.0, 1.0, 1, 1) + log(p[i]) - log(w);
-        x[i] =  (b + c)*sigma2 + sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
-      }
-
+  if (u<=w) {
+    double v3 = (c_val + b_val)*sigma;
+    
+    double phi_minus = exp(-v3 * v3 / 2)/M_SQRT_2PI;
+    
+    if (flipSign & (b_val < 0)) {
+      // Save us from overflow (I hope)
+      p = (exp(v1*v1/2 - v3*v3/2) + m3*phi_minus)*u/w;
     } else {
-
-      double v4 = (c - b)*sigma;
-      double phi_plus = exp(-v4 * v4 / 2)/M_SQRT_2PI;
-
-
-
-      if (flipSign & (b > 0)) {
-        // Save us from overflow (I hope)
-        p_new = (exp(v1*v1/2 - v4*v4/2) + m3*phi_plus)*(1 - p[i])/(1 - w);
-      } else {
-        p_new = m_plus*(1-p[i])*phi_plus/(1 - w);
-      }
-
-
-      if (p_new>0) {
-        x[i] =  (b - c)*sigma2 - sigma*R::qnorm5( p_new, 0.0, 1.0, 1, 0);
-      } else {
-        // Save us from underflow
-        log_p = R::pnorm5( (b - c)*sigma, 0.0, 1.0, 1, 1) + log(1-p[i]) - log(1-w);
-        x[i] =  (b - c)*sigma2 - sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
-      }
+      p = m_minus*u*phi_minus/w;
     }
-
-    if (!std::isfinite(x[i])) {
-      //  Rcout << "w:" << w << " \n";
-      //  Rcout << "p:" << p[i] << " \n";
-      //  Rcout << "p_new:" << p_new << " \n";
-      //  Rcout << "w:" << w << " \n";
-      //  Rcout << "p:" << p[i] << " \n";
-      //  Rcout << "p_new:" << p_new << " \n";
-
-      //  Rcout << "a:" << a << " \n";
-      //  Rcout << "b:" << b << " \n";
-      //  Rcout << "c:" << c << " \n";
-      stop("The returned value is not finite");
+    
+    if (p>0) {
+      x =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
+    } else {
+      // Save us from underflow
+      log_p = R::pnorm5(-(b_val + c_val)*sigma, 0.0, 1.0, 1, 1) + log(u) - log(w);
+      x =  (b_val + c_val)*sigma2 + sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
+    }
+    
+  } else {
+    
+    double v4 = (c_val - b_val)*sigma;
+    double phi_plus = exp(-v4 * v4 / 2)/M_SQRT_2PI;
+    
+    
+    
+    if (flipSign & (b_val > 0)) {
+      // Save us from overflow (I hope)
+      p = (exp(v1*v1/2 - v4*v4/2) + m3*phi_plus)*(1 - u)/(1 - w);
+    } else {
+      p = m_plus*(1-u)*phi_plus/(1 - w);
+    }
+    
+    
+    if (p>0) {
+      x =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( p, 0.0, 1.0, 1, 0);
+    } else {
+      // Save us from underflow
+      log_p = R::pnorm5( (b_val - c_val)*sigma, 0.0, 1.0, 1, 1) + log(1-u) - log(1-w);
+      x =  (b_val - c_val)*sigma2 - sigma*R::qnorm5( log_p, 0.0, 1.0, 1, 1);
     }
   }
-
-
+  
+  if (!std::isfinite(x)) {
+    Rcout << "w:" << w << " \n";
+    Rcout << "u:" << u << " \n";
+    Rcout << "p:" << p << " \n";
+    Rcout << "w:" << w << " \n";
+    Rcout << "u:" << u << " \n";
+    Rcout << "p:" << p << " \n";
+    
+    Rcout << "a_val:" << a_val << " \n";
+    Rcout << "b_val:" << b_val << " \n";
+    Rcout << "c_val:" << c_val << " \n";
+    stop("qlasso_fast_c_v1 - returned value is not finite");
+  }
+  
+  
   return x;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// double qlasso_internal_scalar(double u, double a, double b, double c) {
+//  arma::vec p(1);
+//  p[0] = u;
+//  return qlasso_internal(p, a, b, c)[0];
+// }
 
 
 // User-facing quantile function. Calls the inverse-CDF sampler implemented
 // in qlasso_internal().
 
 // [[Rcpp::export]]
-Rcpp::NumericVector qlasso(NumericVector p, double a, double b, double c) {
-  arma::vec p_arma = Rcpp::as<arma::vec>(p);
-  arma::vec result = qlasso_internal(p_arma, a, b, c);
-  Rcpp::NumericVector out(result.begin(), result.end());  
+Rcpp::NumericVector qlasso(Rcpp::NumericVector p, double a, double b, double c) {
+  int n = p.size();
+  Rcpp::NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    out[i] = qlasso_fast_c_v2(p[i], a, b, c);
+  }
   return out;
 }
 
@@ -842,11 +854,10 @@ arma::vec rlasso_fast_c_v1(double n, double a, double b, double c) {
 arma::vec rlasso_internal(double n, double a, double b, double c) {
 
   arma::vec x(n);
-  arma::vec p(n);  // Create a n-element vector
-  for(int i =0; i < n; ++i){
-    p[i] = R::runif(0.0, 1.0);
+  for (int i = 0; i < n; ++i) {
+    double u = R::runif(0.0, 1.0);
+    x[i] = qlasso_fast_c_v2(u, a, b, c);
   }
-  x = qlasso_internal(p, a, b, c);
   return x;
 }
 

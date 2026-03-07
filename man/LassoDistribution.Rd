@@ -24,10 +24,10 @@ elasso(a, b, c)
 vlasso(a, b, c)
 mlasso(a, b, c)
 MillsRatio(d)
-Modified_Hans_Gibbs(X, y, a1, b1, u1, v1,
-              nsamples, beta_init, lambda_init, sigma2_init, verbose)
+Modified_Hans_Gibbs(y, X, beta_init, a1, b1, u1, v1,
+              nsamples, lambda_init, sigma2_init, thin, verbose, tune_lambda2, rao_blackwellization)
 Modified_PC_Gibbs(X, y, a1, b1, u1, v1, 
-              nsamples, lambda_init, sigma2_init, verbose)
+              nsamples, lambda_init, sigma2_init, thin, verbose)
 }
 \arguments{
 \item{x, q}{Vector of quantiles (vectorized).}
@@ -66,7 +66,15 @@ Modified_PC_Gibbs(X, y, a1, b1, u1, v1,
 
 \item{sigma2_init}{Initial value for the error variance \eqn{\sigma^2}.}
 
+\item{thin}{Thinning interval for the MCMC chain. Only every `thin`-th draw is stored. Default is 1 (no thinning).}
+
 \item{verbose}{Integer. If greater than 0, progress is printed every \code{verbose} iterations during sampling. Set to 0 to suppress output.}
+
+\item{tune_lambda2}{Logical; if TRUE (default), the tuning parameter
+\eqn{\lambda^2} is estimated during sampling.}
+
+\item{rao_blackwellization}{Logical; if TRUE, Rao–Blackwellization
+is applied to improve posterior estimation. Default is FALSE.}
 }
 \value{
 \itemize{
@@ -147,8 +155,8 @@ nsamples <- 1000
 verbose <- 100
 
 Output_Hans <- Modified_Hans_Gibbs(
-                X, y, a1, b1, u1, v1,
-                nsamples, beta_init, lambda_init, sigma2_init, verbose
+                X, y, beta_init, a1, b1, u1, v1,
+                nsamples, lambda_init, sigma2_init, verbose, tune_lambda2, rao_blackwellization
 )
 
 colMeans(Output_Hans$mBeta)

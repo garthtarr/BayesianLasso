@@ -48,7 +48,7 @@ benchmark_blasso_monomvn <- function(
     mStat = rbind(mStat,stats)
   }
 
-  colname_vals = c("eff_beta", "mix_beta", "eff_sigma2", "mix_sigma2", "eff_lambda2", "mix_lambda2", "time")
+  colname_vals = c("mix_beta", "eff_beta", "mix_sigma2", "eff_sigma2", "mix_lambda2", "eff_lambda2", "time")
 
   #rownames(mStat) <- NA
   colnames(mStat) <- colname_vals

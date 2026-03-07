@@ -24,11 +24,11 @@ benchmark_blasso_hans <- function(
 
   # Run the Gibbs sampler trials times
   mStat = NULL
+  p = ncol(mX)
 
   for (i in seq_len(trials)) {
     time_val = system.time({
-      res_mcmc = lasso_gibbs_modified_hans(vy, mX, a, b, u, v, nsamples,
-                                                     vbeta_init = rep(0,p),
+      res_mcmc = Modified_Hans_Gibbs(vy, mX, beta_init = rep(0,p), a, b, u, v, nsamples,
                                                      lambda_init = lambda_init,
                                                      sigma2_init = sigma2_init,
                                                      verbose = nsamples/5,
@@ -48,7 +48,7 @@ benchmark_blasso_hans <- function(
     mStat = rbind(mStat,stats)
   }
 
-  colname_vals = c("eff_beta", "mix_beta", "eff_sigma2", "mix_sigma2", "eff_lambda2", "mix_lambda2", "time")
+  colname_vals = c( "mix_beta", "eff_beta", "mix_sigma2", "eff_sigma2", "mix_lambda2", "eff_lambda2", "time")
 
   #rownames(mStat) <- NA
   colnames(mStat) <- colname_vals
@@ -74,7 +74,7 @@ benchmark_blasso_hans <- function(
   } else {
     rhat_sigma2  <- posterior::rhat(res_mcmc$vsigma2[inds_use])
     rhat_lambda2 <- posterior::rhat(res_mcmc$vlambda2[inds_use])
-  }
+    }
   # }
 
   if (any(is.na(beta_inds))) {

@@ -25,9 +25,9 @@ typedef Map<VectorXd> MapVec;
 // Assumes that n>p
 
 // [[Rcpp::export]]
-List Modified_PC_Gibbs(arma::mat X, arma::vec y,double a1, double b1, double u1, double v1, 
-                       int nsamples, double lambda_init, double sigma2_init, 
-                       int verbose) {
+List Modified_PC_Gibbs(const arma::mat X, const arma::vec y,double a1 = 1, double b1 = 1, double u1 = 1, double v1 = 1, 
+                       int nsamples = 100, double lambda_init = 1, double sigma2_init = 1, int thin = 1, 
+                       int verbose = 100) {
   int n = X.n_rows;
   int p = X.n_cols;
   
@@ -36,7 +36,12 @@ List Modified_PC_Gibbs(arma::mat X, arma::vec y,double a1, double b1, double u1,
   arma::vec XTy = X.t()*y;
   //double yTy = vy.t()*vy;
   
-  int maxiter = nsamples;
+  if (thin <= 0)
+    Rcpp::stop("thin must be >= 1");
+  
+
+  const int maxiter = nsamples / thin;
+  if (maxiter <= 0) stop("thin is larger than nsamples: no draws would be stored.");
   
   // Initialise storage of samples
   arma::mat mBeta(maxiter,p);
@@ -69,6 +74,8 @@ List Modified_PC_Gibbs(arma::mat X, arma::vec y,double a1, double b1, double u1,
   arma::vec vmu;
   arma::vec vlambda = ones(p);
   
+  int keep_idx = 0;
+  
   // Main loop
   for (int i = 0; i < maxiter; ++i) 
   {
@@ -96,18 +103,22 @@ List Modified_PC_Gibbs(arma::mat X, arma::vec y,double a1, double b1, double u1,
       }
     }
     
-    // Storing samples
-    mBeta.row(i) = vbeta.as_row();
-    vsigma2[i] = sigma2;
-    vlambda2[i] = lambda2;
+    if (i % thin == 0){
+      // Storing samples
+      mBeta.row(keep_idx) = vbeta.as_row();
+      vsigma2[keep_idx] = sigma2;
+      vlambda2[keep_idx] = lambda2;
     
-    // Storage for Rao-Blackwellization
-    mM.row(i) = vmu_til.as_row();
-    mV.row(i) = diagvec(mSigma_til).as_row();
-    va_til[i] = a_til;
-    vb_til[i] = b_til;
-    vu_til[i] = u_til;
-    vv_til[i] = v_til;
+      // Storage for Rao-Blackwellization
+      mM.row(keep_idx) = vmu_til.as_row();
+      mV.row(keep_idx) = diagvec(mSigma_til).as_row();
+      va_til[keep_idx] = a_til;
+      vb_til[keep_idx] = b_til;
+      vu_til[keep_idx] = u_til;
+      vv_til[keep_idx] = v_til;
+    
+      keep_idx++;
+    }
   }
   
   return List::create(_["mBeta"] = mBeta, 

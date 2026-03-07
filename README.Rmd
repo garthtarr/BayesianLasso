@@ -62,7 +62,7 @@ result <- Modified_Hans_Gibbs(
   beta_init = beta_init,
   lambda_init = 0.1,
   sigma2_init = 1,
-  verbose = 0
+  verbose = 0, tune_lambda2 = TRUE, rao_blackwellization = FALSE
 )
 
 str(result)

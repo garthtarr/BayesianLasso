@@ -7,15 +7,17 @@ test_that("Modified_Hans_Gibbs returns valid output", {
   out <- Modified_Hans_Gibbs(
     X = X,
     y = y,
+    beta_init = beta_init,
     a1 = 0.01,
     b1 = 0.01,
     u1 = 0.01,
     v1 = 0.01,
     nsamples = 10,
-    beta_init = beta_init,
     lambda_init = 0.1,
     sigma2_init = 1,
-    verbose = 0
+    verbose = 0,
+    tune_lambda2 = TRUE,
+    rao_blackwellization = FALSE
   )
   
   expect_type(out, "list")
