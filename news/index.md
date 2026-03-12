@@ -1,5 +1,7 @@
 # Changelog
 
+## BayesianLasso 0.3.8
+
 ## BayesianLasso 0.3.7
 
 ## BayesianLasso 0.3.6
