@@ -2,13 +2,13 @@ Package: BayesianLasso
 Type: Package
 Title: Bayesian Lasso Regression and Tools for the Lasso Distribution
 Version: 0.3.7
-Date: 2026-02-22
+Date: 2026-03-13
 Authors@R: c(person("John", "Ormerod", role = c("aut", "cph"), email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
-             person("Mohammad Javad", "Davoudabadi", role = c("aut","cre", "cph"), email = "mohammad.davoudabadi@sydney.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
+             person("Mohammad Javad", "Davoudabadi", role = c("aut","cre", "cph"), email = "mohammad.davoudabadi@qut.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
              person("Garth", "Tarr", role = c("aut", "cph"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")),
              person("Samuel", "Mueller", role = c("aut", "cph"), email = "samuel.mueller@sydney.edu.au", comment = c(ORCID = "0000-0002-3087-8127")),
              person("Jonathon", "Tidswell", role = c("aut", "cph"), email = "jonathon.tidswell@sydney.edu.au"))
-Maintainer: Mohammad Javad Davoudabadi <mohammad.davoudabadi@sydney.edu.au>
+Maintainer: Mohammad Javad Davoudabadi <mohammad.davoudabadi@qut.edu.au>
 Description: Implements Bayesian Lasso regression using efficient Gibbs sampling
                algorithms, including modified versions of the Hans and Park–Casella (PC) samplers.
                Includes functions for working with the Lasso distribution, such as its density,
@@ -22,13 +22,14 @@ LinkingTo: Rcpp,
   RcppArmadillo,
   RcppEigen
 RoxygenNote: 7.3.2
+SystemRequirements: C++11
 Encoding: UTF-8
 URL: https://garthtarr.github.io/BayesianLasso/, https://github.com/garthtarr/BayesianLasso
 VignetteBuilder: knitr
 Suggests: 
     knitr, rmarkdown, 
-    monomvn, 
-    rstan, bayesreg, 
+    monomvn, posterior,
+    rstan, bayesreg,
     lars, Ecdat,
     testthat (>= 3.0.0), MASS
 Config/testthat/edition: 3

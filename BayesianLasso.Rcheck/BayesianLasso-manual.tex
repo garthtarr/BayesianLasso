@@ -1,0 +1,300 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\makeatletter\@ifl@t@r\fmtversion{2018/04/01}{}{\usepackage[utf8]{inputenc}}\makeatother
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `BayesianLasso'}}
+\par\bigskip{\large \today}
+\end{center}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {BayesianLasso: Bayesian Lasso Regression and Tools for the Lasso Distribution}}}{}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdfauthor = {John Ormerod; Mohammad Javad Davoudabadi; Garth Tarr; Samuel Mueller; Jonathon Tidswell}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Bayesian Lasso Regression and Tools for the Lasso Distribution}
+\item[Version]\AsIs{0.3.7}
+\item[Date]\AsIs{2026-03-13}
+\item[Maintainer]\AsIs{Mohammad Javad Davoudabadi }\email{mohammad.davoudabadi@qut.edu.au}\AsIs{}
+\item[Description]\AsIs{Implements Bayesian Lasso regression using efficient Gibbs sampling
+algorithms, including modified versions of the Hans and Park–Casella (PC) samplers.
+Includes functions for working with the Lasso distribution, such as its density,
+cumulative distribution, quantile, and random generation functions, along with moment
+calculations. Also includes a function to compute the Mills ratio. Designed for sparse
+linear models and suitable for high-dimensional regression problems.}
+\item[License]\AsIs{GPL-3}
+\item[Imports]\AsIs{Rcpp (>= 1.0.12)}
+\item[LinkingTo]\AsIs{Rcpp, RcppNumerical, RcppArmadillo, RcppEigen}
+\item[RoxygenNote]\AsIs{7.3.2}
+\item[SystemRequirements]\AsIs{C++11}
+\item[Encoding]\AsIs{UTF-8}
+\item[URL]\AsIs{}\url{https://garthtarr.github.io/BayesianLasso/}\AsIs{,
+}\url{https://github.com/garthtarr/BayesianLasso}\AsIs{}
+\item[VignetteBuilder]\AsIs{knitr}
+\item[Suggests]\AsIs{knitr, rmarkdown, monomvn, posterior, rstan, bayesreg, lars,
+Ecdat, testthat (>= 3.0.0), MASS}
+\item[Config/testthat/edition]\AsIs{3}
+\item[BugReports]\AsIs{}\url{https://github.com/garthtarr/BayesianLasso/issues}\AsIs{}
+\item[NeedsCompilation]\AsIs{yes}
+\item[Author]\AsIs{John Ormerod [aut, cph] (<}\url{https://orcid.org/0000-0002-4650-7507}\AsIs{>),
+Mohammad Javad Davoudabadi [aut, cre, cph]
+  (<}\url{https://orcid.org/0000-0001-7312-1530}\AsIs{>),
+Garth Tarr [aut, cph] (<}\url{https://orcid.org/0000-0002-6605-7478}\AsIs{>),
+Samuel Mueller [aut, cph] (<}\url{https://orcid.org/0000-0002-3087-8127}\AsIs{>),
+Jonathon Tidswell [aut, cph]}
+\item[Archs]\AsIs{x64}
+\end{description}
+\Rdcontents{Contents}
+\HeaderA{LassoDistribution}{The Lasso Distribution}{LassoDistribution}
+\aliasA{dlasso}{LassoDistribution}{dlasso}
+\aliasA{elasso}{LassoDistribution}{elasso}
+\aliasA{MillsRatio}{LassoDistribution}{MillsRatio}
+\aliasA{mlasso}{LassoDistribution}{mlasso}
+\aliasA{Modified\_Hans\_Gibbs}{LassoDistribution}{Modified.Rul.Hans.Rul.Gibbs}
+\aliasA{Modified\_PC\_Gibbs}{LassoDistribution}{Modified.Rul.PC.Rul.Gibbs}
+\aliasA{plasso}{LassoDistribution}{plasso}
+\aliasA{qlasso}{LassoDistribution}{qlasso}
+\aliasA{rlasso}{LassoDistribution}{rlasso}
+\aliasA{vlasso}{LassoDistribution}{vlasso}
+\aliasA{zlasso}{LassoDistribution}{zlasso}
+%
+\begin{Description}
+Provides functions related to the Lasso distribution, including the normalizing constant,
+probability density function, cumulative distribution function, quantile function, and
+random number generation for given parameters \code{a}, \code{b}, and \code{c}.
+Additional utilities include the Mills ratio, expected value, and variance of the distribution.
+The package also implements modified versions of the Hans and Park–Casella Gibbs sampling algorithms
+for Bayesian Lasso regression.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+zlasso(a, b, c, logarithm)
+dlasso(x, a, b, c, logarithm)
+plasso(q, a, b, c)
+qlasso(p, a, b, c)
+rlasso(n, a, b, c)
+elasso(a, b, c)
+vlasso(a, b, c)
+mlasso(a, b, c)
+MillsRatio(d)
+Modified_Hans_Gibbs(X, y, beta_init, a1, b1, u1, v1,
+              nsamples, lambda_init, sigma2_init, thin, verbose,
+              tune_lambda2, rao_blackwellization)
+Modified_PC_Gibbs(X, y, a1, b1, u1, v1, 
+              nsamples, lambda_init, sigma2_init, thin, verbose)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}, \code{q}] Vector of quantiles (vectorized).
+
+\item[\code{p}] Vector of probabilities.
+
+\item[\code{a}] Vector of precision parameter which must be non-negative.
+
+\item[\code{b}] Vector of off set parameter.
+
+\item[\code{c}] Vector of tuning parameter which must be non-negative values.
+
+\item[\code{n}] Number of observations.
+
+\item[\code{logarithm}] Logical. If \code{TRUE}, probabilities are returned on the log scale.
+
+\item[\code{d}] A scalar numeric value. Represents the point at which the Mills ratio is evaluated.
+
+\item[\code{X}] Design matrix (numeric matrix).
+
+\item[\code{y}] Response vector (numeric vector).
+
+\item[\code{a1}] Shape parameter of the prior on \eqn{\lambda^2}{}.
+
+\item[\code{b1}] Rate parameter of the prior on \eqn{\lambda^2}{}.
+
+\item[\code{u1}] Shape parameter of the prior on \eqn{\sigma^2}{}.
+
+\item[\code{v1}] Rate parameter of the prior on \eqn{\sigma^2}{}.
+
+\item[\code{nsamples}] Number of Gibbs samples to draw.
+
+\item[\code{beta\_init}] Initial value for the model parameter \eqn{\beta}{}.
+
+\item[\code{lambda\_init}] Initial value for the shrinkage parameter \eqn{\lambda^2}{}.
+
+\item[\code{sigma2\_init}] Initial value for the error variance \eqn{\sigma^2}{}.
+
+\item[\code{thin}] Thinning interval for the MCMC chain. Only every `thin`-th draw is stored. Default is 1 (no thinning).
+
+\item[\code{verbose}] Integer. If greater than 0, progress is printed every \code{verbose} iterations during sampling. Set to 0 to suppress output.
+
+\item[\code{tune\_lambda2}] Logical; if TRUE (default), the tuning parameter
+\eqn{\lambda^2}{} is estimated during sampling.
+
+\item[\code{rao\_blackwellization}] Logical; if TRUE, Rao–Blackwellization
+is applied to improve posterior estimation. Default is FALSE.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+If \eqn{X \sim \text{Lasso}(a, b, c)}{} then its density function is:
+\deqn{
+p(x;a,b,c) = Z^{-1} \exp\left(-\frac{1}{2} a x^2 + bx - c|x| \right)
+}{}
+where \eqn{x \in \mathbb{R}}{}, \eqn{a > 0}{}, \eqn{b \in \mathbb{R}}{}, \eqn{c > 0}{}, and \eqn{Z}{} is the normalizing constant.
+
+More details are included for the CDF, quantile function, and normalizing constant in the original documentation.
+\end{Details}
+%
+\begin{Value}
+\begin{itemize}
+
+
+\item{} \code{zlasso}, \code{dlasso}, \code{plasso}, \code{qlasso}, \code{rlasso}, \code{elasso}, \code{vlasso}, \code{mlasso}, \code{MillsRatio}: 
+return the corresponding scalar or vector values related to the Lasso distribution and a numeric value representing the Mills ratio.
+\item{} \code{Modified\_Hans\_Gibbs}: returns a list containing:
+\begin{description}
+
+\item[\code{mBeta}] Matrix of MCMC samples for the regression coefficients \eqn{\beta}{}, with \code{nsamples} rows and \code{p} columns.
+\item[\code{vsigma2}] Vector of MCMC samples for the error variance \eqn{\sigma^2}{}.
+\item[\code{vlambda2}] Vector of MCMC samples for the shrinkage parameter \eqn{\lambda^2}{}.
+\item[\code{mA}] Matrix of sampled values for parameter \eqn{a_j}{} of the Lasso distribution for each \eqn{\beta_j}{}.
+\item[\code{mB}] Matrix of sampled values for parameter \eqn{b_j}{} of the Lasso distribution for each \eqn{\beta_j}{}.
+\item[\code{mC}] Matrix of sampled values for parameter \eqn{c_j}{} of the Lasso distribution for each \eqn{\beta_j}{}.
+
+\end{description}
+
+\item{} \code{Modified\_PC\_Gibbs}: returns a list containing:
+\begin{description}
+
+\item[\code{mBeta}] Matrix of MCMC samples for the regression coefficients \eqn{\beta}{}.
+\item[\code{vsigma2}] Vector of MCMC samples for the error variance \eqn{\sigma^2}{}.
+\item[\code{vlambda2}] Vector of MCMC samples for the shrinkage parameter \eqn{\lambda^2}{}.
+\item[\code{mM}] Matrix of estimated means of the full conditional distributions of each \eqn{\beta_j}{}.
+\item[\code{mV}] Matrix of estimated variances of the full conditional distributions of each \eqn{\beta_j}{}.
+\item[\code{va\_til}] Vector of estimated shape parameters for the full conditional inverse-gamma distribution of \eqn{\sigma^2}{}.
+\item[\code{vb\_til}] Vector of estimated rate parameters for the full conditional inverse-gamma distribution of \eqn{\sigma^2}{}.
+\item[\code{vu\_til}] Vector of estimated shape parameters for the full conditional inverse-gamma distribution of \eqn{\lambda^2}{}.
+\item[\code{vv\_til}] Vector of estimated rate parameters for the full conditional inverse-gamma distribution of \eqn{\lambda^2}{}.
+
+\end{description}
+
+
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{SeeAlso}
+\code{\LinkA{normalize}{normalize}} for preprocessing input data before applying the samplers.
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+a <- 2; b <- 1; c <- 3
+x <- seq(-3, 3, length.out = 1000)
+plot(x, dlasso(x, a, b, c, logarithm = FALSE), type = 'l')
+
+r <- rlasso(1000, a, b, c)
+hist(r, breaks = 50, probability = TRUE, col = "grey", border = "white")
+lines(x, dlasso(x, a, b, c, logarithm = FALSE), col = "blue")
+
+plasso(0, a, b, c)
+qlasso(0.25, a, b, c)
+elasso(a, b, c)
+vlasso(a, b, c)
+mlasso(a, b, c)
+MillsRatio(2)
+
+
+
+
+# The Modified_Hans_Gibbs() function uses the Lasso distribution to draw 
+# samples from the full conditional distribution of the regression coefficients.
+
+y <- 1:20
+X <- matrix(c(1:20,12:31,7:26),20,3,byrow = TRUE)
+
+a1 <- b1 <- u1 <- v1 <- 0.01
+sigma2_init <- 1
+lambda_init <- 0.1
+beta_init <- rep(1, ncol(X))
+nsamples <- 1000
+verbose <- 100
+tune_lambda2 <- TRUE
+rao_blackwellization <- FALSE
+
+Output_Hans <- Modified_Hans_Gibbs(
+                X, y, beta_init, a1, b1, u1, v1,
+                nsamples, lambda_init, sigma2_init, 
+                verbose, tune_lambda2, rao_blackwellization
+)
+
+colMeans(Output_Hans$mBeta)
+mean(Output_Hans$vlambda2)
+
+
+Output_PC <- Modified_PC_Gibbs(
+               X, y, a1, b1, u1, v1, 
+               nsamples, lambda_init, sigma2_init, verbose)
+
+colMeans(Output_PC$mBeta)
+mean(Output_PC$vlambda2)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{normalize}{Normalize Response and Covariates}{normalize}
+%
+\begin{Description}
+This function centers and (optionally) scales the response vector and each column
+of the design matrix using the population variance. It is used to prepare data
+for Bayesian Lasso regression.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+normalize(y, X, scale = TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{y}] A numeric response vector.
+
+\item[\code{X}] A numeric matrix or data frame of covariates (design matrix).
+
+\item[\code{scale}] Logical; if \code{TRUE}, variables are scaled to have unit population variance (default is \code{TRUE}).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list with the following elements:
+\begin{itemize}
+
+\item{} \code{vy}: Normalized response vector.
+\item{} \code{mX}: Normalized design matrix.
+\item{} \code{mu.y}: Mean of the response vector.
+\item{} \code{sigma2.y}: Population variance of the response vector.
+\item{} \code{mu.x}: Vector of column means of \code{X}.
+\item{} \code{sigma2.x}: Vector of population variances for columns of \code{X}.
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+set.seed(1)
+X <- matrix(rnorm(100 * 10), 100, 10)
+beta <- c(2, -3, rep(0, 8))
+y <- as.vector(X %*% beta + rnorm(100))
+norm_result <- normalize(y, X)
+
+\end{ExampleCode}
+\end{Examples}
+\printindex{}
+\end{document}
