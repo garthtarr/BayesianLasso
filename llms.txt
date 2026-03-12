@@ -40,8 +40,8 @@ beta_init <- rep(1, 5)
 
 # Run modified Hans Gibbs sampler
 result <- Modified_Hans_Gibbs(
-  y = y,
   X = X,
+  y = y,
   beta_init = beta_init,
   a1 = 0.01,
   b1 = 0.01,
@@ -50,17 +50,17 @@ result <- Modified_Hans_Gibbs(
   nsamples = 100,
   lambda_init = 0.1,
   sigma2_init = 1,
-  verbose = 0
+  verbose = 0, tune_lambda2 = TRUE, rao_blackwellization = FALSE
 )
 
 str(result)
 #> List of 6
-#>  $ mBeta   : num [1:100, 1:5] 0.2441 0.2277 0.2478 -0.1356 -0.0692 ...
-#>  $ vsigma2 : num [1:100, 1] 0.913 0.767 0.704 0.747 0.623 ...
-#>  $ vlambda2: num [1:100, 1] 34.96 87.38 9.41 53.49 68.44 ...
-#>  $ mA      : num [1:100, 1:5] 18.4 20.1 24 26.1 24.6 ...
-#>  $ mB      : num [1:100, 1:5] 5.67 3.15 3 2.11 2.49 ...
-#>  $ mC      : num [1:100, 1:5] 0.1 6.19 10.68 3.66 8.46 ...
+#>  $ mBeta   : num [1:100, 1:5] 0.33112 0.06944 0.00723 -0.00512 0.31311 ...
+#>  $ vsigma2 : num [1:100, 1] 0.787 0.457 0.597 1.219 0.735 ...
+#>  $ vlambda2: num [1:100, 1] 64.45 76.32 40.19 41.73 5.21 ...
+#>  $ mA      : num[0 , 0 ] 
+#>  $ mB      : num[0 , 0 ] 
+#>  $ mC      : num[0 , 0 ]
 ```
 
 The
@@ -108,9 +108,9 @@ Citation information can be found using:
 citation("BayesianLasso")
 #> To cite package 'BayesianLasso' in publications use:
 #> 
-#>   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2025). _Bayesian Lasso Regression and
-#>   Tools for the Lasso Distribution_. R package version 0.3.0,
-#>   <https://garthtarr.github.io/BayesianLasso/>.
+#>   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2025).
+#>   _Bayesian Lasso Regression and Tools for the Lasso Distribution_. R
+#>   package version 0.3.0, <https://garthtarr.github.io/BayesianLasso/>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 

@@ -65,7 +65,13 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://garthtarr.github.io/BayesianLasso/">BayesianLasso</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://garthtarr.github.io/BayesianLasso/">BayesianLasso</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">helpers_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"helpers"</span>, package <span class="op">=</span> <span class="st">"BayesianLasso"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">helper_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">helpers_path</span>, pattern <span class="op">=</span> <span class="st">"\\.R$"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">helper_files</span>, <span class="va">source</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -74,41 +80,268 @@ regression, modified Hans and PC samplers. The modified Hans sampler is
 based on a newly defined Lasso distribution.</p>
 <p>This vignette introduces the main functionality of the package and
 demonstrates how to apply the samplers to real and simulated data.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">effective_sample_size</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">samples</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"posterior"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Package 'posterior' is required to compute effective sample size (ESS).\n"</span>,</span>
+<span>      <span class="st">"Install it with install.packages('posterior') to enable ESS diagnostics."</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NA_real_</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu">posterior</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/posterior/reference/ess_bulk.html" class="external-link">ess_bulk</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="dataset-selection">Dataset selection<a class="anchor" aria-label="anchor" href="#dataset-selection"></a>
+</h2>
+<p>Select a dataset name for dataset_name.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">datasets_ngtp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulated"</span>, <span class="st">"diabetes2"</span>, <span class="st">"Kakadu2"</span>, <span class="st">"Crime"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">datasets_pgtn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cookie"</span>, <span class="st">"eyedata"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dataset_name</span> <span class="op">&lt;-</span> <span class="va">datasets_ngtp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="simulated-example">Simulated Example<a class="anchor" aria-label="anchor" href="#simulated-example"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Simulate data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
-<span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span><span class="op">(</span><span class="va">dataset_name</span> <span class="op">==</span> <span class="va">datasets_ngtp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">{</span></span>
 <span></span>
-<span><span class="co"># Run the modified Hans sampler</span></span>
-<span><span class="va">output_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
-<span>               X <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">y</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>, </span>
-<span>               nsamples<span class="op">=</span><span class="fl">1000</span>, beta_init<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">10</span><span class="op">)</span>, lambda_init<span class="op">=</span><span class="fl">1</span>, sigma2_init<span class="op">=</span><span class="fl">1</span>, verbose<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
-<span><span class="co">#&gt; iter: 0 lambda2: 4.91771 sigma2: 0.960406</span></span>
-<span><span class="co">#&gt; iter: 100 lambda2: 3.58811 sigma2: 0.997586</span></span>
-<span><span class="co">#&gt; iter: 200 lambda2: 0.933625 sigma2: 0.901476</span></span>
-<span><span class="co">#&gt; iter: 300 lambda2: 0.794242 sigma2: 0.991402</span></span>
-<span><span class="co">#&gt; iter: 400 lambda2: 3.81367 sigma2: 1.01224</span></span>
-<span><span class="co">#&gt; iter: 500 lambda2: 2.58749 sigma2: 0.906112</span></span>
-<span><span class="co">#&gt; iter: 600 lambda2: 1.17227 sigma2: 1.2331</span></span>
-<span><span class="co">#&gt; iter: 700 lambda2: 3.38756 sigma2: 1.27917</span></span>
-<span><span class="co">#&gt; iter: 800 lambda2: 0.676862 sigma2: 0.881326</span></span>
-<span><span class="co">#&gt; iter: 900 lambda2: 2.87214 sigma2: 1.21127</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">output_Hans</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1]  2.05825310  1.96658242  1.85249926  0.12747215  0.06827941 -0.04384691</span></span>
-<span><span class="co">#&gt;  [7]  0.07039560  0.10960198 -0.04258196  0.12511862</span></span>
+<span>  <span class="co"># Simulate data</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span>  <span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fl">2000</span></span>
+<span>  <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
+<span>  <span class="va">ps</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
+<span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">ns</span> <span class="op">*</span> <span class="va">ps</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">ns</span><span class="op">)</span></span>
+<span>  <span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">ps</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">ns</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">vtime_val_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">results_Hans</span> <span class="op">&lt;-</span> <span class="cn">NULL</span> </span>
 <span></span>
-<span><span class="co"># Run the modified PC sampler</span></span>
-<span><span class="va">output_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_PC_Gibbs</a></span><span class="op">(</span></span>
-<span>               X <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">y</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>, </span>
-<span>               nsamples<span class="op">=</span><span class="fl">1000</span>, lambda_init<span class="op">=</span><span class="fl">1</span>, sigma2_init<span class="op">=</span><span class="fl">1</span>, verbose<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
+<span>  <span class="co"># Run the modified Hans sampler</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>      <span class="va">res_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
+<span>      X <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">y</span>, beta_init<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">10</span><span class="op">)</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>,</span>
+<span>      nsamples<span class="op">=</span><span class="va">Ns</span>, lambda_init<span class="op">=</span><span class="fl">1</span>, sigma2_init<span class="op">=</span><span class="fl">1</span>, verbose<span class="op">=</span><span class="fl">100</span>, tune_lambda2 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>      rao_blackwellization <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="va">vtime_val_Hans</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">time_val</span></span>
+<span>  </span>
+<span>  <span class="co"># Initialize accumulators after first run</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_Hans</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">results_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      mBeta <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">mBeta</span>,</span>
+<span>      vsigma2 <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vsigma2</span>,</span>
+<span>      vlambda2 <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span>    <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">mBeta</span></span>
+<span>    <span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span>  <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vsigma2</span></span>
+<span>    <span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="co"># Take averages</span></span>
+<span>  <span class="va">mBeta</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vsigma2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vlambda2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">time_val_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">vtime_val_Hans</span><span class="op">)</span></span>
+<span>  </span>
+<span></span>
+<span>  <span class="va">vESS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">ps</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">vESS</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span><span class="op">[</span><span class="fl">200</span><span class="op">:</span><span class="va">Ns</span>,<span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">Ef_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">vESS</span><span class="op">)</span><span class="op">/</span><span class="va">time_val_Hans</span></span>
+<span>  </span>
+<span>  <span class="va">ESS_sigma2_Hans</span>  <span class="op">=</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">[</span><span class="fl">200</span><span class="op">:</span><span class="va">Ns</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">Ef_sigma2_Hans</span> <span class="op">=</span> <span class="va">ESS_sigma2_Hans</span><span class="op">/</span><span class="va">time_val_Hans</span></span>
+<span>  </span>
+<span>  <span class="va">ESS_lambda2_Hans</span>  <span class="op">=</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">[</span><span class="fl">200</span><span class="op">:</span><span class="va">Ns</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">Ef_lambda2_Hans</span> <span class="op">=</span> <span class="va">ESS_lambda2_Hans</span><span class="op">/</span><span class="va">time_val_Hans</span></span>
+<span>  </span>
+<span>  <span class="va">stat_vec_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fl">100</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">vESS</span><span class="op">)</span><span class="op">/</span><span class="va">Ns</span>,</span>
+<span>    <span class="va">Ef_Hans</span>,</span>
+<span>    <span class="fl">100</span><span class="op">*</span><span class="va">ESS_sigma2_Hans</span><span class="op">/</span><span class="va">Ns</span>,</span>
+<span>    <span class="va">Ef_sigma2_Hans</span>,</span>
+<span>    <span class="fl">100</span><span class="op">*</span><span class="va">ESS_lambda2_Hans</span><span class="op">/</span><span class="va">Ns</span>,</span>
+<span>    <span class="va">Ef_lambda2_Hans</span>,</span>
+<span>    <span class="va">time_val_Hans</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">name_vals</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mix_beta"</span>, <span class="st">"eff_beta"</span>, <span class="st">"mix_sigma2"</span>, <span class="st">"eff_sigma2"</span>, <span class="st">"mix_lambda2"</span>, <span class="st">"eff_lambda2"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">stat_vec_Hans</span><span class="op">)</span> <span class="op">=</span> <span class="va">name_vals</span> </span>
+<span></span>
+<span>  </span>
+<span>  <span class="co"># ======================== PC sampler =======================================</span></span>
+<span>  </span>
+<span>  <span class="co"># Run the modified PC sampler</span></span>
+<span>  </span>
+<span>  <span class="va">vtime_val_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">results_PC</span> <span class="op">&lt;-</span> <span class="cn">NULL</span> </span>
+<span>  </span>
+<span> <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">{</span></span>
+<span>   <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>     <span class="va">res_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_PC_Gibbs</a></span><span class="op">(</span></span>
+<span>      X <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">y</span>, a1<span class="op">=</span><span class="fl">2</span>, b1<span class="op">=</span><span class="fl">1</span>, u1<span class="op">=</span><span class="fl">2</span>, v1<span class="op">=</span><span class="fl">1</span>,</span>
+<span>      nsamples<span class="op">=</span><span class="va">Ns</span>, lambda_init<span class="op">=</span><span class="fl">1</span>, sigma2_init<span class="op">=</span><span class="fl">1</span>, verbose<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="va">vtime_val_PC</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">time_val</span></span>
+<span>  </span>
+<span>  <span class="co"># Initialize accumulators after first run</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_PC</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">results_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      mBeta <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">mBeta</span>,</span>
+<span>      vsigma2 <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vsigma2</span>,</span>
+<span>      vlambda2 <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span>    <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">mBeta</span></span>
+<span>    <span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span>  <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vsigma2</span></span>
+<span>    <span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>  <span class="op">}</span></span>
+<span> <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="co"># Take averages</span></span>
+<span>  <span class="va">mBeta</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vsigma2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vlambda2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">time_val_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">vtime_val_PC</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># colMeans(results_PC$mBeta)</span></span>
+<span>  </span>
+<span>  <span class="va">vESS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">ps</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">vESS</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span><span class="op">[</span><span class="fl">200</span><span class="op">:</span><span class="va">Ns</span>,<span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">Ef_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">vESS</span><span class="op">)</span><span class="op">/</span><span class="va">time_val_PC</span></span>
+<span>  </span>
+<span>  <span class="va">ESS_sigma2_PC</span>  <span class="op">=</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">[</span><span class="fl">200</span><span class="op">:</span><span class="va">Ns</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">Ef_sigma2_PC</span> <span class="op">=</span> <span class="va">ESS_sigma2_PC</span><span class="op">/</span><span class="va">time_val_PC</span></span>
+<span>  </span>
+<span>  <span class="va">ESS_lambda2_PC</span>  <span class="op">=</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">[</span><span class="fl">200</span><span class="op">:</span><span class="va">Ns</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">Ef_lambda2_PC</span> <span class="op">=</span> <span class="va">ESS_lambda2_PC</span><span class="op">/</span><span class="va">time_val_PC</span></span>
+<span>  </span>
+<span>  <span class="va">stat_vec_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fl">100</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">vESS</span><span class="op">)</span><span class="op">/</span><span class="va">Ns</span>,</span>
+<span>    <span class="va">Ef_PC</span>,</span>
+<span>    <span class="fl">100</span><span class="op">*</span><span class="va">ESS_sigma2_PC</span><span class="op">/</span><span class="va">Ns</span>,</span>
+<span>    <span class="va">Ef_sigma2_PC</span>,</span>
+<span>    <span class="fl">100</span><span class="op">*</span><span class="va">ESS_lambda2_PC</span><span class="op">/</span><span class="va">Ns</span>,</span>
+<span>    <span class="va">Ef_lambda2_PC</span>,</span>
+<span>    <span class="va">time_val_PC</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">name_vals</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mix_beta"</span>, <span class="st">"eff_beta"</span>, <span class="st">"mix_sigma2"</span>, <span class="st">"eff_sigma2"</span>, <span class="st">"mix_lambda2"</span>, <span class="st">"eff_lambda2"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">stat_vec_PC</span><span class="op">)</span> <span class="op">=</span> <span class="va">name_vals</span> </span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; iter: 0 lambda2: 0.858958 sigma2: 1.00941</span></span>
+<span><span class="co">#&gt; iter: 100 lambda2: 1.4063 sigma2: 0.958329</span></span>
+<span><span class="co">#&gt; iter: 200 lambda2: 2.75352 sigma2: 0.864837</span></span>
+<span><span class="co">#&gt; iter: 300 lambda2: 1.29269 sigma2: 1.04531</span></span>
+<span><span class="co">#&gt; iter: 400 lambda2: 2.95129 sigma2: 0.953137</span></span>
+<span><span class="co">#&gt; iter: 500 lambda2: 1.58173 sigma2: 0.90526</span></span>
+<span><span class="co">#&gt; iter: 600 lambda2: 1.89708 sigma2: 0.962534</span></span>
+<span><span class="co">#&gt; iter: 700 lambda2: 1.74399 sigma2: 1.25343</span></span>
+<span><span class="co">#&gt; iter: 800 lambda2: 2.71632 sigma2: 0.992663</span></span>
+<span><span class="co">#&gt; iter: 900 lambda2: 2.31175 sigma2: 0.915144</span></span>
+<span><span class="co">#&gt; iter: 1000 lambda2: 1.87945 sigma2: 1.12389</span></span>
+<span><span class="co">#&gt; iter: 1100 lambda2: 0.883053 sigma2: 1.23857</span></span>
+<span><span class="co">#&gt; iter: 1200 lambda2: 2.21911 sigma2: 1.07196</span></span>
+<span><span class="co">#&gt; iter: 1300 lambda2: 1.45428 sigma2: 1.0355</span></span>
+<span><span class="co">#&gt; iter: 1400 lambda2: 2.10524 sigma2: 1.01913</span></span>
+<span><span class="co">#&gt; iter: 1500 lambda2: 4.05418 sigma2: 1.07186</span></span>
+<span><span class="co">#&gt; iter: 1600 lambda2: 2.45761 sigma2: 0.90785</span></span>
+<span><span class="co">#&gt; iter: 1700 lambda2: 3.45027 sigma2: 1.34169</span></span>
+<span><span class="co">#&gt; iter: 1800 lambda2: 3.95832 sigma2: 0.881618</span></span>
+<span><span class="co">#&gt; iter: 1900 lambda2: 1.88884 sigma2: 1.24943</span></span>
+<span><span class="co">#&gt; iter: 0 lambda2: 3.08123 sigma2: 1.43085</span></span>
+<span><span class="co">#&gt; iter: 100 lambda2: 1.64498 sigma2: 1.07332</span></span>
+<span><span class="co">#&gt; iter: 200 lambda2: 1.25335 sigma2: 0.980203</span></span>
+<span><span class="co">#&gt; iter: 300 lambda2: 2.31797 sigma2: 1.28925</span></span>
+<span><span class="co">#&gt; iter: 400 lambda2: 1.86186 sigma2: 0.977749</span></span>
+<span><span class="co">#&gt; iter: 500 lambda2: 3.49106 sigma2: 1.06686</span></span>
+<span><span class="co">#&gt; iter: 600 lambda2: 1.54199 sigma2: 1.09826</span></span>
+<span><span class="co">#&gt; iter: 700 lambda2: 2.45581 sigma2: 1.2903</span></span>
+<span><span class="co">#&gt; iter: 800 lambda2: 1.65776 sigma2: 1.18259</span></span>
+<span><span class="co">#&gt; iter: 900 lambda2: 1.85546 sigma2: 1.03839</span></span>
+<span><span class="co">#&gt; iter: 1000 lambda2: 2.24132 sigma2: 1.18037</span></span>
+<span><span class="co">#&gt; iter: 1100 lambda2: 3.54543 sigma2: 1.2783</span></span>
+<span><span class="co">#&gt; iter: 1200 lambda2: 1.37582 sigma2: 1.21287</span></span>
+<span><span class="co">#&gt; iter: 1300 lambda2: 1.87356 sigma2: 1.12916</span></span>
+<span><span class="co">#&gt; iter: 1400 lambda2: 1.33734 sigma2: 1.12834</span></span>
+<span><span class="co">#&gt; iter: 1500 lambda2: 1.80435 sigma2: 1.16175</span></span>
+<span><span class="co">#&gt; iter: 1600 lambda2: 1.29339 sigma2: 1.34696</span></span>
+<span><span class="co">#&gt; iter: 1700 lambda2: 2.56371 sigma2: 0.954944</span></span>
+<span><span class="co">#&gt; iter: 1800 lambda2: 2.45902 sigma2: 1.22607</span></span>
+<span><span class="co">#&gt; iter: 1900 lambda2: 3.40984 sigma2: 1.19406</span></span>
+<span><span class="co">#&gt; iter: 0 lambda2: 1.25219 sigma2: 0.960657</span></span>
+<span><span class="co">#&gt; iter: 100 lambda2: 1.20597 sigma2: 1.01437</span></span>
+<span><span class="co">#&gt; iter: 200 lambda2: 3.48412 sigma2: 1.20471</span></span>
+<span><span class="co">#&gt; iter: 300 lambda2: 1.80046 sigma2: 1.19462</span></span>
+<span><span class="co">#&gt; iter: 400 lambda2: 1.05257 sigma2: 1.0919</span></span>
+<span><span class="co">#&gt; iter: 500 lambda2: 1.57488 sigma2: 0.96958</span></span>
+<span><span class="co">#&gt; iter: 600 lambda2: 0.780784 sigma2: 0.961727</span></span>
+<span><span class="co">#&gt; iter: 700 lambda2: 0.89589 sigma2: 0.859694</span></span>
+<span><span class="co">#&gt; iter: 800 lambda2: 2.21023 sigma2: 0.895006</span></span>
+<span><span class="co">#&gt; iter: 900 lambda2: 5.1711 sigma2: 1.04788</span></span>
+<span><span class="co">#&gt; iter: 1000 lambda2: 4.29003 sigma2: 1.34692</span></span>
+<span><span class="co">#&gt; iter: 1100 lambda2: 2.18293 sigma2: 0.981105</span></span>
+<span><span class="co">#&gt; iter: 1200 lambda2: 4.07203 sigma2: 1.18968</span></span>
+<span><span class="co">#&gt; iter: 1300 lambda2: 1.88576 sigma2: 1.06622</span></span>
+<span><span class="co">#&gt; iter: 1400 lambda2: 2.09095 sigma2: 1.20465</span></span>
+<span><span class="co">#&gt; iter: 1500 lambda2: 3.93494 sigma2: 1.24238</span></span>
+<span><span class="co">#&gt; iter: 1600 lambda2: 1.4093 sigma2: 1.04512</span></span>
+<span><span class="co">#&gt; iter: 1700 lambda2: 1.23756 sigma2: 0.891891</span></span>
+<span><span class="co">#&gt; iter: 1800 lambda2: 1.25073 sigma2: 1.05552</span></span>
+<span><span class="co">#&gt; iter: 1900 lambda2: 4.1184 sigma2: 1.01891</span></span>
+<span><span class="co">#&gt; iter: 0 lambda2: 2.40241 sigma2: 0.969217</span></span>
+<span><span class="co">#&gt; iter: 100 lambda2: 2.32971 sigma2: 0.983008</span></span>
+<span><span class="co">#&gt; iter: 200 lambda2: 2.88361 sigma2: 1.09809</span></span>
+<span><span class="co">#&gt; iter: 300 lambda2: 2.26611 sigma2: 1.03886</span></span>
+<span><span class="co">#&gt; iter: 400 lambda2: 1.79334 sigma2: 0.994797</span></span>
+<span><span class="co">#&gt; iter: 500 lambda2: 3.25743 sigma2: 1.10414</span></span>
+<span><span class="co">#&gt; iter: 600 lambda2: 3.10534 sigma2: 0.995841</span></span>
+<span><span class="co">#&gt; iter: 700 lambda2: 2.01161 sigma2: 0.925017</span></span>
+<span><span class="co">#&gt; iter: 800 lambda2: 2.56433 sigma2: 1.45843</span></span>
+<span><span class="co">#&gt; iter: 900 lambda2: 2.2818 sigma2: 1.05038</span></span>
+<span><span class="co">#&gt; iter: 1000 lambda2: 3.98816 sigma2: 1.26292</span></span>
+<span><span class="co">#&gt; iter: 1100 lambda2: 2.94681 sigma2: 1.03657</span></span>
+<span><span class="co">#&gt; iter: 1200 lambda2: 2.28902 sigma2: 1.03245</span></span>
+<span><span class="co">#&gt; iter: 1300 lambda2: 1.82286 sigma2: 1.10949</span></span>
+<span><span class="co">#&gt; iter: 1400 lambda2: 1.46105 sigma2: 1.25766</span></span>
+<span><span class="co">#&gt; iter: 1500 lambda2: 0.787921 sigma2: 0.911566</span></span>
+<span><span class="co">#&gt; iter: 1600 lambda2: 2.7443 sigma2: 0.988332</span></span>
+<span><span class="co">#&gt; iter: 1700 lambda2: 3.13911 sigma2: 1.32975</span></span>
+<span><span class="co">#&gt; iter: 1800 lambda2: 2.80028 sigma2: 1.29629</span></span>
+<span><span class="co">#&gt; iter: 1900 lambda2: 2.21642 sigma2: 0.93613</span></span>
+<span><span class="co">#&gt; iter: 0 lambda2: 4.47944 sigma2: 1.01204</span></span>
+<span><span class="co">#&gt; iter: 100 lambda2: 1.4653 sigma2: 1.02341</span></span>
+<span><span class="co">#&gt; iter: 200 lambda2: 1.19634 sigma2: 1.10096</span></span>
+<span><span class="co">#&gt; iter: 300 lambda2: 2.2262 sigma2: 0.999395</span></span>
+<span><span class="co">#&gt; iter: 400 lambda2: 2.9787 sigma2: 0.922988</span></span>
+<span><span class="co">#&gt; iter: 500 lambda2: 4.71374 sigma2: 0.85405</span></span>
+<span><span class="co">#&gt; iter: 600 lambda2: 1.83211 sigma2: 0.96172</span></span>
+<span><span class="co">#&gt; iter: 700 lambda2: 3.05674 sigma2: 1.16421</span></span>
+<span><span class="co">#&gt; iter: 800 lambda2: 1.98883 sigma2: 1.01803</span></span>
+<span><span class="co">#&gt; iter: 900 lambda2: 1.16042 sigma2: 1.18473</span></span>
+<span><span class="co">#&gt; iter: 1000 lambda2: 0.936166 sigma2: 1.0562</span></span>
+<span><span class="co">#&gt; iter: 1100 lambda2: 0.864847 sigma2: 1.18938</span></span>
+<span><span class="co">#&gt; iter: 1200 lambda2: 3.82901 sigma2: 0.846567</span></span>
+<span><span class="co">#&gt; iter: 1300 lambda2: 1.27783 sigma2: 0.878591</span></span>
+<span><span class="co">#&gt; iter: 1400 lambda2: 1.11838 sigma2: 0.972412</span></span>
+<span><span class="co">#&gt; iter: 1500 lambda2: 2.4752 sigma2: 0.87348</span></span>
+<span><span class="co">#&gt; iter: 1600 lambda2: 1.46618 sigma2: 0.732426</span></span>
+<span><span class="co">#&gt; iter: 1700 lambda2: 1.74941 sigma2: 1.0051</span></span>
+<span><span class="co">#&gt; iter: 1800 lambda2: 2.86923 sigma2: 1.00961</span></span>
+<span><span class="co">#&gt; iter: 1900 lambda2: 1.03685 sigma2: 0.887191</span></span>
 <span><span class="co">#&gt; iter: 0</span></span>
 <span><span class="co">#&gt; iter: 100</span></span>
 <span><span class="co">#&gt; iter: 200</span></span>
@@ -119,9 +352,96 @@ demonstrates how to apply the samplers to real and simulated data.</p>
 <span><span class="co">#&gt; iter: 700</span></span>
 <span><span class="co">#&gt; iter: 800</span></span>
 <span><span class="co">#&gt; iter: 900</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">output_PC</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1]  2.05197868  1.96502229  1.84986538  0.12355534  0.06721269 -0.04147922</span></span>
-<span><span class="co">#&gt;  [7]  0.06621934  0.11292249 -0.03955249  0.12324313</span></span></code></pre></div>
+<span><span class="co">#&gt; iter: 1000</span></span>
+<span><span class="co">#&gt; iter: 1100</span></span>
+<span><span class="co">#&gt; iter: 1200</span></span>
+<span><span class="co">#&gt; iter: 1300</span></span>
+<span><span class="co">#&gt; iter: 1400</span></span>
+<span><span class="co">#&gt; iter: 1500</span></span>
+<span><span class="co">#&gt; iter: 1600</span></span>
+<span><span class="co">#&gt; iter: 1700</span></span>
+<span><span class="co">#&gt; iter: 1800</span></span>
+<span><span class="co">#&gt; iter: 1900</span></span>
+<span><span class="co">#&gt; iter: 0</span></span>
+<span><span class="co">#&gt; iter: 100</span></span>
+<span><span class="co">#&gt; iter: 200</span></span>
+<span><span class="co">#&gt; iter: 300</span></span>
+<span><span class="co">#&gt; iter: 400</span></span>
+<span><span class="co">#&gt; iter: 500</span></span>
+<span><span class="co">#&gt; iter: 600</span></span>
+<span><span class="co">#&gt; iter: 700</span></span>
+<span><span class="co">#&gt; iter: 800</span></span>
+<span><span class="co">#&gt; iter: 900</span></span>
+<span><span class="co">#&gt; iter: 1000</span></span>
+<span><span class="co">#&gt; iter: 1100</span></span>
+<span><span class="co">#&gt; iter: 1200</span></span>
+<span><span class="co">#&gt; iter: 1300</span></span>
+<span><span class="co">#&gt; iter: 1400</span></span>
+<span><span class="co">#&gt; iter: 1500</span></span>
+<span><span class="co">#&gt; iter: 1600</span></span>
+<span><span class="co">#&gt; iter: 1700</span></span>
+<span><span class="co">#&gt; iter: 1800</span></span>
+<span><span class="co">#&gt; iter: 1900</span></span>
+<span><span class="co">#&gt; iter: 0</span></span>
+<span><span class="co">#&gt; iter: 100</span></span>
+<span><span class="co">#&gt; iter: 200</span></span>
+<span><span class="co">#&gt; iter: 300</span></span>
+<span><span class="co">#&gt; iter: 400</span></span>
+<span><span class="co">#&gt; iter: 500</span></span>
+<span><span class="co">#&gt; iter: 600</span></span>
+<span><span class="co">#&gt; iter: 700</span></span>
+<span><span class="co">#&gt; iter: 800</span></span>
+<span><span class="co">#&gt; iter: 900</span></span>
+<span><span class="co">#&gt; iter: 1000</span></span>
+<span><span class="co">#&gt; iter: 1100</span></span>
+<span><span class="co">#&gt; iter: 1200</span></span>
+<span><span class="co">#&gt; iter: 1300</span></span>
+<span><span class="co">#&gt; iter: 1400</span></span>
+<span><span class="co">#&gt; iter: 1500</span></span>
+<span><span class="co">#&gt; iter: 1600</span></span>
+<span><span class="co">#&gt; iter: 1700</span></span>
+<span><span class="co">#&gt; iter: 1800</span></span>
+<span><span class="co">#&gt; iter: 1900</span></span>
+<span><span class="co">#&gt; iter: 0</span></span>
+<span><span class="co">#&gt; iter: 100</span></span>
+<span><span class="co">#&gt; iter: 200</span></span>
+<span><span class="co">#&gt; iter: 300</span></span>
+<span><span class="co">#&gt; iter: 400</span></span>
+<span><span class="co">#&gt; iter: 500</span></span>
+<span><span class="co">#&gt; iter: 600</span></span>
+<span><span class="co">#&gt; iter: 700</span></span>
+<span><span class="co">#&gt; iter: 800</span></span>
+<span><span class="co">#&gt; iter: 900</span></span>
+<span><span class="co">#&gt; iter: 1000</span></span>
+<span><span class="co">#&gt; iter: 1100</span></span>
+<span><span class="co">#&gt; iter: 1200</span></span>
+<span><span class="co">#&gt; iter: 1300</span></span>
+<span><span class="co">#&gt; iter: 1400</span></span>
+<span><span class="co">#&gt; iter: 1500</span></span>
+<span><span class="co">#&gt; iter: 1600</span></span>
+<span><span class="co">#&gt; iter: 1700</span></span>
+<span><span class="co">#&gt; iter: 1800</span></span>
+<span><span class="co">#&gt; iter: 1900</span></span>
+<span><span class="co">#&gt; iter: 0</span></span>
+<span><span class="co">#&gt; iter: 100</span></span>
+<span><span class="co">#&gt; iter: 200</span></span>
+<span><span class="co">#&gt; iter: 300</span></span>
+<span><span class="co">#&gt; iter: 400</span></span>
+<span><span class="co">#&gt; iter: 500</span></span>
+<span><span class="co">#&gt; iter: 600</span></span>
+<span><span class="co">#&gt; iter: 700</span></span>
+<span><span class="co">#&gt; iter: 800</span></span>
+<span><span class="co">#&gt; iter: 900</span></span>
+<span><span class="co">#&gt; iter: 1000</span></span>
+<span><span class="co">#&gt; iter: 1100</span></span>
+<span><span class="co">#&gt; iter: 1200</span></span>
+<span><span class="co">#&gt; iter: 1300</span></span>
+<span><span class="co">#&gt; iter: 1400</span></span>
+<span><span class="co">#&gt; iter: 1500</span></span>
+<span><span class="co">#&gt; iter: 1600</span></span>
+<span><span class="co">#&gt; iter: 1700</span></span>
+<span><span class="co">#&gt; iter: 1800</span></span>
+<span><span class="co">#&gt; iter: 1900</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
@@ -152,109 +472,70 @@ the preprocessing steps outlined in this vignette.</p></li>
 table from the manuscript, comparing the mixing percentages, sampling
 efficiencies, and runtimes for the Diabetes, Kakadu, and Communities and
 Crime datasets.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">effective_sample_size</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">samples</span><span class="op">)</span> </span>
-<span><span class="op">{</span></span>
-<span>  <span class="co"># Using the spectral method</span></span>
-<span>  <span class="va">N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># Compute spectral density at zero using spectrum0.ar (uses AR smoothing)</span></span>
-<span>  <span class="va">spectral_density_zero</span> <span class="op">&lt;-</span> <span class="fu">spectrum0.ar</span><span class="op">(</span><span class="va">samples</span><span class="op">)</span><span class="op">$</span><span class="va">spec</span></span>
-<span>  </span>
-<span>  <span class="co"># Compute effective sample size using variance ratio</span></span>
-<span>  <span class="va">sample_variance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
-<span>  <span class="va">tau</span> <span class="op">&lt;-</span> <span class="va">spectral_density_zero</span> <span class="op">/</span> <span class="va">sample_variance</span>  <span class="co"># Integrated autocorrelation time</span></span>
-<span>  <span class="va">ESS</span> <span class="op">&lt;-</span> <span class="va">N</span> <span class="op">/</span> <span class="va">tau</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">ESS</span> <span class="op">&gt;</span> <span class="va">N</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">ESS</span> <span class="op">=</span> <span class="va">N</span></span>
-<span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">ESS</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://garthtarr.github.io/BayesianLasso/">BayesianLasso</a></span><span class="op">)</span></span>
-<span><span class="co"># This code requires bayesreg</span></span>
-<span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"monomvn"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">monomvn</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/monomvn/man/monomvn.html" class="external-link">monomvn</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>  <span class="co"># use the function safely</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"monomvn package not installed; skipping example."</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"bayeslm"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">bayeslm</span><span class="fu">::</span><span class="fu">bayeslm</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>  <span class="co"># use the function safely</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"bayeslm package not installed; skipping example."</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rstan"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">rstan</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/rstan/reference/rstan.html" class="external-link">rstan</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>  <span class="co"># use the function safely</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"rstan package not installed; skipping example."</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"bayesreg"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">bayesreg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bayesreg/man/bayesreg.html" class="external-link">bayesreg</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>  <span class="co"># use the function safely</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"bayesreg package not installed; skipping example."</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Example: dataset_name &lt;- "diabetes2"</span></span>
 <span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="va">dataset_name</span><span class="op">==</span><span class="st">"diabetes2"</span><span class="op">)</span> </span>
-<span><span class="op">{</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="va">dataset_name</span> <span class="op">==</span> <span class="va">datasets_ngtp</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"lars"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"lars"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Package 'lars' is required for the diabetes example in this vignette."</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="kw">else</span><span class="op">{</span></span>
+<span>    </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"diabetes"</span>, package <span class="op">=</span> <span class="st">"lars"</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    </span>
+<span>    <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">diabetes</span><span class="op">$</span><span class="va">y</span></span>
+<span>    <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">diabetes</span><span class="op">$</span><span class="va">x</span></span>
+<span>    <span class="va">inds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>    </span>
+<span>    <span class="co"># Normalizing and scaling the dataset by function normalize()</span></span>
+<span>    <span class="va">norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize.html">normalize</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span>, scale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">norm</span><span class="op">$</span><span class="va">mX</span></span>
+<span>    <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span><span class="op">^</span><span class="fl">2</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">[</span> , <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
+<span>    <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">norm</span><span class="op">$</span><span class="va">vy</span></span>
 <span>  <span class="op">}</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">diabetes</span>, package <span class="op">=</span> <span class="st">"lars"</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">y</span> <span class="op">=</span> <span class="va">diabetes</span><span class="op">$</span><span class="va">y</span></span>
-<span>  <span class="va">x</span> <span class="op">=</span> <span class="va">diabetes</span><span class="op">$</span><span class="va">x</span></span>
-<span>  <span class="va">inds</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># Normalizing and scaling the dataset by function normalize()</span></span>
-<span>  <span class="va">norm</span> <span class="op">=</span> <span class="fu"><a href="../reference/normalize.html">normalize</a></span><span class="op">(</span><span class="va">y</span>,<span class="va">x</span>, scale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="va">x</span> <span class="op">=</span> <span class="va">norm</span><span class="op">$</span><span class="va">mX</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">^</span><span class="fl">2</span>, data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">norm</span><span class="op">$</span><span class="va">vy</span></span>
-<span>  </span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="va">dataset_name</span><span class="op">==</span><span class="st">"Kakadu2"</span><span class="op">)</span> </span>
-<span><span class="op">{</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"Ecdat"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"Ecdat"</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Kakadu"</span>, package <span class="op">=</span> <span class="st">"Ecdat"</span><span class="op">)</span></span>
-<span>  </span>
-<span></span>
-<span>  <span class="co"># Get y vector and X matrix</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">income</span><span class="op">)</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">dat</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">21</span>,<span class="fl">23</span><span class="op">)</span><span class="op">]</span>  </span>
-<span>  </span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">^</span><span class="fl">2</span>,data<span class="op">=</span><span class="va">x</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="va">dataset_name</span> <span class="op">==</span> <span class="va">datasets_ngtp</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"Ecdat"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Package 'Ecdat' is required for the Kakadu example in this vignette."</span><span class="op">)</span></span>
+<span>    <span class="op">}</span><span class="kw">else</span><span class="op">{</span></span>
+<span>      </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Kakadu"</span>, package <span class="op">=</span> <span class="st">"Ecdat"</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>      </span>
+<span>      <span class="co"># Get y vector and X matrix</span></span>
+<span>      <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">Kakadu</span><span class="op">$</span><span class="va">income</span><span class="op">)</span></span>
+<span>      <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">Kakadu</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, <span class="fl">22</span><span class="op">)</span><span class="op">]</span></span>
+<span>      </span>
+<span>      <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span><span class="op">^</span><span class="fl">2</span>, data <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">[</span> , <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
+<span>    <span class="op">}</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Make sure Crime.csv (or comData.Rdata) is downloaded manually before running this</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="va">dataset_name</span><span class="op">==</span><span class="st">"Crime"</span><span class="op">)</span> </span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="va">dataset_name</span> <span class="op">==</span> <span class="va">datasets_ngtp</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> </span>
 <span><span class="op">{</span></span>
-<span>  <span class="va">rdata_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"comData.Rdata"</span>, package <span class="op">=</span> <span class="st">"BayesianLasso"</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">rdata_path</span><span class="op">)</span></span>
-<span>  <span class="co"># Show only if file exists</span></span>
-<span>  <span class="va">crime_path</span> <span class="op">&lt;-</span> <span class="st">"Crime.csv"</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">crime_path</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">crime_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">crime_path</span><span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Please download 'communities.data' from the UCI Machine Learning Repository and convert to Crime.csv."</span><span class="op">)</span></span>
+<span>  <span class="va">rdata_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"comData.Rdata"</span>, package <span class="op">=</span> <span class="st">"BayesianLasso"</span><span class="op">)</span> </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">rdata_path</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">rdata_path</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">rdata_path</span><span class="op">)</span> </span>
+<span>  <span class="op">}</span><span class="kw">else</span> <span class="op">{</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"File 'comData.Rdata' not found in package extdata."</span><span class="op">)</span> </span>
 <span>  <span class="op">}</span></span>
 <span>  </span>
-<span></span>
-<span>  <span class="va">mX</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>  </span>
-<span>  <span class="va">mX</span> <span class="op">&lt;-</span> <span class="va">mX</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ownHousQrange"</span>,<span class="st">"rentUpperQ"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
-<span>  <span class="va">varnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mX</span><span class="op">)</span></span>
-<span>  <span class="va">vy</span> <span class="op">&lt;-</span> <span class="va">Y</span><span class="op">[</span>,<span class="st">"murders"</span><span class="op">]</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">mX</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">vy</span></span>
-<span>  <span class="va">inds</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># ---- Remove rows with NA while keeping X and Y aligned ----</span></span>
+<span>  <span class="va">datXY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">X2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">datXY</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">Y2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">datXY</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># ---- Drop unwanted columns safely ----</span></span>
+<span>  <span class="va">drop_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ownHousQrange"</span>, <span class="st">"rentUpperQ"</span><span class="op">)</span></span>
+<span>  <span class="va">X2</span> <span class="op">&lt;-</span> <span class="va">X2</span><span class="op">[</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">drop_cols</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="co"># ---- Define regression inputs ----</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">X2</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">Y2</span><span class="op">[</span>, <span class="st">"murders"</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">varnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">inds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span></span>
@@ -275,46 +556,51 @@ Crime datasets.</p>
 <span><span class="va">inds_use</span> <span class="op">=</span> <span class="op">(</span><span class="va">nburn</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">nsamples</span></span>
 <span><span class="va">N</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">inds_use</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># To store elapsed time and results of the PC sampler</span></span>
-<span><span class="va">vtime_val_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">results_PC</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>  <span class="co"># to be initialized after the first run</span></span>
 <span></span>
-<span><span class="co"># Running the modified PC sampler 5 times and taking the average of the results across runs.</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>    <span class="va">res_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_PC_Gibbs</a></span><span class="op">(</span></span>
-<span>      X <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
-<span>      <span class="va">nsamples</span>,</span>
-<span>      lambda_init <span class="op">=</span> <span class="va">lambda_init</span>,</span>
-<span>      sigma2_init <span class="op">=</span> <span class="va">sigma2_init</span>,</span>
-<span>      verbose <span class="op">=</span> <span class="fl">1000</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
 <span></span>
-<span>  <span class="va">vtime_val_PC</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">time_val</span></span>
-<span></span>
-<span>  <span class="co"># Initialize accumulators after first run</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_PC</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">results_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      mBeta <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">mBeta</span>,</span>
-<span>      vsigma2 <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vsigma2</span>,</span>
-<span>      vlambda2 <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vlambda2</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span>    <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">mBeta</span></span>
-<span>    <span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span>  <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vsigma2</span></span>
-<span>    <span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="va">dataset_name</span> <span class="op">!=</span> <span class="va">datasets_ngtp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="co"># To store elapsed time and results of the PC sampler</span></span>
+<span>  <span class="va">vtime_val_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">results_PC</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>  <span class="co"># to be initialized after the first run</span></span>
+<span>  </span>
+<span>  <span class="co"># Running the modified PC sampler 5 times and taking the average of the results across runs.</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>      <span class="va">res_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_PC_Gibbs</a></span><span class="op">(</span></span>
+<span>        X <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
+<span>        <span class="va">nsamples</span>,</span>
+<span>        lambda_init <span class="op">=</span> <span class="va">lambda_init</span>,</span>
+<span>        sigma2_init <span class="op">=</span> <span class="va">sigma2_init</span>,</span>
+<span>        verbose <span class="op">=</span> <span class="fl">1000</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
+<span>    </span>
+<span>    <span class="va">vtime_val_PC</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">time_val</span></span>
+<span>    </span>
+<span>    <span class="co"># Initialize accumulators after first run</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_PC</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">results_PC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        mBeta <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">mBeta</span>,</span>
+<span>        vsigma2 <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vsigma2</span>,</span>
+<span>        vlambda2 <span class="op">=</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span>    <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">mBeta</span></span>
+<span>      <span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span>  <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vsigma2</span></span>
+<span>      <span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">&lt;-</span> <span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">+</span> <span class="va">res_PC</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>    <span class="op">}</span></span>
 <span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># Take averages</span></span>
-<span><span class="va">mBeta</span> <span class="op">=</span> <span class="op">(</span><span class="va">res_PC</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
-<span><span class="va">vsigma2</span> <span class="op">=</span> <span class="op">(</span><span class="va">res_PC</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
-<span><span class="va">vlambda2</span> <span class="op">=</span> <span class="op">(</span><span class="va">res_PC</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
-<span><span class="va">time_val_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">vtime_val_PC</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Compute effective sample sizes  </span></span>
+<span>  </span>
+<span>  <span class="co"># Take averages</span></span>
+<span>  <span class="va">mBeta</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vsigma2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vlambda2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_PC</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">time_val_PC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">vtime_val_PC</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Compute effective sample sizes  </span></span>
 <span>  <span class="va">vESS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span>  <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">vESS</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="va">mBeta</span><span class="op">[</span><span class="va">inds_use</span>,<span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
@@ -335,51 +621,52 @@ Crime datasets.</p>
 <span>    <span class="va">Ef_lambda2_PC</span>,</span>
 <span>    <span class="va">time_val_PC</span><span class="op">)</span></span>
 <span>  </span>
-<span><span class="va">name_vals</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mix_beta"</span>, <span class="st">"eff_beta"</span>, <span class="st">"mix_sigma2"</span>, <span class="st">"eff_sigma2"</span>, <span class="st">"mix_lambda2"</span>, <span class="st">"eff_lambda2"</span>, <span class="st">"time"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">stat_vec_PC</span><span class="op">)</span> <span class="op">=</span> <span class="va">name_vals</span> </span>
-<span></span>
-<span></span>
-<span><span class="co"># To store elapsed time and results of the Hans sampler</span></span>
-<span><span class="va">vtime_val_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">results_Hans</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>  <span class="co"># to be initialized after the first run</span></span>
-<span></span>
-<span><span class="co"># Running the modified Hans sampler 5 times and taking the average of the results across runs.</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>    <span class="va">res_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
-<span>      X <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
-<span>      <span class="va">nsamples</span>,</span>
-<span>      beta_init <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">mBeta</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>      lambda_init <span class="op">=</span> <span class="va">lambda_init</span>,</span>
-<span>      sigma2_init <span class="op">=</span> <span class="va">sigma2_init</span>,</span>
-<span>      verbose <span class="op">=</span> <span class="fl">1000</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
-<span></span>
-<span>  <span class="va">vtime_val_Hans</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">time_val</span></span>
-<span></span>
-<span>  <span class="co"># Initialize accumulators after first run</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_Hans</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">results_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      mBeta <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">mBeta</span>,</span>
-<span>      vsigma2 <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vsigma2</span>,</span>
-<span>      vlambda2 <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vlambda2</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span>    <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">mBeta</span></span>
-<span>    <span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span>  <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vsigma2</span></span>
-<span>    <span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>  <span class="va">name_vals</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mix_beta"</span>, <span class="st">"eff_beta"</span>, <span class="st">"mix_sigma2"</span>, <span class="st">"eff_sigma2"</span>, <span class="st">"mix_lambda2"</span>, <span class="st">"eff_lambda2"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">stat_vec_PC</span><span class="op">)</span> <span class="op">=</span> <span class="va">name_vals</span> </span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="co"># To store elapsed time and results of the Hans sampler</span></span>
+<span>  <span class="va">vtime_val_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">results_Hans</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>  <span class="co"># to be initialized after the first run</span></span>
+<span>  </span>
+<span>  <span class="co"># Running the modified Hans sampler 5 times and taking the average of the results across runs.</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">time_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>      <span class="va">res_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
+<span>        X <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, beta_init <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">mBeta</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>,</span>
+<span>        <span class="va">nsamples</span>,</span>
+<span>        lambda_init <span class="op">=</span> <span class="va">lambda_init</span>,</span>
+<span>        sigma2_init <span class="op">=</span> <span class="va">sigma2_init</span>,</span>
+<span>        verbose <span class="op">=</span> <span class="fl">1000</span>, tune_lambda2 <span class="op">=</span> <span class="cn">TRUE</span>, rao_blackwellization <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
+<span>    </span>
+<span>    <span class="va">vtime_val_Hans</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">time_val</span></span>
+<span>    </span>
+<span>    <span class="co"># Initialize accumulators after first run</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_Hans</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">results_Hans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        mBeta <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">mBeta</span>,</span>
+<span>        vsigma2 <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vsigma2</span>,</span>
+<span>        vlambda2 <span class="op">=</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span>    <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">mBeta</span></span>
+<span>      <span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span>  <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vsigma2</span></span>
+<span>      <span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">&lt;-</span> <span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span> <span class="op">+</span> <span class="va">res_Hans</span><span class="op">$</span><span class="va">vlambda2</span></span>
+<span>    <span class="op">}</span></span>
 <span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># Take averages</span></span>
-<span><span class="va">mBeta</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
-<span><span class="va">vsigma2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
-<span><span class="va">vlambda2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
-<span><span class="va">time_val_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">vtime_val_Hans</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Compute effective sample sizes</span></span>
+<span>  </span>
+<span>  <span class="co"># Take averages</span></span>
+<span>  <span class="va">mBeta</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">mBeta</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vsigma2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vsigma2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">vlambda2</span> <span class="op">=</span> <span class="op">(</span><span class="va">results_Hans</span><span class="op">$</span><span class="va">vlambda2</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span></span>
+<span>  <span class="va">time_val_Hans</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">vtime_val_Hans</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Compute effective sample sizes</span></span>
 <span>  <span class="va">vESS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span>  <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">vESS</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">effective_sample_size</span><span class="op">(</span><span class="va">mBeta</span><span class="op">[</span><span class="va">inds_use</span>,<span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
@@ -400,8 +687,103 @@ Crime datasets.</p>
 <span>    <span class="va">Ef_lambda2_Hans</span>,</span>
 <span>    <span class="va">time_val_Hans</span><span class="op">)</span></span>
 <span>  </span>
-<span><span class="va">name_vals</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mix_beta"</span>, <span class="st">"eff_beta"</span>, <span class="st">"mix_sigma2"</span>, <span class="st">"eff_sigma2"</span>, <span class="st">"mix_lambda2"</span>, <span class="st">"eff_lambda2"</span>, <span class="st">"time"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">stat_vec_Hans</span><span class="op">)</span> <span class="op">=</span> <span class="va">name_vals</span> </span></code></pre></div>
+<span>  <span class="va">name_vals</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mix_beta"</span>, <span class="st">"eff_beta"</span>, <span class="st">"mix_sigma2"</span>, <span class="st">"eff_sigma2"</span>, <span class="st">"mix_lambda2"</span>, <span class="st">"eff_lambda2"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">stat_vec_Hans</span><span class="op">)</span> <span class="op">=</span> <span class="va">name_vals</span> </span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="va">dataset_name</span> <span class="op">!=</span> <span class="va">datasets_ngtp</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="va">res_monomvn</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span>    </span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"monomvn"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      </span>
+<span>      </span>
+<span>      <span class="va">res_monomvn</span> <span class="op">=</span> <span class="fu">benchmark_blasso_monomvn</span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span>,</span>
+<span>                                             <span class="va">lambda_init</span>, <span class="va">sigma2_init</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>, </span>
+<span>                                             <span class="va">nburn</span>, <span class="va">nsamples</span>, trials<span class="op">=</span><span class="fl">5</span>, </span>
+<span>                                             beta_inds<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> </span>
+<span>      </span>
+<span>      <span class="va">stat_vec_monomvn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res_monomvn</span><span class="op">$</span><span class="va">mStat</span><span class="op">)</span></span>
+<span>      </span>
+<span>      </span>
+<span>    <span class="op">}</span><span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Skipping monomvn benchmark: package 'monomvn' is not installed."</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="co"># ======================= Run bayeslm ============================</span></span>
+<span>  </span>
+<span>  <span class="va">res_bayeslm</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"bayeslm"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    </span>
+<span>    <span class="va">res_bayeslm</span> <span class="op">=</span> <span class="fu">benchmark_blasso_bayeslm</span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span>,</span>
+<span>                                           <span class="va">lambda_init</span>, <span class="va">sigma2_init</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>, </span>
+<span>                                           <span class="va">nburn</span>, <span class="va">nsamples</span>, trials<span class="op">=</span><span class="fl">5</span>, </span>
+<span>                                           beta_inds<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> </span>
+<span>    </span>
+<span>    <span class="va">stat_vec_bayeslm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res_bayeslm</span><span class="op">$</span><span class="va">mStat</span><span class="op">)</span></span>
+<span>    </span>
+<span>    </span>
+<span>  <span class="op">}</span><span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Skipping bayeslm benchmark: package 'bayeslm' is not installed."</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="co"># ======================= Run rstan ============================</span></span>
+<span>  </span>
+<span>  <span class="va">res_rstan</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rstan"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    </span>
+<span>    <span class="va">res_rstan</span> <span class="op">=</span> <span class="fu">benchmark_blasso_rstan</span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span>,</span>
+<span>                                       <span class="va">lambda_init</span>, <span class="va">sigma2_init</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>, </span>
+<span>                                       <span class="va">nburn</span>, <span class="va">nsamples</span>, trials<span class="op">=</span><span class="fl">5</span>, </span>
+<span>                                       beta_inds<span class="op">=</span><span class="cn">NA</span><span class="op">)</span></span>
+<span>    </span>
+<span>    <span class="va">stat_vec_rstan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res_rstan</span><span class="op">$</span><span class="va">mStat</span><span class="op">)</span></span>
+<span>    </span>
+<span>    </span>
+<span>  <span class="op">}</span><span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Skipping rstan benchmark: package 'rstan' is not installed."</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="co"># ======================= Run bayesreg ============================</span></span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="va">res_bayesreg</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"bayesreg"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    </span>
+<span>    <span class="va">res_bayesreg</span> <span class="op">=</span> <span class="fu">benchmark_blasso_bayesreg</span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span>,</span>
+<span>                                             <span class="va">lambda_init</span>, <span class="va">sigma2_init</span>, <span class="va">a1</span>, <span class="va">b1</span>, <span class="va">u1</span>, <span class="va">v1</span>, </span>
+<span>                                             <span class="va">nburn</span>, <span class="va">nsamples</span>, trials<span class="op">=</span><span class="fl">5</span>, </span>
+<span>                                             beta_inds<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> </span>
+<span>    </span>
+<span>    <span class="va">stat_vec_bayesreg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res_bayesreg</span><span class="op">$</span><span class="va">mStat</span><span class="op">)</span></span>
+<span>    </span>
+<span>    </span>
+<span>  <span class="op">}</span><span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Skipping bayesreg benchmark: package 'bayesreg' is not installed."</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="convergence-diagnostics">Convergence diagnostics<a class="anchor" aria-label="anchor" href="#convergence-diagnostics"></a>
+</h2>
+<p>Assessing convergence of the MCMC chains is an important step in
+Bayesian analysis. The package provides helper functions such as
+<code>mcmc_stats()</code> and <code>mcmc_diagnostics()</code> to
+summarize mixing behavior and visualize the behavior of the chains. The
+function <code>mcmc_stats()</code> computes numerical summaries of the
+MCMC output, while <code>mcmc_diagnostics()</code> produces basic
+diagnostic plots such as trace and autocorrelation plots for selected
+parameters. These tools allow users to assess mixing and stability of
+the chains in practice. Posterior draws can also be passed to packages
+such as <code>coda</code>, <code>posterior</code>, or
+<code>bayesplot</code> for additional diagnostics.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

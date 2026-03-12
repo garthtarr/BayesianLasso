@@ -20,10 +20,11 @@ elasso(a, b, c)
 vlasso(a, b, c)
 mlasso(a, b, c)
 MillsRatio(d)
-Modified_Hans_Gibbs(X, y, a1, b1, u1, v1,
-              nsamples, beta_init, lambda_init, sigma2_init, verbose)
+Modified_Hans_Gibbs(X, y, beta_init, a1, b1, u1, v1,
+              nsamples, lambda_init, sigma2_init, thin, verbose,
+              tune_lambda2, rao_blackwellization)
 Modified_PC_Gibbs(X, y, a1, b1, u1, v1, 
-              nsamples, lambda_init, sigma2_init, verbose)
+              nsamples, lambda_init, sigma2_init, thin, verbose)
 ```
 
 ## Arguments
@@ -101,10 +102,25 @@ Modified_PC_Gibbs(X, y, a1, b1, u1, v1,
 
   Initial value for the error variance \\\sigma^2\\.
 
+- thin:
+
+  Thinning interval for the MCMC chain. Only every \`thin\`-th draw is
+  stored. Default is 1 (no thinning).
+
 - verbose:
 
   Integer. If greater than 0, progress is printed every `verbose`
   iterations during sampling. Set to 0 to suppress output.
+
+- tune_lambda2:
+
+  Logical; if TRUE (default), the tuning parameter \\\lambda^2\\ is
+  estimated during sampling.
+
+- rao_blackwellization:
+
+  Logical; if TRUE, Rao–Blackwellization is applied to improve posterior
+  estimation. Default is FALSE.
 
 ## Value
 
@@ -243,44 +259,38 @@ lambda_init <- 0.1
 beta_init <- rep(1, ncol(X))
 nsamples <- 1000
 verbose <- 100
+tune_lambda2 <- TRUE
+rao_blackwellization <- FALSE
 
 Output_Hans <- Modified_Hans_Gibbs(
-                X, y, a1, b1, u1, v1,
-                nsamples, beta_init, lambda_init, sigma2_init, verbose
+                X, y, beta_init, a1, b1, u1, v1,
+                nsamples, lambda_init, sigma2_init, 
+                verbose, tune_lambda2, rao_blackwellization
 )
-#> iter: 0 lambda2: 111.808 sigma2: 87.5523
-#> iter: 100 lambda2: 78.3137 sigma2: 31.5026
-#> iter: 200 lambda2: 82.2531 sigma2: 22.8744
-#> iter: 300 lambda2: 43.4028 sigma2: 16.3699
-#> iter: 400 lambda2: 93.2793 sigma2: 21.5296
-#> iter: 500 lambda2: 16.2335 sigma2: 25.1914
-#> iter: 600 lambda2: 74.3442 sigma2: 10.7202
-#> iter: 700 lambda2: 43.4173 sigma2: 20.7042
-#> iter: 800 lambda2: 13.0825 sigma2: 26.2766
-#> iter: 900 lambda2: 8.89624 sigma2: 15.0216
+#> iter: 0 lambda2: 0.01 sigma2: 87.1593
+#> iter: 1 lambda2: 0.01 sigma2: 95.9609
+#> iter: 2 lambda2: 0.01 sigma2: 50.9426
+#> iter: 3 lambda2: 0.01 sigma2: 52.1754
+#> iter: 4 lambda2: 0.01 sigma2: 80.7908
+#> iter: 5 lambda2: 0.01 sigma2: 74.9386
+#> iter: 6 lambda2: 0.01 sigma2: 69.402
+#> iter: 7 lambda2: 0.01 sigma2: 50.4434
+#> iter: 8 lambda2: 0.01 sigma2: 41.5339
+#> iter: 9 lambda2: 0.01 sigma2: 39.48
 
 colMeans(Output_Hans$mBeta)
-#> [1] 0.300507310 0.003085177 0.321644003
+#> [1] -0.12758493  0.08436887  0.10115044
 mean(Output_Hans$vlambda2)
-#> [1] 71.41197
+#> [1] 0.001
 
 
 Output_PC <- Modified_PC_Gibbs(
                X, y, a1, b1, u1, v1, 
                nsamples, lambda_init, sigma2_init, verbose)
 #> iter: 0
-#> iter: 100
-#> iter: 200
-#> iter: 300
-#> iter: 400
-#> iter: 500
-#> iter: 600
-#> iter: 700
-#> iter: 800
-#> iter: 900
 
 colMeans(Output_PC$mBeta)
-#> [1]  0.31996577 -0.09120189  0.38965795
+#> [1]  0.03753301 -0.02313929  0.04647570
 mean(Output_PC$vlambda2)
-#> [1] 69.64793
+#> [1] 1.66784
 ```

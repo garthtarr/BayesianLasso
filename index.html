@@ -95,8 +95,8 @@
 <span></span>
 <span><span class="co"># Run modified Hans Gibbs sampler</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/LassoDistribution.html">Modified_Hans_Gibbs</a></span><span class="op">(</span></span>
-<span>  y <span class="op">=</span> <span class="va">y</span>,</span>
 <span>  X <span class="op">=</span> <span class="va">X</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span>,</span>
 <span>  beta_init <span class="op">=</span> <span class="va">beta_init</span>,</span>
 <span>  a1 <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  b1 <span class="op">=</span> <span class="fl">0.01</span>,</span>
@@ -105,17 +105,17 @@
 <span>  nsamples <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  lambda_init <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  sigma2_init <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span>, tune_lambda2 <span class="op">=</span> <span class="cn">TRUE</span>, rao_blackwellization <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 6</span></span>
-<span><span class="co">#&gt;  $ mBeta   : num [1:100, 1:5] 0.2441 0.2277 0.2478 -0.1356 -0.0692 ...</span></span>
-<span><span class="co">#&gt;  $ vsigma2 : num [1:100, 1] 0.913 0.767 0.704 0.747 0.623 ...</span></span>
-<span><span class="co">#&gt;  $ vlambda2: num [1:100, 1] 34.96 87.38 9.41 53.49 68.44 ...</span></span>
-<span><span class="co">#&gt;  $ mA      : num [1:100, 1:5] 18.4 20.1 24 26.1 24.6 ...</span></span>
-<span><span class="co">#&gt;  $ mB      : num [1:100, 1:5] 5.67 3.15 3 2.11 2.49 ...</span></span>
-<span><span class="co">#&gt;  $ mC      : num [1:100, 1:5] 0.1 6.19 10.68 3.66 8.46 ...</span></span></code></pre></div>
+<span><span class="co">#&gt;  $ mBeta   : num [1:100, 1:5] 0.33112 0.06944 0.00723 -0.00512 0.31311 ...</span></span>
+<span><span class="co">#&gt;  $ vsigma2 : num [1:100, 1] 0.787 0.457 0.597 1.219 0.735 ...</span></span>
+<span><span class="co">#&gt;  $ vlambda2: num [1:100, 1] 64.45 76.32 40.19 41.73 5.21 ...</span></span>
+<span><span class="co">#&gt;  $ mA      : num[0 , 0 ] </span></span>
+<span><span class="co">#&gt;  $ mB      : num[0 , 0 ] </span></span>
+<span><span class="co">#&gt;  $ mC      : num[0 , 0 ]</span></span></code></pre></div>
 <p>The <code><a href="reference/LassoDistribution.html">Modified_Hans_Gibbs()</a></code> function returns a list with the following components:</p>
 <ul>
 <li>
@@ -152,9 +152,9 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"BayesianLasso"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; To cite package 'BayesianLasso' in publications use:</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2025). _Bayesian Lasso Regression and</span></span>
-<span><span class="co">#&gt;   Tools for the Lasso Distribution_. R package version 0.3.0,</span></span>
-<span><span class="co">#&gt;   &lt;https://garthtarr.github.io/BayesianLasso/&gt;.</span></span>
+<span><span class="co">#&gt;   Ormerod J, Davoudabadi M, Tarr G, Mueller S, Tidswell J (2025).</span></span>
+<span><span class="co">#&gt;   _Bayesian Lasso Regression and Tools for the Lasso Distribution_. R</span></span>
+<span><span class="co">#&gt;   package version 0.3.0, &lt;https://garthtarr.github.io/BayesianLasso/&gt;.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
 <span><span class="co">#&gt; </span></span>
