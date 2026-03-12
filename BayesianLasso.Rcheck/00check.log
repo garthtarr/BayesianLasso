@@ -9,9 +9,9 @@
 * using option '--as-cran'
 * checking for file 'BayesianLasso/DESCRIPTION' ... OK
 * checking extension type ... Package
-* this is package 'BayesianLasso' version '0.3.7'
+* this is package 'BayesianLasso' version '0.3.8'
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... [60s] NOTE
+* checking CRAN incoming feasibility ... [59s] NOTE
 Maintainer: 'Mohammad Javad Davoudabadi <mohammad.davoudabadi@qut.edu.au>'
 
 New submission
@@ -29,13 +29,14 @@ CRAN repository db overrides:
 * checking for hidden files and directories ... OK
 * checking for portable file names ... OK
 * checking serialization versions ... OK
-* checking whether package 'BayesianLasso' can be installed ... [57s] OK
+* checking whether package 'BayesianLasso' can be installed ... [74s] OK
 * used C++ compiler: 'G__~1.EXE (GCC) 13.3.0'
 * checking C++ specification ... NOTE
   Specified C++11: please drop specification unless essential
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking for future file timestamps ... OK
+* checking for future file timestamps ... NOTE
+unable to verify current time
 * checking 'build' directory ... OK
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
@@ -100,4 +101,4 @@ Found the following files/directories:
   'BayesianLasso-manual.tex'
 * checking for detritus in the temp directory ... OK
 * DONE
-Status: 1 ERROR, 1 WARNING, 6 NOTEs
+Status: 1 ERROR, 1 WARNING, 7 NOTEs

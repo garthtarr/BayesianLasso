@@ -6,4 +6,4 @@ Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
 Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
   pdflatex is not available
 Error in running tools::texi2pdf()
-You may want to clean up by 'rm -Rf C:/Users/mjava/AppData/Local/Temp/RtmpIrWXMV/Rd2pdf8b783d96605c'
+You may want to clean up by 'rm -Rf C:/Users/mjava/AppData/Local/Temp/Rtmpi0inFY/Rd2pdf93481a2c3140'

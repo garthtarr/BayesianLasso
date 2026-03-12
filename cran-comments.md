@@ -13,7 +13,7 @@
 There are currently no downstream dependencies.
 
 ## Comments
-* Resubmission of version 0.3.7 (BayesianLasso)
+* Resubmission of version 0.3.8 (BayesianLasso)
 * Corrected the `Date` field in the DESCRIPTION file and removed non-standard top-level files (`README.html`, `pic.png`)
 * Added compressed logo (`man/figures/logo.png`, <100 KB)
 * Replaced deprecated `arma::is_finite(val)` calls with `std::isfinite(val)` to comply with Armadillo ≥ 15  

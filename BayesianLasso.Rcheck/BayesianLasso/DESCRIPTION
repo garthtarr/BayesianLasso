@@ -1,7 +1,7 @@
 Package: BayesianLasso
 Type: Package
 Title: Bayesian Lasso Regression and Tools for the Lasso Distribution
-Version: 0.3.7
+Version: 0.3.8
 Date: 2026-03-13
 Authors@R: c(person("John", "Ormerod", role = c("aut", "cph"), email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
              person("Mohammad Javad", "Davoudabadi", role = c("aut","cre", "cph"), email = "mohammad.davoudabadi@qut.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
@@ -29,12 +29,12 @@ Suggests: knitr, rmarkdown, monomvn, posterior, rstan, bayesreg, lars,
 Config/testthat/edition: 3
 BugReports: https://github.com/garthtarr/BayesianLasso/issues
 NeedsCompilation: yes
-Packaged: 2026-03-12 22:07:22 UTC; mjava
+Packaged: 2026-03-12 22:51:46 UTC; mjava
 Author: John Ormerod [aut, cph] (<https://orcid.org/0000-0002-4650-7507>),
   Mohammad Javad Davoudabadi [aut, cre, cph]
     (<https://orcid.org/0000-0001-7312-1530>),
   Garth Tarr [aut, cph] (<https://orcid.org/0000-0002-6605-7478>),
   Samuel Mueller [aut, cph] (<https://orcid.org/0000-0002-3087-8127>),
   Jonathon Tidswell [aut, cph]
-Built: R 4.4.2; x86_64-w64-mingw32; 2026-03-12 22:08:43 UTC; windows
+Built: R 4.4.2; x86_64-w64-mingw32; 2026-03-12 22:53:13 UTC; windows
 Archs: x64
