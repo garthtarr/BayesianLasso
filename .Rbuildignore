@@ -11,4 +11,6 @@
 ^pic\.png$
 ^tools-raw$
 ^inst/media$
-
+^reproduction$
+^build$
+^inst/helpers/benchmark_blasso_bayeslm\.R$
