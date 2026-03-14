@@ -13,4 +13,6 @@
 ^inst/media$
 ^reproduction$
 ^build$
-^inst/helpers/benchmark_blasso_bayeslm\.R$
+^inst/helpers$
+^vignettes/.*\.html$
+^\.DS_Store$

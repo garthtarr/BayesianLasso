@@ -22,7 +22,6 @@ LinkingTo: Rcpp,
   RcppArmadillo,
   RcppEigen
 RoxygenNote: 7.3.2
-SystemRequirements:  C++14
 Encoding: UTF-8
 URL: https://garthtarr.github.io/BayesianLasso/, https://github.com/garthtarr/BayesianLasso
 VignetteBuilder: knitr

@@ -6,11 +6,11 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
+  
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+collapse = TRUE,
+comment = "#>"
 )
 ```
 
@@ -62,7 +62,7 @@ dataset_name <- datasets_ngtp[1]
 ## Simulated Example
 ```{r}
 if(dataset_name == datasets_ngtp[1]){
-
+  
   # Simulate data
   set.seed(123)
   Ns <- 2000
@@ -74,30 +74,30 @@ if(dataset_name == datasets_ngtp[1]){
   
   vtime_val_Hans = c()
   results_Hans <- NULL 
-
+  
   # Run the modified Hans sampler
   for(i in 1:5){
     time_val <- system.time({
       res_Hans <- Modified_Hans_Gibbs(
-      X = X, y = y, beta_init= rep(1,10), a1=2, b1=1, u1=2, v1=1,
-      nsamples=Ns, lambda_init=1, sigma2_init=1, verbose=100, tune_lambda2 = TRUE,
-      rao_blackwellization = FALSE)
-  })[3]
-  
-  vtime_val_Hans[i] <- time_val
-  
-  # Initialize accumulators after first run
-  if (is.null(results_Hans)) {
-    results_Hans <- list(
-      mBeta = res_Hans$mBeta,
-      vsigma2 = res_Hans$vsigma2,
-      vlambda2 = res_Hans$vlambda2
-    )
-  } else {
-    results_Hans$mBeta    <- results_Hans$mBeta + res_Hans$mBeta
-    results_Hans$vsigma2  <- results_Hans$vsigma2 + res_Hans$vsigma2
-    results_Hans$vlambda2 <- results_Hans$vlambda2 + res_Hans$vlambda2
-  }
+        X = X, y = y, beta_init= rep(1,10), a1=2, b1=1, u1=2, v1=1,
+        nsamples=Ns, lambda_init=1, sigma2_init=1, verbose=100, tune_lambda2 = TRUE,
+        rao_blackwellization = FALSE)
+    })[3]
+    
+    vtime_val_Hans[i] <- time_val
+    
+    # Initialize accumulators after first run
+    if (is.null(results_Hans)) {
+      results_Hans <- list(
+        mBeta = res_Hans$mBeta,
+        vsigma2 = res_Hans$vsigma2,
+        vlambda2 = res_Hans$vlambda2
+      )
+    } else {
+      results_Hans$mBeta    <- results_Hans$mBeta + res_Hans$mBeta
+      results_Hans$vsigma2  <- results_Hans$vsigma2 + res_Hans$vsigma2
+      results_Hans$vlambda2 <- results_Hans$vlambda2 + res_Hans$vlambda2
+    }
   }
   
   # Take averages
@@ -106,7 +106,7 @@ if(dataset_name == datasets_ngtp[1]){
   vlambda2 = (results_Hans$vlambda2)/5
   time_val_Hans = mean(vtime_val_Hans)
   
-
+  
   vESS <- c()
   for(j in 1:ps) {
     vESS[j] <- effective_sample_size(results_Hans$mBeta[200:Ns,j])
@@ -130,7 +130,7 @@ if(dataset_name == datasets_ngtp[1]){
   
   name_vals = c("mix_beta", "eff_beta", "mix_sigma2", "eff_sigma2", "mix_lambda2", "eff_lambda2", "time")
   names(stat_vec_Hans) = name_vals 
-
+  
   
   # ======================== PC sampler =======================================
   
@@ -139,28 +139,28 @@ if(dataset_name == datasets_ngtp[1]){
   vtime_val_PC = c()
   results_PC <- NULL 
   
- for(i in 1:5){
-   time_val <- system.time({
-     res_PC <- Modified_PC_Gibbs(
-      X = X, y = y, a1=2, b1=1, u1=2, v1=1,
-      nsamples=Ns, lambda_init=1, sigma2_init=1, verbose=100)
-  })[3]
-  
-  vtime_val_PC[i] <- time_val
-  
-  # Initialize accumulators after first run
-  if (is.null(results_PC)) {
-    results_PC <- list(
-      mBeta = res_PC$mBeta,
-      vsigma2 = res_PC$vsigma2,
-      vlambda2 = res_PC$vlambda2
-    )
-  } else {
-    results_PC$mBeta    <- results_PC$mBeta + res_PC$mBeta
-    results_PC$vsigma2  <- results_PC$vsigma2 + res_PC$vsigma2
-    results_PC$vlambda2 <- results_PC$vlambda2 + res_PC$vlambda2
+  for(i in 1:5){
+    time_val <- system.time({
+      res_PC <- Modified_PC_Gibbs(
+        X = X, y = y, a1=2, b1=1, u1=2, v1=1,
+        nsamples=Ns, lambda_init=1, sigma2_init=1, verbose=100)
+    })[3]
+    
+    vtime_val_PC[i] <- time_val
+    
+    # Initialize accumulators after first run
+    if (is.null(results_PC)) {
+      results_PC <- list(
+        mBeta = res_PC$mBeta,
+        vsigma2 = res_PC$vsigma2,
+        vlambda2 = res_PC$vlambda2
+      )
+    } else {
+      results_PC$mBeta    <- results_PC$mBeta + res_PC$mBeta
+      results_PC$vsigma2  <- results_PC$vsigma2 + res_PC$vsigma2
+      results_PC$vlambda2 <- results_PC$vlambda2 + res_PC$vlambda2
+    }
   }
- }
   
   # Take averages
   mBeta = (results_PC$mBeta)/5
@@ -207,7 +207,7 @@ This vignette demonstrates the usage of the `BayesianLasso` package on several w
 - **Kakadu**: Available in the \CRANpkg{Ecdat} package and loaded using `data(Kakadu, package = "Ecdat")`.
 
 - **Communities and Crime**: This dataset is available from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/183/communities+and+crime).  
-  Due to licensing and redistribution considerations, the *Communities and Crime* dataset is not included in this package. Users can download the dataset manually by visiting the repository and following the preprocessing steps outlined in this vignette.
+Due to licensing and redistribution considerations, the *Communities and Crime* dataset is not included in this package. Users can download the dataset manually by visiting the repository and following the preprocessing steps outlined in this vignette.
 
 
 ## Reproducing Table 1: Performance Comparison
@@ -243,18 +243,18 @@ if (dataset_name == datasets_ngtp[2]) {
 }
 
 if (dataset_name == datasets_ngtp[3]) {
-    if (!requireNamespace("Ecdat", quietly = TRUE)) {
-        message("Package 'Ecdat' is required for the Kakadu example in this vignette.")
-    }else{
-      
-      data("Kakadu", package = "Ecdat", envir = environment())
-      
-      # Get y vector and X matrix
-      y <- as.vector(Kakadu$income)
-      x <- Kakadu[, c(1:20, 22)]
-      
-      x <- model.matrix(~ .^2, data = x)[ , -1]
-    }
+  if (!requireNamespace("Ecdat", quietly = TRUE)) {
+    message("Package 'Ecdat' is required for the Kakadu example in this vignette.")
+  }else{
+    
+    data("Kakadu", package = "Ecdat", envir = environment())
+    
+    # Get y vector and X matrix
+    y <- as.vector(Kakadu$income)
+    x <- Kakadu[, c(1:20, 22)]
+    
+    x <- model.matrix(~ .^2, data = x)[ , -1]
+  }
 }
 
 # Make sure Crime.csv (or comData.Rdata) is downloaded manually before running this
@@ -435,83 +435,6 @@ if(dataset_name != datasets_ngtp[1]){
   names(stat_vec_Hans) = name_vals 
   
   
-  if(dataset_name != datasets_ngtp[3]){
-    res_monomvn <- NULL
-    
-    if (requireNamespace("monomvn", quietly = TRUE)) {
-      
-      
-      res_monomvn = benchmark_blasso_monomvn(y, x,
-                                             lambda_init, sigma2_init, a1, b1, u1, v1, 
-                                             nburn, nsamples, trials=5, 
-                                             beta_inds=NA) 
-      
-      stat_vec_monomvn <- colMeans(res_monomvn$mStat)
-      
-      
-    }else {
-      message("Skipping monomvn benchmark: package 'monomvn' is not installed.")
-    }
-  }
-  
-  
-  # ======================= Run bayeslm ============================
-  ## Note that package bayeslm is not on CRAN anymore
-  
-  res_bayeslm <- NULL
-  
-  if (requireNamespace("bayeslm", quietly = TRUE)) {
-    
-    res_bayeslm = benchmark_blasso_bayeslm(y, x,
-                                           lambda_init, sigma2_init, a1, b1, u1, v1, 
-                                           nburn, nsamples, trials=5, 
-                                           beta_inds=NA) 
-    
-    stat_vec_bayeslm <- colMeans(res_bayeslm$mStat)
-    
-    
-  }else {
-    message("Skipping bayeslm benchmark: package 'bayeslm' is not installed.")
-  }
-  
-  
-  # ======================= Run rstan ============================
-  
-  res_rstan <- NULL
-  
-  if (requireNamespace("rstan", quietly = TRUE)) {
-    
-    res_rstan = benchmark_blasso_rstan(y, x,
-                                       lambda_init, sigma2_init, a1, b1, u1, v1, 
-                                       nburn, nsamples, trials=5, 
-                                       beta_inds=NA)
-    
-    stat_vec_rstan <- colMeans(res_rstan$mStat)
-    
-    
-  }else {
-    message("Skipping rstan benchmark: package 'rstan' is not installed.")
-  }
-  
-  
-  # ======================= Run bayesreg ============================
-  
-  
-  res_bayesreg <- NULL
-  
-  if (requireNamespace("bayesreg", quietly = TRUE)) {
-    
-    res_bayesreg = benchmark_blasso_bayesreg(y, x,
-                                             lambda_init, sigma2_init, a1, b1, u1, v1, 
-                                             nburn, nsamples, trials=5, 
-                                             beta_inds=NA) 
-    
-    stat_vec_bayesreg <- colMeans(res_bayesreg$mStat)
-    
-    
-  }else {
-    message("Skipping bayesreg benchmark: package 'bayesreg' is not installed.")
-  }
   
 }
 
