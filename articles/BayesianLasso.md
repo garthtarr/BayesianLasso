@@ -652,6 +652,7 @@ if(dataset_name != datasets_ngtp[1]){
   
   
   # ======================= Run bayeslm ============================
+  ## Note that package bayeslm is not on CRAN anymore
   
   res_bayeslm <- NULL
   
