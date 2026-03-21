@@ -1,21 +1,32 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 4 notes
-
-* All local and win-builder checks passed cleanly.
+0 errors | 0 warnings | 1 note
 
 ## Test environments
-* local Windows 11 install, R 4.4.1
+* local Windows 11 install, R 4.4.2
 * Ubuntu 22.04 (on GitHub Actions), R-devel, R-release, R-oldrel
-* win-builder (devel and release)
+* win-builder (release)
 
 ## Downstream dependencies
 There are currently no downstream dependencies.
 
 ## Comments
-* Resubmission of version 0.3.8 (BayesianLasso)
-* Corrected the `Date` field in the DESCRIPTION file and removed non-standard top-level files (`README.html`, `pic.png`)
-* Added compressed logo (`man/figures/logo.png`, <100 KB)
-* Replaced deprecated `arma::is_finite(val)` calls with `std::isfinite(val)` to comply with Armadillo ≥ 15  
-* Removed the non-CRAN dependency `bayeslm` from DESCRIPTION. It is only used in optional comparison scripts and is not required for building, checking, or running the package.
-* Package passes all checks: 0 errors, 0 warnings, 4 notes on local and win-builder
+This is a resubmission of BayesianLasso version 0.3.9.
+
+The previous CRAN version was archived because it depended on the archived package `RcppClock`.
+That dependency has now been completely removed.
+
+I rebuilt the package from a clean source tree and verified that the submitted source tarball contains no reference to `RcppClock`.
+
+Additional updates in this resubmission include:
+* corrected the `Date` field in `DESCRIPTION`
+* removed non-standard top-level files
+* added a compressed logo (`man/figures/logo.png`, <100 KB)
+* replaced deprecated `arma::is_finite(val)` calls with `std::isfinite(val)`
+* removed the non-CRAN dependency `bayeslm` from `DESCRIPTION`
+
+Checks performed:
+* `devtools::check(args = "--as-cran")`
+* win-builder (release)
+
+All checks pass with only minor NOTES.
