@@ -1,8 +1,8 @@
 Package: BayesianLasso
 Type: Package
 Title: Bayesian Lasso Regression and Tools for the Lasso Distribution
-Version: 0.3.8
-Date: 2026-03-13
+Version: 0.3.9
+Date: 2026-03-21
 Authors@R: c(person("John", "Ormerod", role = c("aut", "cph"), email = "john.ormerod@sydney.edu.au", comment = c(ORCID = "0000-0002-4650-7507")), 
              person("Mohammad Javad", "Davoudabadi", role = c("aut","cre", "cph"), email = "mohammad.davoudabadi@qut.edu.au", comment = c(ORCID = "0000-0001-7312-1530")),
              person("Garth", "Tarr", role = c("aut", "cph"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")),
@@ -10,7 +10,7 @@ Authors@R: c(person("John", "Ormerod", role = c("aut", "cph"), email = "john.orm
              person("Jonathon", "Tidswell", role = c("aut", "cph"), email = "jonathon.tidswell@sydney.edu.au"))
 Maintainer: Mohammad Javad Davoudabadi <mohammad.davoudabadi@qut.edu.au>
 Description: Implements Bayesian Lasso regression using efficient Gibbs sampling
-               algorithms, including modified versions of the Hans and Park–Casella (PC) samplers.
+               algorithms, including modified versions of the Hans and Park Casella (PC) samplers.
                Includes functions for working with the Lasso distribution, such as its density,
                cumulative distribution, quantile, and random generation functions, along with moment
                calculations. Also includes a function to compute the Mills ratio. Designed for sparse
