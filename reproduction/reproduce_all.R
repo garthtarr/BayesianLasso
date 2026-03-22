@@ -10,6 +10,15 @@
 # }
 # reproduce_all.R
 
+# install/load BayesianLasso from GitHub master branch
+if (!requireNamespace("BayesianLasso", quietly = TRUE)) {
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+  }
+  remotes::install_github("garthtarr/BayesianLasso", ref = "master", upgrade = "never")
+}
+
+library(BayesianLasso)
 
 
 repro_dir <- dirname(normalizePath(sys.frame(1)$ofile))
@@ -29,26 +38,26 @@ time_val_total_ngtp <- system.time({
 
 print(time_val_total_ngtp)
 
-datasets_pgtn <- c("cookie", "eyedata")
-
-
-
-for (d in datasets_pgtn) {
-  print(d)
-  rmarkdown::render(
-    "benchmarks_pgtn.Rmd",
-    params = list(dataset_name = d, results_dir = "results"),
-    envir = new.env(parent = globalenv())
-  )
-}
-
-
-load(file.path(results_dir,"eyedata_results_pgtn.Rdata"))
-
-print(colMeans(res_PC$mStat))
-print(colMeans(res_hans$mStat))
-print(colMeans(res_bayesreg$mStat))
-print(time_val_total_pgtn)
-
-
+# datasets_pgtn <- c("cookie", "eyedata")
+# 
+# 
+# 
+# for (d in datasets_pgtn) {
+#   print(d)
+#   rmarkdown::render(
+#     "benchmarks_pgtn.Rmd",
+#     params = list(dataset_name = d, results_dir = "results"),
+#     envir = new.env(parent = globalenv())
+#   )
+# }
+# 
+# 
+# load(file.path(results_dir,"eyedata_results_pgtn.Rdata"))
+# 
+# print(colMeans(res_PC$mStat))
+# print(colMeans(res_hans$mStat))
+# print(colMeans(res_bayesreg$mStat))
+# print(time_val_total_pgtn)
+# 
+# 
 

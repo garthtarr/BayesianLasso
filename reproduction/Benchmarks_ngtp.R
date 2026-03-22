@@ -222,28 +222,6 @@ if(dataset_name == "simulated"){
 # ==========================
 # ==========================
 
-# if (requireNamespace("monomvn", quietly = TRUE)) {
-#   monomvn::monomvn(...)  # use the function safely
-# } else {
-#   message("monomvn package not installed; skipping example.")
-# }
-# if (requireNamespace("bayeslm", quietly = TRUE)) {
-#   bayeslm::bayeslm(...)  # use the function safely
-# } else {
-#   message("bayeslm package not installed; skipping example.")
-# }
-# if (requireNamespace("rstan", quietly = TRUE)) {
-#   rstan::rstan(...)  # use the function safely
-# } else {
-#   message("rstan package not installed; skipping example.")
-# }
-# if (requireNamespace("bayesreg", quietly = TRUE)) {
-#   bayesreg::bayesreg(...)  # use the function safely
-# } else {
-#   message("bayesreg package not installed; skipping example.")
-# }
-
-
 # Example: dataset_name <- "diabetes2"
 
 if (dataset_name=="diabetes2") 
