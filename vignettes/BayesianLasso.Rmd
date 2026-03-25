@@ -295,8 +295,8 @@ lambda_init = sqrt(lambda2_init)
 sigma2_init = 1
 
 # Number of samples to run the MCMC
-nburn = 1000
-nsamples = 5000
+nburn = 100
+nsamples = 1000
 inds_use = (nburn + 1):nsamples
 N = length(inds_use)
 
