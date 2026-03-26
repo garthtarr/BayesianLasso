@@ -18,3 +18,4 @@
 ^inst/helpers$
 ^vignettes/.*\.html$
 ^\.DS_Store$
+^vignettes/.*\.R$
