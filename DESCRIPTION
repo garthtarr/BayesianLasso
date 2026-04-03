@@ -29,7 +29,6 @@ Suggests:
     knitr, rmarkdown, 
     monomvn, posterior,
     rstan, bayesreg,
-    lars, Ecdat,
     testthat (>= 3.0.0), MASS
 Config/testthat/edition: 3
 BugReports: https://github.com/garthtarr/BayesianLasso/issues

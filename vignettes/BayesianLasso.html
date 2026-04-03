@@ -341,639 +341,261 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(BayesianLasso)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>helpers_path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;helpers&quot;</span>, <span class="at">package =</span> <span class="st">&quot;BayesianLasso&quot;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>helper_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(helpers_path, <span class="at">pattern =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.R$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">lapply</span>(helper_files, source))</span></code></pre></div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>The package provides efficient sampling algorithms for Bayesian Lasso
-regression, modified Hans and PC samplers. The modified Hans sampler is
-based on a newly defined Lasso distribution.</p>
+<p>The ‘BayesianLasso’ package provides efficient sampling algorithms
+for Bayesian Lasso regression, modified Hans and PC samplers. The
+modified Hans sampler is based on a newly defined Lasso
+distribution.</p>
 <p>This vignette introduces the main functionality of the package and
-demonstrates how to apply the samplers to real and simulated data.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>effective_sample_size <span class="ot">&lt;-</span> <span class="cf">function</span>(samples) {</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;posterior&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    <span class="fu">message</span>(</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>      <span class="st">&quot;Package &#39;posterior&#39; is required to compute effective sample size (ESS).</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>      <span class="st">&quot;Install it with install.packages(&#39;posterior&#39;) to enable ESS diagnostics.&quot;</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    )</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NA_real_</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  }</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  </span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="fu">as.numeric</span>(posterior<span class="sc">::</span><span class="fu">ess_bulk</span>(<span class="fu">as.numeric</span>(samples)))</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>}</span></code></pre></div>
-</div>
-<div id="dataset-selection" class="section level2">
-<h2>Dataset selection</h2>
-<p>Select a dataset name for dataset_name.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>datasets_ngtp <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;simulated&quot;</span>, <span class="st">&quot;diabetes2&quot;</span>, <span class="st">&quot;Kakadu2&quot;</span>, <span class="st">&quot;Crime&quot;</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>datasets_pgtn <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;cookie&quot;</span>, <span class="st">&quot;eyedata&quot;</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>dataset_name <span class="ot">&lt;-</span> datasets_ngtp[<span class="dv">1</span>]</span></code></pre></div>
+demonstrates how to apply the samplers to a simulated data.</p>
 </div>
 <div id="simulated-example" class="section level2">
 <h2>Simulated Example</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="cf">if</span>(dataset_name <span class="sc">==</span> datasets_ngtp[<span class="dv">1</span>]){</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  </span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="co"># Simulate data</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  Ns <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  ns <span class="ot">&lt;-</span> <span class="dv">100</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(ns <span class="sc">*</span> ps), <span class="at">nrow =</span> ns)</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="dv">0</span>, ps <span class="sc">-</span> <span class="dv">3</span>))</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  y <span class="ot">&lt;-</span> X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(ns)</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  </span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  vtime_val_Hans <span class="ot">=</span> <span class="fu">c</span>()</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  results_Hans <span class="ot">&lt;-</span> <span class="cn">NULL</span> </span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  </span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="co"># Run the modified Hans sampler</span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>    time_val <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>      res_Hans <span class="ot">&lt;-</span> <span class="fu">Modified_Hans_Gibbs</span>(</span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>        <span class="at">X =</span> X, <span class="at">y =</span> y, <span class="at">beta_init=</span> <span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">10</span>), <span class="at">a1=</span><span class="dv">2</span>, <span class="at">b1=</span><span class="dv">1</span>, <span class="at">u1=</span><span class="dv">2</span>, <span class="at">v1=</span><span class="dv">1</span>,</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>        <span class="at">nsamples=</span>Ns, <span class="at">lambda_init=</span><span class="dv">1</span>, <span class="at">sigma2_init=</span><span class="dv">1</span>, <span class="at">verbose=</span><span class="dv">100</span>, <span class="at">tune_lambda2 =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>        <span class="at">rao_blackwellization =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>    })[<span class="dv">3</span>]</span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>    </span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>    vtime_val_Hans[i] <span class="ot">&lt;-</span> time_val</span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>    </span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>    <span class="co"># Initialize accumulators after first run</span></span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(results_Hans)) {</span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>      results_Hans <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>        <span class="at">mBeta =</span> res_Hans<span class="sc">$</span>mBeta,</span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>        <span class="at">vsigma2 =</span> res_Hans<span class="sc">$</span>vsigma2,</span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>        <span class="at">vlambda2 =</span> res_Hans<span class="sc">$</span>vlambda2</span>
-<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>      )</span>
-<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>      results_Hans<span class="sc">$</span>mBeta    <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>mBeta <span class="sc">+</span> res_Hans<span class="sc">$</span>mBeta</span>
-<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>      results_Hans<span class="sc">$</span>vsigma2  <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>vsigma2 <span class="sc">+</span> res_Hans<span class="sc">$</span>vsigma2</span>
-<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>      results_Hans<span class="sc">$</span>vlambda2 <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>vlambda2 <span class="sc">+</span> res_Hans<span class="sc">$</span>vlambda2</span>
-<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>    }</span>
-<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>  }</span>
-<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a>  </span>
-<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>  <span class="co"># Take averages</span></span>
-<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>  mBeta <span class="ot">=</span> (results_Hans<span class="sc">$</span>mBeta)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>  vsigma2 <span class="ot">=</span> (results_Hans<span class="sc">$</span>vsigma2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>  vlambda2 <span class="ot">=</span> (results_Hans<span class="sc">$</span>vlambda2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>  time_val_Hans <span class="ot">=</span> <span class="fu">mean</span>(vtime_val_Hans)</span>
-<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a>  </span>
-<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a>  </span>
-<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a>  vESS <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ps) {</span>
-<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a>    vESS[j] <span class="ot">&lt;-</span> <span class="fu">effective_sample_size</span>(results_Hans<span class="sc">$</span>mBeta[<span class="dv">200</span><span class="sc">:</span>Ns,j])</span>
-<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a>  }</span>
-<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a>  Ef_Hans <span class="ot">=</span> <span class="fu">median</span>(vESS)<span class="sc">/</span>time_val_Hans</span>
-<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a>  </span>
-<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a>  ESS_sigma2_Hans  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(results_Hans<span class="sc">$</span>vsigma2[<span class="dv">200</span><span class="sc">:</span>Ns]))</span>
-<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a>  Ef_sigma2_Hans <span class="ot">=</span> ESS_sigma2_Hans<span class="sc">/</span>time_val_Hans</span>
-<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a>  </span>
-<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a>  ESS_lambda2_Hans  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(results_Hans<span class="sc">$</span>vlambda2[<span class="dv">200</span><span class="sc">:</span>Ns]))</span>
-<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a>  Ef_lambda2_Hans <span class="ot">=</span> ESS_lambda2_Hans<span class="sc">/</span>time_val_Hans</span>
-<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a>  </span>
-<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a>  stat_vec_Hans <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span><span class="fu">median</span>(vESS)<span class="sc">/</span>Ns,</span>
-<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a>    Ef_Hans,</span>
-<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_sigma2_Hans<span class="sc">/</span>Ns,</span>
-<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a>    Ef_sigma2_Hans,</span>
-<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_lambda2_Hans<span class="sc">/</span>Ns,</span>
-<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a>    Ef_lambda2_Hans,</span>
-<span id="cb4-66"><a href="#cb4-66" tabindex="-1"></a>    time_val_Hans)</span>
-<span id="cb4-67"><a href="#cb4-67" tabindex="-1"></a>  </span>
-<span id="cb4-68"><a href="#cb4-68" tabindex="-1"></a>  name_vals <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;mix_beta&quot;</span>, <span class="st">&quot;eff_beta&quot;</span>, <span class="st">&quot;mix_sigma2&quot;</span>, <span class="st">&quot;eff_sigma2&quot;</span>, <span class="st">&quot;mix_lambda2&quot;</span>, <span class="st">&quot;eff_lambda2&quot;</span>, <span class="st">&quot;time&quot;</span>)</span>
-<span id="cb4-69"><a href="#cb4-69" tabindex="-1"></a>  <span class="fu">names</span>(stat_vec_Hans) <span class="ot">=</span> name_vals </span>
-<span id="cb4-70"><a href="#cb4-70" tabindex="-1"></a>  </span>
-<span id="cb4-71"><a href="#cb4-71" tabindex="-1"></a>  </span>
-<span id="cb4-72"><a href="#cb4-72" tabindex="-1"></a>  <span class="co"># ======================== PC sampler =======================================</span></span>
-<span id="cb4-73"><a href="#cb4-73" tabindex="-1"></a>  </span>
-<span id="cb4-74"><a href="#cb4-74" tabindex="-1"></a>  <span class="co"># Run the modified PC sampler</span></span>
-<span id="cb4-75"><a href="#cb4-75" tabindex="-1"></a>  </span>
-<span id="cb4-76"><a href="#cb4-76" tabindex="-1"></a>  vtime_val_PC <span class="ot">=</span> <span class="fu">c</span>()</span>
-<span id="cb4-77"><a href="#cb4-77" tabindex="-1"></a>  results_PC <span class="ot">&lt;-</span> <span class="cn">NULL</span> </span>
-<span id="cb4-78"><a href="#cb4-78" tabindex="-1"></a>  </span>
-<span id="cb4-79"><a href="#cb4-79" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
-<span id="cb4-80"><a href="#cb4-80" tabindex="-1"></a>    time_val <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
-<span id="cb4-81"><a href="#cb4-81" tabindex="-1"></a>      res_PC <span class="ot">&lt;-</span> <span class="fu">Modified_PC_Gibbs</span>(</span>
-<span id="cb4-82"><a href="#cb4-82" tabindex="-1"></a>        <span class="at">X =</span> X, <span class="at">y =</span> y, <span class="at">a1=</span><span class="dv">2</span>, <span class="at">b1=</span><span class="dv">1</span>, <span class="at">u1=</span><span class="dv">2</span>, <span class="at">v1=</span><span class="dv">1</span>,</span>
-<span id="cb4-83"><a href="#cb4-83" tabindex="-1"></a>        <span class="at">nsamples=</span>Ns, <span class="at">lambda_init=</span><span class="dv">1</span>, <span class="at">sigma2_init=</span><span class="dv">1</span>, <span class="at">verbose=</span><span class="dv">100</span>)</span>
-<span id="cb4-84"><a href="#cb4-84" tabindex="-1"></a>    })[<span class="dv">3</span>]</span>
-<span id="cb4-85"><a href="#cb4-85" tabindex="-1"></a>    </span>
-<span id="cb4-86"><a href="#cb4-86" tabindex="-1"></a>    vtime_val_PC[i] <span class="ot">&lt;-</span> time_val</span>
-<span id="cb4-87"><a href="#cb4-87" tabindex="-1"></a>    </span>
-<span id="cb4-88"><a href="#cb4-88" tabindex="-1"></a>    <span class="co"># Initialize accumulators after first run</span></span>
-<span id="cb4-89"><a href="#cb4-89" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(results_PC)) {</span>
-<span id="cb4-90"><a href="#cb4-90" tabindex="-1"></a>      results_PC <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb4-91"><a href="#cb4-91" tabindex="-1"></a>        <span class="at">mBeta =</span> res_PC<span class="sc">$</span>mBeta,</span>
-<span id="cb4-92"><a href="#cb4-92" tabindex="-1"></a>        <span class="at">vsigma2 =</span> res_PC<span class="sc">$</span>vsigma2,</span>
-<span id="cb4-93"><a href="#cb4-93" tabindex="-1"></a>        <span class="at">vlambda2 =</span> res_PC<span class="sc">$</span>vlambda2</span>
-<span id="cb4-94"><a href="#cb4-94" tabindex="-1"></a>      )</span>
-<span id="cb4-95"><a href="#cb4-95" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb4-96"><a href="#cb4-96" tabindex="-1"></a>      results_PC<span class="sc">$</span>mBeta    <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>mBeta <span class="sc">+</span> res_PC<span class="sc">$</span>mBeta</span>
-<span id="cb4-97"><a href="#cb4-97" tabindex="-1"></a>      results_PC<span class="sc">$</span>vsigma2  <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>vsigma2 <span class="sc">+</span> res_PC<span class="sc">$</span>vsigma2</span>
-<span id="cb4-98"><a href="#cb4-98" tabindex="-1"></a>      results_PC<span class="sc">$</span>vlambda2 <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>vlambda2 <span class="sc">+</span> res_PC<span class="sc">$</span>vlambda2</span>
-<span id="cb4-99"><a href="#cb4-99" tabindex="-1"></a>    }</span>
-<span id="cb4-100"><a href="#cb4-100" tabindex="-1"></a>  }</span>
-<span id="cb4-101"><a href="#cb4-101" tabindex="-1"></a>  </span>
-<span id="cb4-102"><a href="#cb4-102" tabindex="-1"></a>  <span class="co"># Take averages</span></span>
-<span id="cb4-103"><a href="#cb4-103" tabindex="-1"></a>  mBeta <span class="ot">=</span> (results_PC<span class="sc">$</span>mBeta)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb4-104"><a href="#cb4-104" tabindex="-1"></a>  vsigma2 <span class="ot">=</span> (results_PC<span class="sc">$</span>vsigma2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb4-105"><a href="#cb4-105" tabindex="-1"></a>  vlambda2 <span class="ot">=</span> (results_PC<span class="sc">$</span>vlambda2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb4-106"><a href="#cb4-106" tabindex="-1"></a>  time_val_PC <span class="ot">=</span> <span class="fu">mean</span>(vtime_val_PC)</span>
-<span id="cb4-107"><a href="#cb4-107" tabindex="-1"></a>  </span>
-<span id="cb4-108"><a href="#cb4-108" tabindex="-1"></a>  <span class="co"># colMeans(results_PC$mBeta)</span></span>
-<span id="cb4-109"><a href="#cb4-109" tabindex="-1"></a>  </span>
-<span id="cb4-110"><a href="#cb4-110" tabindex="-1"></a>  vESS <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb4-111"><a href="#cb4-111" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ps) {</span>
-<span id="cb4-112"><a href="#cb4-112" tabindex="-1"></a>    vESS[j] <span class="ot">&lt;-</span> <span class="fu">effective_sample_size</span>(results_PC<span class="sc">$</span>mBeta[<span class="dv">200</span><span class="sc">:</span>Ns,j])</span>
-<span id="cb4-113"><a href="#cb4-113" tabindex="-1"></a>  }</span>
-<span id="cb4-114"><a href="#cb4-114" tabindex="-1"></a>  Ef_PC <span class="ot">=</span> <span class="fu">median</span>(vESS)<span class="sc">/</span>time_val_PC</span>
-<span id="cb4-115"><a href="#cb4-115" tabindex="-1"></a>  </span>
-<span id="cb4-116"><a href="#cb4-116" tabindex="-1"></a>  ESS_sigma2_PC  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(results_PC<span class="sc">$</span>vsigma2[<span class="dv">200</span><span class="sc">:</span>Ns]))</span>
-<span id="cb4-117"><a href="#cb4-117" tabindex="-1"></a>  Ef_sigma2_PC <span class="ot">=</span> ESS_sigma2_PC<span class="sc">/</span>time_val_PC</span>
-<span id="cb4-118"><a href="#cb4-118" tabindex="-1"></a>  </span>
-<span id="cb4-119"><a href="#cb4-119" tabindex="-1"></a>  ESS_lambda2_PC  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(results_PC<span class="sc">$</span>vlambda2[<span class="dv">200</span><span class="sc">:</span>Ns]))</span>
-<span id="cb4-120"><a href="#cb4-120" tabindex="-1"></a>  Ef_lambda2_PC <span class="ot">=</span> ESS_lambda2_PC<span class="sc">/</span>time_val_PC</span>
-<span id="cb4-121"><a href="#cb4-121" tabindex="-1"></a>  </span>
-<span id="cb4-122"><a href="#cb4-122" tabindex="-1"></a>  stat_vec_PC <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb4-123"><a href="#cb4-123" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span><span class="fu">median</span>(vESS)<span class="sc">/</span>Ns,</span>
-<span id="cb4-124"><a href="#cb4-124" tabindex="-1"></a>    Ef_PC,</span>
-<span id="cb4-125"><a href="#cb4-125" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_sigma2_PC<span class="sc">/</span>Ns,</span>
-<span id="cb4-126"><a href="#cb4-126" tabindex="-1"></a>    Ef_sigma2_PC,</span>
-<span id="cb4-127"><a href="#cb4-127" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_lambda2_PC<span class="sc">/</span>Ns,</span>
-<span id="cb4-128"><a href="#cb4-128" tabindex="-1"></a>    Ef_lambda2_PC,</span>
-<span id="cb4-129"><a href="#cb4-129" tabindex="-1"></a>    time_val_PC)</span>
-<span id="cb4-130"><a href="#cb4-130" tabindex="-1"></a>  </span>
-<span id="cb4-131"><a href="#cb4-131" tabindex="-1"></a>  name_vals <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;mix_beta&quot;</span>, <span class="st">&quot;eff_beta&quot;</span>, <span class="st">&quot;mix_sigma2&quot;</span>, <span class="st">&quot;eff_sigma2&quot;</span>, <span class="st">&quot;mix_lambda2&quot;</span>, <span class="st">&quot;eff_lambda2&quot;</span>, <span class="st">&quot;time&quot;</span>)</span>
-<span id="cb4-132"><a href="#cb4-132" tabindex="-1"></a>  <span class="fu">names</span>(stat_vec_PC) <span class="ot">=</span> name_vals </span>
-<span id="cb4-133"><a href="#cb4-133" tabindex="-1"></a>}</span>
-<span id="cb4-134"><a href="#cb4-134" tabindex="-1"></a><span class="co">#&gt; iter: 0 lambda2: 0.858958 sigma2: 1.00941</span></span>
-<span id="cb4-135"><a href="#cb4-135" tabindex="-1"></a><span class="co">#&gt; iter: 100 lambda2: 1.4063 sigma2: 0.958329</span></span>
-<span id="cb4-136"><a href="#cb4-136" tabindex="-1"></a><span class="co">#&gt; iter: 200 lambda2: 2.75352 sigma2: 0.864837</span></span>
-<span id="cb4-137"><a href="#cb4-137" tabindex="-1"></a><span class="co">#&gt; iter: 300 lambda2: 1.29269 sigma2: 1.04531</span></span>
-<span id="cb4-138"><a href="#cb4-138" tabindex="-1"></a><span class="co">#&gt; iter: 400 lambda2: 2.95129 sigma2: 0.953137</span></span>
-<span id="cb4-139"><a href="#cb4-139" tabindex="-1"></a><span class="co">#&gt; iter: 500 lambda2: 1.58173 sigma2: 0.90526</span></span>
-<span id="cb4-140"><a href="#cb4-140" tabindex="-1"></a><span class="co">#&gt; iter: 600 lambda2: 1.89708 sigma2: 0.962534</span></span>
-<span id="cb4-141"><a href="#cb4-141" tabindex="-1"></a><span class="co">#&gt; iter: 700 lambda2: 1.74399 sigma2: 1.25343</span></span>
-<span id="cb4-142"><a href="#cb4-142" tabindex="-1"></a><span class="co">#&gt; iter: 800 lambda2: 2.71632 sigma2: 0.992663</span></span>
-<span id="cb4-143"><a href="#cb4-143" tabindex="-1"></a><span class="co">#&gt; iter: 900 lambda2: 2.31175 sigma2: 0.915144</span></span>
-<span id="cb4-144"><a href="#cb4-144" tabindex="-1"></a><span class="co">#&gt; iter: 1000 lambda2: 1.87945 sigma2: 1.12389</span></span>
-<span id="cb4-145"><a href="#cb4-145" tabindex="-1"></a><span class="co">#&gt; iter: 1100 lambda2: 0.883053 sigma2: 1.23857</span></span>
-<span id="cb4-146"><a href="#cb4-146" tabindex="-1"></a><span class="co">#&gt; iter: 1200 lambda2: 2.21911 sigma2: 1.07196</span></span>
-<span id="cb4-147"><a href="#cb4-147" tabindex="-1"></a><span class="co">#&gt; iter: 1300 lambda2: 1.45428 sigma2: 1.0355</span></span>
-<span id="cb4-148"><a href="#cb4-148" tabindex="-1"></a><span class="co">#&gt; iter: 1400 lambda2: 2.10524 sigma2: 1.01913</span></span>
-<span id="cb4-149"><a href="#cb4-149" tabindex="-1"></a><span class="co">#&gt; iter: 1500 lambda2: 4.05418 sigma2: 1.07186</span></span>
-<span id="cb4-150"><a href="#cb4-150" tabindex="-1"></a><span class="co">#&gt; iter: 1600 lambda2: 2.45761 sigma2: 0.90785</span></span>
-<span id="cb4-151"><a href="#cb4-151" tabindex="-1"></a><span class="co">#&gt; iter: 1700 lambda2: 3.45027 sigma2: 1.34169</span></span>
-<span id="cb4-152"><a href="#cb4-152" tabindex="-1"></a><span class="co">#&gt; iter: 1800 lambda2: 3.95832 sigma2: 0.881618</span></span>
-<span id="cb4-153"><a href="#cb4-153" tabindex="-1"></a><span class="co">#&gt; iter: 1900 lambda2: 1.88884 sigma2: 1.24943</span></span>
-<span id="cb4-154"><a href="#cb4-154" tabindex="-1"></a><span class="co">#&gt; iter: 0 lambda2: 3.08123 sigma2: 1.43085</span></span>
-<span id="cb4-155"><a href="#cb4-155" tabindex="-1"></a><span class="co">#&gt; iter: 100 lambda2: 1.64498 sigma2: 1.07332</span></span>
-<span id="cb4-156"><a href="#cb4-156" tabindex="-1"></a><span class="co">#&gt; iter: 200 lambda2: 1.25335 sigma2: 0.980203</span></span>
-<span id="cb4-157"><a href="#cb4-157" tabindex="-1"></a><span class="co">#&gt; iter: 300 lambda2: 2.31797 sigma2: 1.28925</span></span>
-<span id="cb4-158"><a href="#cb4-158" tabindex="-1"></a><span class="co">#&gt; iter: 400 lambda2: 1.86186 sigma2: 0.977749</span></span>
-<span id="cb4-159"><a href="#cb4-159" tabindex="-1"></a><span class="co">#&gt; iter: 500 lambda2: 3.49106 sigma2: 1.06686</span></span>
-<span id="cb4-160"><a href="#cb4-160" tabindex="-1"></a><span class="co">#&gt; iter: 600 lambda2: 1.54199 sigma2: 1.09826</span></span>
-<span id="cb4-161"><a href="#cb4-161" tabindex="-1"></a><span class="co">#&gt; iter: 700 lambda2: 2.45581 sigma2: 1.2903</span></span>
-<span id="cb4-162"><a href="#cb4-162" tabindex="-1"></a><span class="co">#&gt; iter: 800 lambda2: 1.65776 sigma2: 1.18259</span></span>
-<span id="cb4-163"><a href="#cb4-163" tabindex="-1"></a><span class="co">#&gt; iter: 900 lambda2: 1.85546 sigma2: 1.03839</span></span>
-<span id="cb4-164"><a href="#cb4-164" tabindex="-1"></a><span class="co">#&gt; iter: 1000 lambda2: 2.24132 sigma2: 1.18037</span></span>
-<span id="cb4-165"><a href="#cb4-165" tabindex="-1"></a><span class="co">#&gt; iter: 1100 lambda2: 3.54543 sigma2: 1.2783</span></span>
-<span id="cb4-166"><a href="#cb4-166" tabindex="-1"></a><span class="co">#&gt; iter: 1200 lambda2: 1.37582 sigma2: 1.21287</span></span>
-<span id="cb4-167"><a href="#cb4-167" tabindex="-1"></a><span class="co">#&gt; iter: 1300 lambda2: 1.87356 sigma2: 1.12916</span></span>
-<span id="cb4-168"><a href="#cb4-168" tabindex="-1"></a><span class="co">#&gt; iter: 1400 lambda2: 1.33734 sigma2: 1.12834</span></span>
-<span id="cb4-169"><a href="#cb4-169" tabindex="-1"></a><span class="co">#&gt; iter: 1500 lambda2: 1.80435 sigma2: 1.16175</span></span>
-<span id="cb4-170"><a href="#cb4-170" tabindex="-1"></a><span class="co">#&gt; iter: 1600 lambda2: 1.29339 sigma2: 1.34696</span></span>
-<span id="cb4-171"><a href="#cb4-171" tabindex="-1"></a><span class="co">#&gt; iter: 1700 lambda2: 2.56371 sigma2: 0.954944</span></span>
-<span id="cb4-172"><a href="#cb4-172" tabindex="-1"></a><span class="co">#&gt; iter: 1800 lambda2: 2.45902 sigma2: 1.22607</span></span>
-<span id="cb4-173"><a href="#cb4-173" tabindex="-1"></a><span class="co">#&gt; iter: 1900 lambda2: 3.40984 sigma2: 1.19406</span></span>
-<span id="cb4-174"><a href="#cb4-174" tabindex="-1"></a><span class="co">#&gt; iter: 0 lambda2: 1.25219 sigma2: 0.960657</span></span>
-<span id="cb4-175"><a href="#cb4-175" tabindex="-1"></a><span class="co">#&gt; iter: 100 lambda2: 1.20597 sigma2: 1.01437</span></span>
-<span id="cb4-176"><a href="#cb4-176" tabindex="-1"></a><span class="co">#&gt; iter: 200 lambda2: 3.48412 sigma2: 1.20471</span></span>
-<span id="cb4-177"><a href="#cb4-177" tabindex="-1"></a><span class="co">#&gt; iter: 300 lambda2: 1.80046 sigma2: 1.19462</span></span>
-<span id="cb4-178"><a href="#cb4-178" tabindex="-1"></a><span class="co">#&gt; iter: 400 lambda2: 1.05257 sigma2: 1.0919</span></span>
-<span id="cb4-179"><a href="#cb4-179" tabindex="-1"></a><span class="co">#&gt; iter: 500 lambda2: 1.57488 sigma2: 0.96958</span></span>
-<span id="cb4-180"><a href="#cb4-180" tabindex="-1"></a><span class="co">#&gt; iter: 600 lambda2: 0.780784 sigma2: 0.961727</span></span>
-<span id="cb4-181"><a href="#cb4-181" tabindex="-1"></a><span class="co">#&gt; iter: 700 lambda2: 0.89589 sigma2: 0.859694</span></span>
-<span id="cb4-182"><a href="#cb4-182" tabindex="-1"></a><span class="co">#&gt; iter: 800 lambda2: 2.21023 sigma2: 0.895006</span></span>
-<span id="cb4-183"><a href="#cb4-183" tabindex="-1"></a><span class="co">#&gt; iter: 900 lambda2: 5.1711 sigma2: 1.04788</span></span>
-<span id="cb4-184"><a href="#cb4-184" tabindex="-1"></a><span class="co">#&gt; iter: 1000 lambda2: 4.29003 sigma2: 1.34692</span></span>
-<span id="cb4-185"><a href="#cb4-185" tabindex="-1"></a><span class="co">#&gt; iter: 1100 lambda2: 2.18293 sigma2: 0.981105</span></span>
-<span id="cb4-186"><a href="#cb4-186" tabindex="-1"></a><span class="co">#&gt; iter: 1200 lambda2: 4.07203 sigma2: 1.18968</span></span>
-<span id="cb4-187"><a href="#cb4-187" tabindex="-1"></a><span class="co">#&gt; iter: 1300 lambda2: 1.88576 sigma2: 1.06622</span></span>
-<span id="cb4-188"><a href="#cb4-188" tabindex="-1"></a><span class="co">#&gt; iter: 1400 lambda2: 2.09095 sigma2: 1.20465</span></span>
-<span id="cb4-189"><a href="#cb4-189" tabindex="-1"></a><span class="co">#&gt; iter: 1500 lambda2: 3.93494 sigma2: 1.24238</span></span>
-<span id="cb4-190"><a href="#cb4-190" tabindex="-1"></a><span class="co">#&gt; iter: 1600 lambda2: 1.4093 sigma2: 1.04512</span></span>
-<span id="cb4-191"><a href="#cb4-191" tabindex="-1"></a><span class="co">#&gt; iter: 1700 lambda2: 1.23756 sigma2: 0.891891</span></span>
-<span id="cb4-192"><a href="#cb4-192" tabindex="-1"></a><span class="co">#&gt; iter: 1800 lambda2: 1.25073 sigma2: 1.05552</span></span>
-<span id="cb4-193"><a href="#cb4-193" tabindex="-1"></a><span class="co">#&gt; iter: 1900 lambda2: 4.1184 sigma2: 1.01891</span></span>
-<span id="cb4-194"><a href="#cb4-194" tabindex="-1"></a><span class="co">#&gt; iter: 0 lambda2: 2.40241 sigma2: 0.969217</span></span>
-<span id="cb4-195"><a href="#cb4-195" tabindex="-1"></a><span class="co">#&gt; iter: 100 lambda2: 2.32971 sigma2: 0.983008</span></span>
-<span id="cb4-196"><a href="#cb4-196" tabindex="-1"></a><span class="co">#&gt; iter: 200 lambda2: 2.88361 sigma2: 1.09809</span></span>
-<span id="cb4-197"><a href="#cb4-197" tabindex="-1"></a><span class="co">#&gt; iter: 300 lambda2: 2.26611 sigma2: 1.03886</span></span>
-<span id="cb4-198"><a href="#cb4-198" tabindex="-1"></a><span class="co">#&gt; iter: 400 lambda2: 1.79334 sigma2: 0.994797</span></span>
-<span id="cb4-199"><a href="#cb4-199" tabindex="-1"></a><span class="co">#&gt; iter: 500 lambda2: 3.25743 sigma2: 1.10414</span></span>
-<span id="cb4-200"><a href="#cb4-200" tabindex="-1"></a><span class="co">#&gt; iter: 600 lambda2: 3.10534 sigma2: 0.995841</span></span>
-<span id="cb4-201"><a href="#cb4-201" tabindex="-1"></a><span class="co">#&gt; iter: 700 lambda2: 2.01161 sigma2: 0.925017</span></span>
-<span id="cb4-202"><a href="#cb4-202" tabindex="-1"></a><span class="co">#&gt; iter: 800 lambda2: 2.56433 sigma2: 1.45843</span></span>
-<span id="cb4-203"><a href="#cb4-203" tabindex="-1"></a><span class="co">#&gt; iter: 900 lambda2: 2.2818 sigma2: 1.05038</span></span>
-<span id="cb4-204"><a href="#cb4-204" tabindex="-1"></a><span class="co">#&gt; iter: 1000 lambda2: 3.98816 sigma2: 1.26292</span></span>
-<span id="cb4-205"><a href="#cb4-205" tabindex="-1"></a><span class="co">#&gt; iter: 1100 lambda2: 2.94681 sigma2: 1.03657</span></span>
-<span id="cb4-206"><a href="#cb4-206" tabindex="-1"></a><span class="co">#&gt; iter: 1200 lambda2: 2.28902 sigma2: 1.03245</span></span>
-<span id="cb4-207"><a href="#cb4-207" tabindex="-1"></a><span class="co">#&gt; iter: 1300 lambda2: 1.82286 sigma2: 1.10949</span></span>
-<span id="cb4-208"><a href="#cb4-208" tabindex="-1"></a><span class="co">#&gt; iter: 1400 lambda2: 1.46105 sigma2: 1.25766</span></span>
-<span id="cb4-209"><a href="#cb4-209" tabindex="-1"></a><span class="co">#&gt; iter: 1500 lambda2: 0.787921 sigma2: 0.911566</span></span>
-<span id="cb4-210"><a href="#cb4-210" tabindex="-1"></a><span class="co">#&gt; iter: 1600 lambda2: 2.7443 sigma2: 0.988332</span></span>
-<span id="cb4-211"><a href="#cb4-211" tabindex="-1"></a><span class="co">#&gt; iter: 1700 lambda2: 3.13911 sigma2: 1.32975</span></span>
-<span id="cb4-212"><a href="#cb4-212" tabindex="-1"></a><span class="co">#&gt; iter: 1800 lambda2: 2.80028 sigma2: 1.29629</span></span>
-<span id="cb4-213"><a href="#cb4-213" tabindex="-1"></a><span class="co">#&gt; iter: 1900 lambda2: 2.21642 sigma2: 0.93613</span></span>
-<span id="cb4-214"><a href="#cb4-214" tabindex="-1"></a><span class="co">#&gt; iter: 0 lambda2: 4.47944 sigma2: 1.01204</span></span>
-<span id="cb4-215"><a href="#cb4-215" tabindex="-1"></a><span class="co">#&gt; iter: 100 lambda2: 1.4653 sigma2: 1.02341</span></span>
-<span id="cb4-216"><a href="#cb4-216" tabindex="-1"></a><span class="co">#&gt; iter: 200 lambda2: 1.19634 sigma2: 1.10096</span></span>
-<span id="cb4-217"><a href="#cb4-217" tabindex="-1"></a><span class="co">#&gt; iter: 300 lambda2: 2.2262 sigma2: 0.999395</span></span>
-<span id="cb4-218"><a href="#cb4-218" tabindex="-1"></a><span class="co">#&gt; iter: 400 lambda2: 2.9787 sigma2: 0.922988</span></span>
-<span id="cb4-219"><a href="#cb4-219" tabindex="-1"></a><span class="co">#&gt; iter: 500 lambda2: 4.71374 sigma2: 0.85405</span></span>
-<span id="cb4-220"><a href="#cb4-220" tabindex="-1"></a><span class="co">#&gt; iter: 600 lambda2: 1.83211 sigma2: 0.96172</span></span>
-<span id="cb4-221"><a href="#cb4-221" tabindex="-1"></a><span class="co">#&gt; iter: 700 lambda2: 3.05674 sigma2: 1.16421</span></span>
-<span id="cb4-222"><a href="#cb4-222" tabindex="-1"></a><span class="co">#&gt; iter: 800 lambda2: 1.98883 sigma2: 1.01803</span></span>
-<span id="cb4-223"><a href="#cb4-223" tabindex="-1"></a><span class="co">#&gt; iter: 900 lambda2: 1.16042 sigma2: 1.18473</span></span>
-<span id="cb4-224"><a href="#cb4-224" tabindex="-1"></a><span class="co">#&gt; iter: 1000 lambda2: 0.936166 sigma2: 1.0562</span></span>
-<span id="cb4-225"><a href="#cb4-225" tabindex="-1"></a><span class="co">#&gt; iter: 1100 lambda2: 0.864847 sigma2: 1.18938</span></span>
-<span id="cb4-226"><a href="#cb4-226" tabindex="-1"></a><span class="co">#&gt; iter: 1200 lambda2: 3.82901 sigma2: 0.846567</span></span>
-<span id="cb4-227"><a href="#cb4-227" tabindex="-1"></a><span class="co">#&gt; iter: 1300 lambda2: 1.27783 sigma2: 0.878591</span></span>
-<span id="cb4-228"><a href="#cb4-228" tabindex="-1"></a><span class="co">#&gt; iter: 1400 lambda2: 1.11838 sigma2: 0.972412</span></span>
-<span id="cb4-229"><a href="#cb4-229" tabindex="-1"></a><span class="co">#&gt; iter: 1500 lambda2: 2.4752 sigma2: 0.87348</span></span>
-<span id="cb4-230"><a href="#cb4-230" tabindex="-1"></a><span class="co">#&gt; iter: 1600 lambda2: 1.46618 sigma2: 0.732426</span></span>
-<span id="cb4-231"><a href="#cb4-231" tabindex="-1"></a><span class="co">#&gt; iter: 1700 lambda2: 1.74941 sigma2: 1.0051</span></span>
-<span id="cb4-232"><a href="#cb4-232" tabindex="-1"></a><span class="co">#&gt; iter: 1800 lambda2: 2.86923 sigma2: 1.00961</span></span>
-<span id="cb4-233"><a href="#cb4-233" tabindex="-1"></a><span class="co">#&gt; iter: 1900 lambda2: 1.03685 sigma2: 0.887191</span></span>
-<span id="cb4-234"><a href="#cb4-234" tabindex="-1"></a><span class="co">#&gt; iter: 0</span></span>
-<span id="cb4-235"><a href="#cb4-235" tabindex="-1"></a><span class="co">#&gt; iter: 100</span></span>
-<span id="cb4-236"><a href="#cb4-236" tabindex="-1"></a><span class="co">#&gt; iter: 200</span></span>
-<span id="cb4-237"><a href="#cb4-237" tabindex="-1"></a><span class="co">#&gt; iter: 300</span></span>
-<span id="cb4-238"><a href="#cb4-238" tabindex="-1"></a><span class="co">#&gt; iter: 400</span></span>
-<span id="cb4-239"><a href="#cb4-239" tabindex="-1"></a><span class="co">#&gt; iter: 500</span></span>
-<span id="cb4-240"><a href="#cb4-240" tabindex="-1"></a><span class="co">#&gt; iter: 600</span></span>
-<span id="cb4-241"><a href="#cb4-241" tabindex="-1"></a><span class="co">#&gt; iter: 700</span></span>
-<span id="cb4-242"><a href="#cb4-242" tabindex="-1"></a><span class="co">#&gt; iter: 800</span></span>
-<span id="cb4-243"><a href="#cb4-243" tabindex="-1"></a><span class="co">#&gt; iter: 900</span></span>
-<span id="cb4-244"><a href="#cb4-244" tabindex="-1"></a><span class="co">#&gt; iter: 1000</span></span>
-<span id="cb4-245"><a href="#cb4-245" tabindex="-1"></a><span class="co">#&gt; iter: 1100</span></span>
-<span id="cb4-246"><a href="#cb4-246" tabindex="-1"></a><span class="co">#&gt; iter: 1200</span></span>
-<span id="cb4-247"><a href="#cb4-247" tabindex="-1"></a><span class="co">#&gt; iter: 1300</span></span>
-<span id="cb4-248"><a href="#cb4-248" tabindex="-1"></a><span class="co">#&gt; iter: 1400</span></span>
-<span id="cb4-249"><a href="#cb4-249" tabindex="-1"></a><span class="co">#&gt; iter: 1500</span></span>
-<span id="cb4-250"><a href="#cb4-250" tabindex="-1"></a><span class="co">#&gt; iter: 1600</span></span>
-<span id="cb4-251"><a href="#cb4-251" tabindex="-1"></a><span class="co">#&gt; iter: 1700</span></span>
-<span id="cb4-252"><a href="#cb4-252" tabindex="-1"></a><span class="co">#&gt; iter: 1800</span></span>
-<span id="cb4-253"><a href="#cb4-253" tabindex="-1"></a><span class="co">#&gt; iter: 1900</span></span>
-<span id="cb4-254"><a href="#cb4-254" tabindex="-1"></a><span class="co">#&gt; iter: 0</span></span>
-<span id="cb4-255"><a href="#cb4-255" tabindex="-1"></a><span class="co">#&gt; iter: 100</span></span>
-<span id="cb4-256"><a href="#cb4-256" tabindex="-1"></a><span class="co">#&gt; iter: 200</span></span>
-<span id="cb4-257"><a href="#cb4-257" tabindex="-1"></a><span class="co">#&gt; iter: 300</span></span>
-<span id="cb4-258"><a href="#cb4-258" tabindex="-1"></a><span class="co">#&gt; iter: 400</span></span>
-<span id="cb4-259"><a href="#cb4-259" tabindex="-1"></a><span class="co">#&gt; iter: 500</span></span>
-<span id="cb4-260"><a href="#cb4-260" tabindex="-1"></a><span class="co">#&gt; iter: 600</span></span>
-<span id="cb4-261"><a href="#cb4-261" tabindex="-1"></a><span class="co">#&gt; iter: 700</span></span>
-<span id="cb4-262"><a href="#cb4-262" tabindex="-1"></a><span class="co">#&gt; iter: 800</span></span>
-<span id="cb4-263"><a href="#cb4-263" tabindex="-1"></a><span class="co">#&gt; iter: 900</span></span>
-<span id="cb4-264"><a href="#cb4-264" tabindex="-1"></a><span class="co">#&gt; iter: 1000</span></span>
-<span id="cb4-265"><a href="#cb4-265" tabindex="-1"></a><span class="co">#&gt; iter: 1100</span></span>
-<span id="cb4-266"><a href="#cb4-266" tabindex="-1"></a><span class="co">#&gt; iter: 1200</span></span>
-<span id="cb4-267"><a href="#cb4-267" tabindex="-1"></a><span class="co">#&gt; iter: 1300</span></span>
-<span id="cb4-268"><a href="#cb4-268" tabindex="-1"></a><span class="co">#&gt; iter: 1400</span></span>
-<span id="cb4-269"><a href="#cb4-269" tabindex="-1"></a><span class="co">#&gt; iter: 1500</span></span>
-<span id="cb4-270"><a href="#cb4-270" tabindex="-1"></a><span class="co">#&gt; iter: 1600</span></span>
-<span id="cb4-271"><a href="#cb4-271" tabindex="-1"></a><span class="co">#&gt; iter: 1700</span></span>
-<span id="cb4-272"><a href="#cb4-272" tabindex="-1"></a><span class="co">#&gt; iter: 1800</span></span>
-<span id="cb4-273"><a href="#cb4-273" tabindex="-1"></a><span class="co">#&gt; iter: 1900</span></span>
-<span id="cb4-274"><a href="#cb4-274" tabindex="-1"></a><span class="co">#&gt; iter: 0</span></span>
-<span id="cb4-275"><a href="#cb4-275" tabindex="-1"></a><span class="co">#&gt; iter: 100</span></span>
-<span id="cb4-276"><a href="#cb4-276" tabindex="-1"></a><span class="co">#&gt; iter: 200</span></span>
-<span id="cb4-277"><a href="#cb4-277" tabindex="-1"></a><span class="co">#&gt; iter: 300</span></span>
-<span id="cb4-278"><a href="#cb4-278" tabindex="-1"></a><span class="co">#&gt; iter: 400</span></span>
-<span id="cb4-279"><a href="#cb4-279" tabindex="-1"></a><span class="co">#&gt; iter: 500</span></span>
-<span id="cb4-280"><a href="#cb4-280" tabindex="-1"></a><span class="co">#&gt; iter: 600</span></span>
-<span id="cb4-281"><a href="#cb4-281" tabindex="-1"></a><span class="co">#&gt; iter: 700</span></span>
-<span id="cb4-282"><a href="#cb4-282" tabindex="-1"></a><span class="co">#&gt; iter: 800</span></span>
-<span id="cb4-283"><a href="#cb4-283" tabindex="-1"></a><span class="co">#&gt; iter: 900</span></span>
-<span id="cb4-284"><a href="#cb4-284" tabindex="-1"></a><span class="co">#&gt; iter: 1000</span></span>
-<span id="cb4-285"><a href="#cb4-285" tabindex="-1"></a><span class="co">#&gt; iter: 1100</span></span>
-<span id="cb4-286"><a href="#cb4-286" tabindex="-1"></a><span class="co">#&gt; iter: 1200</span></span>
-<span id="cb4-287"><a href="#cb4-287" tabindex="-1"></a><span class="co">#&gt; iter: 1300</span></span>
-<span id="cb4-288"><a href="#cb4-288" tabindex="-1"></a><span class="co">#&gt; iter: 1400</span></span>
-<span id="cb4-289"><a href="#cb4-289" tabindex="-1"></a><span class="co">#&gt; iter: 1500</span></span>
-<span id="cb4-290"><a href="#cb4-290" tabindex="-1"></a><span class="co">#&gt; iter: 1600</span></span>
-<span id="cb4-291"><a href="#cb4-291" tabindex="-1"></a><span class="co">#&gt; iter: 1700</span></span>
-<span id="cb4-292"><a href="#cb4-292" tabindex="-1"></a><span class="co">#&gt; iter: 1800</span></span>
-<span id="cb4-293"><a href="#cb4-293" tabindex="-1"></a><span class="co">#&gt; iter: 1900</span></span>
-<span id="cb4-294"><a href="#cb4-294" tabindex="-1"></a><span class="co">#&gt; iter: 0</span></span>
-<span id="cb4-295"><a href="#cb4-295" tabindex="-1"></a><span class="co">#&gt; iter: 100</span></span>
-<span id="cb4-296"><a href="#cb4-296" tabindex="-1"></a><span class="co">#&gt; iter: 200</span></span>
-<span id="cb4-297"><a href="#cb4-297" tabindex="-1"></a><span class="co">#&gt; iter: 300</span></span>
-<span id="cb4-298"><a href="#cb4-298" tabindex="-1"></a><span class="co">#&gt; iter: 400</span></span>
-<span id="cb4-299"><a href="#cb4-299" tabindex="-1"></a><span class="co">#&gt; iter: 500</span></span>
-<span id="cb4-300"><a href="#cb4-300" tabindex="-1"></a><span class="co">#&gt; iter: 600</span></span>
-<span id="cb4-301"><a href="#cb4-301" tabindex="-1"></a><span class="co">#&gt; iter: 700</span></span>
-<span id="cb4-302"><a href="#cb4-302" tabindex="-1"></a><span class="co">#&gt; iter: 800</span></span>
-<span id="cb4-303"><a href="#cb4-303" tabindex="-1"></a><span class="co">#&gt; iter: 900</span></span>
-<span id="cb4-304"><a href="#cb4-304" tabindex="-1"></a><span class="co">#&gt; iter: 1000</span></span>
-<span id="cb4-305"><a href="#cb4-305" tabindex="-1"></a><span class="co">#&gt; iter: 1100</span></span>
-<span id="cb4-306"><a href="#cb4-306" tabindex="-1"></a><span class="co">#&gt; iter: 1200</span></span>
-<span id="cb4-307"><a href="#cb4-307" tabindex="-1"></a><span class="co">#&gt; iter: 1300</span></span>
-<span id="cb4-308"><a href="#cb4-308" tabindex="-1"></a><span class="co">#&gt; iter: 1400</span></span>
-<span id="cb4-309"><a href="#cb4-309" tabindex="-1"></a><span class="co">#&gt; iter: 1500</span></span>
-<span id="cb4-310"><a href="#cb4-310" tabindex="-1"></a><span class="co">#&gt; iter: 1600</span></span>
-<span id="cb4-311"><a href="#cb4-311" tabindex="-1"></a><span class="co">#&gt; iter: 1700</span></span>
-<span id="cb4-312"><a href="#cb4-312" tabindex="-1"></a><span class="co">#&gt; iter: 1800</span></span>
-<span id="cb4-313"><a href="#cb4-313" tabindex="-1"></a><span class="co">#&gt; iter: 1900</span></span>
-<span id="cb4-314"><a href="#cb4-314" tabindex="-1"></a><span class="co">#&gt; iter: 0</span></span>
-<span id="cb4-315"><a href="#cb4-315" tabindex="-1"></a><span class="co">#&gt; iter: 100</span></span>
-<span id="cb4-316"><a href="#cb4-316" tabindex="-1"></a><span class="co">#&gt; iter: 200</span></span>
-<span id="cb4-317"><a href="#cb4-317" tabindex="-1"></a><span class="co">#&gt; iter: 300</span></span>
-<span id="cb4-318"><a href="#cb4-318" tabindex="-1"></a><span class="co">#&gt; iter: 400</span></span>
-<span id="cb4-319"><a href="#cb4-319" tabindex="-1"></a><span class="co">#&gt; iter: 500</span></span>
-<span id="cb4-320"><a href="#cb4-320" tabindex="-1"></a><span class="co">#&gt; iter: 600</span></span>
-<span id="cb4-321"><a href="#cb4-321" tabindex="-1"></a><span class="co">#&gt; iter: 700</span></span>
-<span id="cb4-322"><a href="#cb4-322" tabindex="-1"></a><span class="co">#&gt; iter: 800</span></span>
-<span id="cb4-323"><a href="#cb4-323" tabindex="-1"></a><span class="co">#&gt; iter: 900</span></span>
-<span id="cb4-324"><a href="#cb4-324" tabindex="-1"></a><span class="co">#&gt; iter: 1000</span></span>
-<span id="cb4-325"><a href="#cb4-325" tabindex="-1"></a><span class="co">#&gt; iter: 1100</span></span>
-<span id="cb4-326"><a href="#cb4-326" tabindex="-1"></a><span class="co">#&gt; iter: 1200</span></span>
-<span id="cb4-327"><a href="#cb4-327" tabindex="-1"></a><span class="co">#&gt; iter: 1300</span></span>
-<span id="cb4-328"><a href="#cb4-328" tabindex="-1"></a><span class="co">#&gt; iter: 1400</span></span>
-<span id="cb4-329"><a href="#cb4-329" tabindex="-1"></a><span class="co">#&gt; iter: 1500</span></span>
-<span id="cb4-330"><a href="#cb4-330" tabindex="-1"></a><span class="co">#&gt; iter: 1600</span></span>
-<span id="cb4-331"><a href="#cb4-331" tabindex="-1"></a><span class="co">#&gt; iter: 1700</span></span>
-<span id="cb4-332"><a href="#cb4-332" tabindex="-1"></a><span class="co">#&gt; iter: 1800</span></span>
-<span id="cb4-333"><a href="#cb4-333" tabindex="-1"></a><span class="co">#&gt; iter: 1900</span></span></code></pre></div>
-</div>
-<div id="data-sources" class="section level2">
-<h2>Data Sources</h2>
-<p>This vignette demonstrates the usage of the
-<code>BayesianLasso</code> package on several well-known datasets. To
-avoid redistribution issues and keep the package lightweight, none of
-these datasets are included directly in the package. Instead, we provide
-guidance on how to access them.</p>
-<ul>
-<li><p><strong>Diabetes</strong>: Available in the package and loaded
-using <code>data(diabetes, package = &quot;lars&quot;)</code>.</p></li>
-<li><p><strong>Kakadu</strong>: Available in the package and loaded
-using <code>data(Kakadu, package = &quot;Ecdat&quot;)</code>.</p></li>
-<li><p><strong>Communities and Crime</strong>: This dataset is available
-from the <a href="https://archive.ics.uci.edu/dataset/183/communities+and+crime">UCI
-Machine Learning Repository</a>.<br />
-Due to licensing and redistribution considerations, the <em>Communities
-and Crime</em> dataset is not included in this package. Users can
-download the dataset manually by visiting the repository and following
-the preprocessing steps outlined in this vignette.</p></li>
-</ul>
-</div>
-<div id="reproducing-table-1-performance-comparison" class="section level2">
-<h2>Reproducing Table 1: Performance Comparison</h2>
-<p>This section demonstrates how to reproduce the performance comparison
-table from the manuscript, comparing the mixing percentages, sampling
-efficiencies, and runtimes for the Diabetes, Kakadu, and Communities and
-Crime datasets.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Load libraries</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">library</span>(BayesianLasso)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co"># Example: dataset_name &lt;- &quot;diabetes2&quot;</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="cf">if</span> (dataset_name <span class="sc">==</span> datasets_ngtp[<span class="dv">2</span>]) {</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;lars&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Package &#39;lars&#39; is required for the diabetes example in this vignette.&quot;</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>    </span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>    <span class="fu">data</span>(<span class="st">&quot;diabetes&quot;</span>, <span class="at">package =</span> <span class="st">&quot;lars&quot;</span>, <span class="at">envir =</span> <span class="fu">environment</span>())</span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>    </span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>    y <span class="ot">&lt;-</span> diabetes<span class="sc">$</span>y</span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>    x <span class="ot">&lt;-</span> diabetes<span class="sc">$</span>x</span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>    inds <span class="ot">&lt;-</span> <span class="fu">seq_len</span>(<span class="fu">ncol</span>(x))</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>    </span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>    <span class="co"># Normalizing and scaling the dataset by function normalize()</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>    norm <span class="ot">&lt;-</span> <span class="fu">normalize</span>(y, x, <span class="at">scale =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>    x <span class="ot">&lt;-</span> norm<span class="sc">$</span>mX</span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> .<span class="sc">^</span><span class="dv">2</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x))[ , <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>    y <span class="ot">&lt;-</span> norm<span class="sc">$</span>vy</span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>  }</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>}</span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="cf">if</span> (dataset_name <span class="sc">==</span> datasets_ngtp[<span class="dv">3</span>]) {</span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;Ecdat&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">&quot;Package &#39;Ecdat&#39; is required for the Kakadu example in this vignette.&quot;</span>)</span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>    </span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>    <span class="fu">data</span>(<span class="st">&quot;Kakadu&quot;</span>, <span class="at">package =</span> <span class="st">&quot;Ecdat&quot;</span>, <span class="at">envir =</span> <span class="fu">environment</span>())</span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>    </span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>    <span class="co"># Get y vector and X matrix</span></span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>    y <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(Kakadu<span class="sc">$</span>income)</span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>    x <span class="ot">&lt;-</span> Kakadu[, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="dv">22</span>)]</span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>    </span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> .<span class="sc">^</span><span class="dv">2</span>, <span class="at">data =</span> x)[ , <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>  }</span>
-<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>}</span>
-<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co"># Make sure Crime.csv (or comData.Rdata) is downloaded manually before running this</span></span>
-<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a><span class="cf">if</span> (dataset_name <span class="sc">==</span> datasets_ngtp[<span class="dv">4</span>]) </span>
-<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a>{</span>
-<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a>  rdata_path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;comData.Rdata&quot;</span>, <span class="at">package =</span> <span class="st">&quot;BayesianLasso&quot;</span>) </span>
-<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nzchar</span>(rdata_path) <span class="sc">&amp;&amp;</span> <span class="fu">file.exists</span>(rdata_path)) { <span class="fu">load</span>(rdata_path) </span>
-<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a>  }<span class="cf">else</span> { <span class="fu">stop</span>(<span class="st">&quot;File &#39;comData.Rdata&#39; not found in package extdata.&quot;</span>) </span>
-<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a>  }</span>
-<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a>  </span>
-<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a>  </span>
-<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a>  <span class="co"># ---- Remove rows with NA while keeping X and Y aligned ----</span></span>
-<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a>  datXY <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(<span class="fu">cbind</span>(<span class="fu">as.data.frame</span>(X), <span class="fu">as.data.frame</span>(Y)))</span>
-<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a>  X2 <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(datXY[, <span class="fu">colnames</span>(X), <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a>  Y2 <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(datXY[, <span class="fu">colnames</span>(Y), <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a>  </span>
-<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a>  <span class="co"># ---- Drop unwanted columns safely ----</span></span>
-<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a>  drop_cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ownHousQrange&quot;</span>, <span class="st">&quot;rentUpperQ&quot;</span>)</span>
-<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a>  X2 <span class="ot">&lt;-</span> X2[, <span class="sc">!</span><span class="fu">colnames</span>(X2) <span class="sc">%in%</span> drop_cols, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a>  </span>
-<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a>  <span class="co"># ---- Define regression inputs ----</span></span>
-<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a>  x <span class="ot">&lt;-</span> X2</span>
-<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(Y2[, <span class="st">&quot;murders&quot;</span>])</span>
-<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a>  varnames <span class="ot">&lt;-</span> <span class="fu">colnames</span>(x)</span>
-<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a>  inds <span class="ot">&lt;-</span> <span class="fu">seq_len</span>(<span class="fu">ncol</span>(x))</span>
-<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a>}</span>
-<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a></span>
-<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a></span>
-<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a><span class="co"># Set prior hyperparameter constants</span></span>
-<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a>a1 <span class="ot">=</span> <span class="fl">1.0E-2</span>  <span class="co"># Prior shape for sigma2</span></span>
-<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a>b1 <span class="ot">=</span> <span class="fl">1.0E-2</span>  <span class="co"># Prior scale for sigma2</span></span>
-<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a>u1 <span class="ot">=</span> <span class="fl">1.0E-2</span>  <span class="co"># Prior shape for lambda2</span></span>
-<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a>v1 <span class="ot">=</span> <span class="fl">1.0E-2</span>  <span class="co"># Prior scale for lambda2</span></span>
-<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a></span>
-<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a><span class="co"># Initial values for lambda2 and sigma2</span></span>
-<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a>lambda2_init  <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a>lambda_init <span class="ot">=</span> <span class="fu">sqrt</span>(lambda2_init)</span>
-<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a>sigma2_init <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a></span>
-<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a><span class="co"># Number of samples to run the MCMC</span></span>
-<span id="cb5-79"><a href="#cb5-79" tabindex="-1"></a>nburn <span class="ot">=</span> <span class="dv">100</span></span>
-<span id="cb5-80"><a href="#cb5-80" tabindex="-1"></a>nsamples <span class="ot">=</span> <span class="dv">1000</span></span>
-<span id="cb5-81"><a href="#cb5-81" tabindex="-1"></a>inds_use <span class="ot">=</span> (nburn <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>nsamples</span>
-<span id="cb5-82"><a href="#cb5-82" tabindex="-1"></a>N <span class="ot">=</span> <span class="fu">length</span>(inds_use)</span>
-<span id="cb5-83"><a href="#cb5-83" tabindex="-1"></a></span>
-<span id="cb5-84"><a href="#cb5-84" tabindex="-1"></a></span>
-<span id="cb5-85"><a href="#cb5-85" tabindex="-1"></a></span>
-<span id="cb5-86"><a href="#cb5-86" tabindex="-1"></a><span class="cf">if</span>(dataset_name <span class="sc">!=</span> datasets_ngtp[<span class="dv">1</span>]){</span>
-<span id="cb5-87"><a href="#cb5-87" tabindex="-1"></a>  </span>
-<span id="cb5-88"><a href="#cb5-88" tabindex="-1"></a>  <span class="co"># To store elapsed time and results of the PC sampler</span></span>
-<span id="cb5-89"><a href="#cb5-89" tabindex="-1"></a>  vtime_val_PC <span class="ot">=</span> <span class="fu">c</span>()</span>
-<span id="cb5-90"><a href="#cb5-90" tabindex="-1"></a>  results_PC <span class="ot">&lt;-</span> <span class="cn">NULL</span>  <span class="co"># to be initialized after the first run</span></span>
-<span id="cb5-91"><a href="#cb5-91" tabindex="-1"></a>  </span>
-<span id="cb5-92"><a href="#cb5-92" tabindex="-1"></a>  <span class="co"># Running the modified PC sampler 5 times and taking the average of the results across runs.</span></span>
-<span id="cb5-93"><a href="#cb5-93" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) {</span>
-<span id="cb5-94"><a href="#cb5-94" tabindex="-1"></a>    time_val <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
-<span id="cb5-95"><a href="#cb5-95" tabindex="-1"></a>      res_PC <span class="ot">&lt;-</span> <span class="fu">Modified_PC_Gibbs</span>(</span>
-<span id="cb5-96"><a href="#cb5-96" tabindex="-1"></a>        <span class="at">X =</span> x, <span class="at">y =</span> y, a1, b1, u1, v1,</span>
-<span id="cb5-97"><a href="#cb5-97" tabindex="-1"></a>        nsamples,</span>
-<span id="cb5-98"><a href="#cb5-98" tabindex="-1"></a>        <span class="at">lambda_init =</span> lambda_init,</span>
-<span id="cb5-99"><a href="#cb5-99" tabindex="-1"></a>        <span class="at">sigma2_init =</span> sigma2_init,</span>
-<span id="cb5-100"><a href="#cb5-100" tabindex="-1"></a>        <span class="at">verbose =</span> <span class="dv">1000</span></span>
-<span id="cb5-101"><a href="#cb5-101" tabindex="-1"></a>      )</span>
-<span id="cb5-102"><a href="#cb5-102" tabindex="-1"></a>    })[<span class="dv">3</span>]</span>
-<span id="cb5-103"><a href="#cb5-103" tabindex="-1"></a>    </span>
-<span id="cb5-104"><a href="#cb5-104" tabindex="-1"></a>    vtime_val_PC[i] <span class="ot">&lt;-</span> time_val</span>
-<span id="cb5-105"><a href="#cb5-105" tabindex="-1"></a>    </span>
-<span id="cb5-106"><a href="#cb5-106" tabindex="-1"></a>    <span class="co"># Initialize accumulators after first run</span></span>
-<span id="cb5-107"><a href="#cb5-107" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(results_PC)) {</span>
-<span id="cb5-108"><a href="#cb5-108" tabindex="-1"></a>      results_PC <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb5-109"><a href="#cb5-109" tabindex="-1"></a>        <span class="at">mBeta =</span> res_PC<span class="sc">$</span>mBeta,</span>
-<span id="cb5-110"><a href="#cb5-110" tabindex="-1"></a>        <span class="at">vsigma2 =</span> res_PC<span class="sc">$</span>vsigma2,</span>
-<span id="cb5-111"><a href="#cb5-111" tabindex="-1"></a>        <span class="at">vlambda2 =</span> res_PC<span class="sc">$</span>vlambda2</span>
-<span id="cb5-112"><a href="#cb5-112" tabindex="-1"></a>      )</span>
-<span id="cb5-113"><a href="#cb5-113" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb5-114"><a href="#cb5-114" tabindex="-1"></a>      results_PC<span class="sc">$</span>mBeta    <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>mBeta <span class="sc">+</span> res_PC<span class="sc">$</span>mBeta</span>
-<span id="cb5-115"><a href="#cb5-115" tabindex="-1"></a>      results_PC<span class="sc">$</span>vsigma2  <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>vsigma2 <span class="sc">+</span> res_PC<span class="sc">$</span>vsigma2</span>
-<span id="cb5-116"><a href="#cb5-116" tabindex="-1"></a>      results_PC<span class="sc">$</span>vlambda2 <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>vlambda2 <span class="sc">+</span> res_PC<span class="sc">$</span>vlambda2</span>
-<span id="cb5-117"><a href="#cb5-117" tabindex="-1"></a>    }</span>
-<span id="cb5-118"><a href="#cb5-118" tabindex="-1"></a>  }</span>
-<span id="cb5-119"><a href="#cb5-119" tabindex="-1"></a>  </span>
-<span id="cb5-120"><a href="#cb5-120" tabindex="-1"></a>  <span class="co"># Take averages</span></span>
-<span id="cb5-121"><a href="#cb5-121" tabindex="-1"></a>  mBeta <span class="ot">=</span> (results_PC<span class="sc">$</span>mBeta)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb5-122"><a href="#cb5-122" tabindex="-1"></a>  vsigma2 <span class="ot">=</span> (results_PC<span class="sc">$</span>vsigma2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb5-123"><a href="#cb5-123" tabindex="-1"></a>  vlambda2 <span class="ot">=</span> (results_PC<span class="sc">$</span>vlambda2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb5-124"><a href="#cb5-124" tabindex="-1"></a>  time_val_PC <span class="ot">=</span> <span class="fu">mean</span>(vtime_val_PC)</span>
-<span id="cb5-125"><a href="#cb5-125" tabindex="-1"></a>  </span>
-<span id="cb5-126"><a href="#cb5-126" tabindex="-1"></a>  <span class="co"># Compute effective sample sizes  </span></span>
-<span id="cb5-127"><a href="#cb5-127" tabindex="-1"></a>  vESS <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb5-128"><a href="#cb5-128" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ncol</span>(x)</span>
-<span id="cb5-129"><a href="#cb5-129" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p) {</span>
-<span id="cb5-130"><a href="#cb5-130" tabindex="-1"></a>    vESS[j] <span class="ot">&lt;-</span> <span class="fu">effective_sample_size</span>(mBeta[inds_use,j])</span>
-<span id="cb5-131"><a href="#cb5-131" tabindex="-1"></a>  }</span>
-<span id="cb5-132"><a href="#cb5-132" tabindex="-1"></a>  Ef_PC <span class="ot">=</span> <span class="fu">median</span>(vESS)<span class="sc">/</span>time_val_PC</span>
-<span id="cb5-133"><a href="#cb5-133" tabindex="-1"></a>  </span>
-<span id="cb5-134"><a href="#cb5-134" tabindex="-1"></a>  ESS_sigma2_PC  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(vsigma2[inds_use]))</span>
-<span id="cb5-135"><a href="#cb5-135" tabindex="-1"></a>  Ef_sigma2_PC <span class="ot">=</span> ESS_sigma2_PC<span class="sc">/</span>time_val_PC</span>
-<span id="cb5-136"><a href="#cb5-136" tabindex="-1"></a>  </span>
-<span id="cb5-137"><a href="#cb5-137" tabindex="-1"></a>  ESS_lambda2_PC  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(vlambda2[inds_use]))</span>
-<span id="cb5-138"><a href="#cb5-138" tabindex="-1"></a>  Ef_lambda2_PC <span class="ot">=</span> ESS_lambda2_PC<span class="sc">/</span>time_val_PC</span>
-<span id="cb5-139"><a href="#cb5-139" tabindex="-1"></a>  </span>
-<span id="cb5-140"><a href="#cb5-140" tabindex="-1"></a>  stat_vec_PC <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb5-141"><a href="#cb5-141" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span><span class="fu">median</span>(vESS)<span class="sc">/</span>N,</span>
-<span id="cb5-142"><a href="#cb5-142" tabindex="-1"></a>    Ef_PC,</span>
-<span id="cb5-143"><a href="#cb5-143" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_sigma2_PC<span class="sc">/</span>N,</span>
-<span id="cb5-144"><a href="#cb5-144" tabindex="-1"></a>    Ef_sigma2_PC,</span>
-<span id="cb5-145"><a href="#cb5-145" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_lambda2_PC<span class="sc">/</span>N,</span>
-<span id="cb5-146"><a href="#cb5-146" tabindex="-1"></a>    Ef_lambda2_PC,</span>
-<span id="cb5-147"><a href="#cb5-147" tabindex="-1"></a>    time_val_PC)</span>
-<span id="cb5-148"><a href="#cb5-148" tabindex="-1"></a>  </span>
-<span id="cb5-149"><a href="#cb5-149" tabindex="-1"></a>  name_vals <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;mix_beta&quot;</span>, <span class="st">&quot;eff_beta&quot;</span>, <span class="st">&quot;mix_sigma2&quot;</span>, <span class="st">&quot;eff_sigma2&quot;</span>, <span class="st">&quot;mix_lambda2&quot;</span>, <span class="st">&quot;eff_lambda2&quot;</span>, <span class="st">&quot;time&quot;</span>)</span>
-<span id="cb5-150"><a href="#cb5-150" tabindex="-1"></a>  <span class="fu">names</span>(stat_vec_PC) <span class="ot">=</span> name_vals </span>
-<span id="cb5-151"><a href="#cb5-151" tabindex="-1"></a>  </span>
-<span id="cb5-152"><a href="#cb5-152" tabindex="-1"></a>  </span>
-<span id="cb5-153"><a href="#cb5-153" tabindex="-1"></a>  <span class="co"># To store elapsed time and results of the Hans sampler</span></span>
-<span id="cb5-154"><a href="#cb5-154" tabindex="-1"></a>  vtime_val_Hans <span class="ot">=</span> <span class="fu">c</span>()</span>
-<span id="cb5-155"><a href="#cb5-155" tabindex="-1"></a>  results_Hans <span class="ot">&lt;-</span> <span class="cn">NULL</span>  <span class="co"># to be initialized after the first run</span></span>
-<span id="cb5-156"><a href="#cb5-156" tabindex="-1"></a>  </span>
-<span id="cb5-157"><a href="#cb5-157" tabindex="-1"></a>  <span class="co"># Running the modified Hans sampler 5 times and taking the average of the results across runs.</span></span>
-<span id="cb5-158"><a href="#cb5-158" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) {</span>
-<span id="cb5-159"><a href="#cb5-159" tabindex="-1"></a>    time_val <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
-<span id="cb5-160"><a href="#cb5-160" tabindex="-1"></a>      res_Hans <span class="ot">&lt;-</span> <span class="fu">Modified_Hans_Gibbs</span>(</span>
-<span id="cb5-161"><a href="#cb5-161" tabindex="-1"></a>        <span class="at">X =</span> x, <span class="at">y =</span> y, <span class="at">beta_init =</span> <span class="fu">as.vector</span>(<span class="fu">colMeans</span>(mBeta)),</span>
-<span id="cb5-162"><a href="#cb5-162" tabindex="-1"></a>        a1, b1, u1, v1,</span>
-<span id="cb5-163"><a href="#cb5-163" tabindex="-1"></a>        nsamples,</span>
-<span id="cb5-164"><a href="#cb5-164" tabindex="-1"></a>        <span class="at">lambda_init =</span> lambda_init,</span>
-<span id="cb5-165"><a href="#cb5-165" tabindex="-1"></a>        <span class="at">sigma2_init =</span> sigma2_init,</span>
-<span id="cb5-166"><a href="#cb5-166" tabindex="-1"></a>        <span class="at">verbose =</span> <span class="dv">1000</span>, <span class="at">tune_lambda2 =</span> <span class="cn">TRUE</span>, <span class="at">rao_blackwellization =</span> <span class="cn">FALSE</span></span>
-<span id="cb5-167"><a href="#cb5-167" tabindex="-1"></a>      )</span>
-<span id="cb5-168"><a href="#cb5-168" tabindex="-1"></a>    })[<span class="dv">3</span>]</span>
-<span id="cb5-169"><a href="#cb5-169" tabindex="-1"></a>    </span>
-<span id="cb5-170"><a href="#cb5-170" tabindex="-1"></a>    vtime_val_Hans[i] <span class="ot">&lt;-</span> time_val</span>
-<span id="cb5-171"><a href="#cb5-171" tabindex="-1"></a>    </span>
-<span id="cb5-172"><a href="#cb5-172" tabindex="-1"></a>    <span class="co"># Initialize accumulators after first run</span></span>
-<span id="cb5-173"><a href="#cb5-173" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(results_Hans)) {</span>
-<span id="cb5-174"><a href="#cb5-174" tabindex="-1"></a>      results_Hans <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb5-175"><a href="#cb5-175" tabindex="-1"></a>        <span class="at">mBeta =</span> res_Hans<span class="sc">$</span>mBeta,</span>
-<span id="cb5-176"><a href="#cb5-176" tabindex="-1"></a>        <span class="at">vsigma2 =</span> res_Hans<span class="sc">$</span>vsigma2,</span>
-<span id="cb5-177"><a href="#cb5-177" tabindex="-1"></a>        <span class="at">vlambda2 =</span> res_Hans<span class="sc">$</span>vlambda2</span>
-<span id="cb5-178"><a href="#cb5-178" tabindex="-1"></a>      )</span>
-<span id="cb5-179"><a href="#cb5-179" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb5-180"><a href="#cb5-180" tabindex="-1"></a>      results_Hans<span class="sc">$</span>mBeta    <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>mBeta <span class="sc">+</span> res_Hans<span class="sc">$</span>mBeta</span>
-<span id="cb5-181"><a href="#cb5-181" tabindex="-1"></a>      results_Hans<span class="sc">$</span>vsigma2  <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>vsigma2 <span class="sc">+</span> res_Hans<span class="sc">$</span>vsigma2</span>
-<span id="cb5-182"><a href="#cb5-182" tabindex="-1"></a>      results_Hans<span class="sc">$</span>vlambda2 <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>vlambda2 <span class="sc">+</span> res_Hans<span class="sc">$</span>vlambda2</span>
-<span id="cb5-183"><a href="#cb5-183" tabindex="-1"></a>    }</span>
-<span id="cb5-184"><a href="#cb5-184" tabindex="-1"></a>  }</span>
-<span id="cb5-185"><a href="#cb5-185" tabindex="-1"></a>  </span>
-<span id="cb5-186"><a href="#cb5-186" tabindex="-1"></a>  <span class="co"># Take averages</span></span>
-<span id="cb5-187"><a href="#cb5-187" tabindex="-1"></a>  mBeta <span class="ot">=</span> (results_Hans<span class="sc">$</span>mBeta)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb5-188"><a href="#cb5-188" tabindex="-1"></a>  vsigma2 <span class="ot">=</span> (results_Hans<span class="sc">$</span>vsigma2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb5-189"><a href="#cb5-189" tabindex="-1"></a>  vlambda2 <span class="ot">=</span> (results_Hans<span class="sc">$</span>vlambda2)<span class="sc">/</span><span class="dv">5</span></span>
-<span id="cb5-190"><a href="#cb5-190" tabindex="-1"></a>  time_val_Hans <span class="ot">=</span> <span class="fu">mean</span>(vtime_val_Hans)</span>
-<span id="cb5-191"><a href="#cb5-191" tabindex="-1"></a>  </span>
-<span id="cb5-192"><a href="#cb5-192" tabindex="-1"></a>  <span class="co"># Compute effective sample sizes</span></span>
-<span id="cb5-193"><a href="#cb5-193" tabindex="-1"></a>  vESS <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb5-194"><a href="#cb5-194" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ncol</span>(x)</span>
-<span id="cb5-195"><a href="#cb5-195" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p) {</span>
-<span id="cb5-196"><a href="#cb5-196" tabindex="-1"></a>    vESS[j] <span class="ot">&lt;-</span> <span class="fu">effective_sample_size</span>(mBeta[inds_use,j])</span>
-<span id="cb5-197"><a href="#cb5-197" tabindex="-1"></a>  }</span>
-<span id="cb5-198"><a href="#cb5-198" tabindex="-1"></a>  Ef_Hans <span class="ot">=</span> <span class="fu">median</span>(vESS)<span class="sc">/</span>time_val_Hans</span>
-<span id="cb5-199"><a href="#cb5-199" tabindex="-1"></a>  </span>
-<span id="cb5-200"><a href="#cb5-200" tabindex="-1"></a>  ESS_sigma2_Hans  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(vsigma2[inds_use]))</span>
-<span id="cb5-201"><a href="#cb5-201" tabindex="-1"></a>  Ef_sigma2_Hans <span class="ot">=</span> ESS_sigma2_Hans<span class="sc">/</span>time_val_Hans</span>
-<span id="cb5-202"><a href="#cb5-202" tabindex="-1"></a>  </span>
-<span id="cb5-203"><a href="#cb5-203" tabindex="-1"></a>  ESS_lambda2_Hans  <span class="ot">=</span> <span class="fu">effective_sample_size</span>(<span class="fu">as.vector</span>(vlambda2[inds_use]))</span>
-<span id="cb5-204"><a href="#cb5-204" tabindex="-1"></a>  Ef_lambda2_Hans <span class="ot">=</span> ESS_lambda2_Hans<span class="sc">/</span>time_val_Hans</span>
-<span id="cb5-205"><a href="#cb5-205" tabindex="-1"></a>  </span>
-<span id="cb5-206"><a href="#cb5-206" tabindex="-1"></a>  stat_vec_Hans <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb5-207"><a href="#cb5-207" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span><span class="fu">median</span>(vESS)<span class="sc">/</span>N,</span>
-<span id="cb5-208"><a href="#cb5-208" tabindex="-1"></a>    Ef_Hans,</span>
-<span id="cb5-209"><a href="#cb5-209" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_sigma2_Hans<span class="sc">/</span>N,</span>
-<span id="cb5-210"><a href="#cb5-210" tabindex="-1"></a>    Ef_sigma2_Hans,</span>
-<span id="cb5-211"><a href="#cb5-211" tabindex="-1"></a>    <span class="dv">100</span><span class="sc">*</span>ESS_lambda2_Hans<span class="sc">/</span>N,</span>
-<span id="cb5-212"><a href="#cb5-212" tabindex="-1"></a>    Ef_lambda2_Hans,</span>
-<span id="cb5-213"><a href="#cb5-213" tabindex="-1"></a>    time_val_Hans)</span>
-<span id="cb5-214"><a href="#cb5-214" tabindex="-1"></a>  </span>
-<span id="cb5-215"><a href="#cb5-215" tabindex="-1"></a>  name_vals <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;mix_beta&quot;</span>, <span class="st">&quot;eff_beta&quot;</span>, <span class="st">&quot;mix_sigma2&quot;</span>, <span class="st">&quot;eff_sigma2&quot;</span>, <span class="st">&quot;mix_lambda2&quot;</span>, <span class="st">&quot;eff_lambda2&quot;</span>, <span class="st">&quot;time&quot;</span>)</span>
-<span id="cb5-216"><a href="#cb5-216" tabindex="-1"></a>  <span class="fu">names</span>(stat_vec_Hans) <span class="ot">=</span> name_vals </span>
-<span id="cb5-217"><a href="#cb5-217" tabindex="-1"></a>  </span>
-<span id="cb5-218"><a href="#cb5-218" tabindex="-1"></a>  </span>
-<span id="cb5-219"><a href="#cb5-219" tabindex="-1"></a>  </span>
-<span id="cb5-220"><a href="#cb5-220" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(BayesianLasso)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># Simulate data</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>Ns <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>ns <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>ps <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(ns <span class="sc">*</span> ps), <span class="at">nrow =</span> ns)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="dv">0</span>, ps <span class="sc">-</span> <span class="dv">3</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>y <span class="ot">&lt;-</span> X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(ns)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>vtime_val_Hans <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>results_Hans <span class="ot">&lt;-</span> <span class="cn">NULL</span> </span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co"># Run the modified Hans sampler</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>  time_val <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>    res_Hans <span class="ot">&lt;-</span> <span class="fu">Modified_Hans_Gibbs</span>(</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>      <span class="at">X =</span> X, <span class="at">y =</span> y, <span class="at">beta_init=</span> <span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">10</span>), <span class="at">a1=</span><span class="dv">2</span>, <span class="at">b1=</span><span class="dv">1</span>, <span class="at">u1=</span><span class="dv">2</span>, <span class="at">v1=</span><span class="dv">1</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>      <span class="at">nsamples=</span>Ns, <span class="at">lambda_init=</span><span class="dv">1</span>, <span class="at">sigma2_init=</span><span class="dv">1</span>, <span class="at">verbose=</span><span class="dv">0</span>, <span class="at">tune_lambda2 =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>      <span class="at">rao_blackwellization =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>  })[<span class="dv">3</span>]</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>  </span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>  vtime_val_Hans[i] <span class="ot">&lt;-</span> time_val</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>  </span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>  <span class="co"># Initialize accumulators after first run</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(results_Hans)) {</span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>    results_Hans <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>      <span class="at">mBeta_Hans =</span> res_Hans<span class="sc">$</span>mBeta,</span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>      <span class="at">vsigma2_Hans =</span> res_Hans<span class="sc">$</span>vsigma2,</span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>      <span class="at">vlambda2_Hans =</span> res_Hans<span class="sc">$</span>vlambda2</span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a>    )</span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a>    results_Hans<span class="sc">$</span>mBeta_Hans    <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>mBeta_Hans <span class="sc">+</span> res_Hans<span class="sc">$</span>mBeta</span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a>    results_Hans<span class="sc">$</span>vsigma2_Hans  <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>vsigma2_Hans <span class="sc">+</span> res_Hans<span class="sc">$</span>vsigma2</span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a>    results_Hans<span class="sc">$</span>vlambda2_Hans <span class="ot">&lt;-</span> results_Hans<span class="sc">$</span>vlambda2_Hans <span class="sc">+</span> res_Hans<span class="sc">$</span>vlambda2</span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a>  }</span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a>}</span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="co"># Take averages</span></span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a>mBeta_Hans    <span class="ot">&lt;-</span> (results_Hans<span class="sc">$</span>mBeta_Hans) <span class="sc">/</span> <span class="dv">5</span></span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a>vsigma2_Hans  <span class="ot">&lt;-</span> (results_Hans<span class="sc">$</span>vsigma2_Hans) <span class="sc">/</span> <span class="dv">5</span></span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a>vlambda2_Hans <span class="ot">&lt;-</span> (results_Hans<span class="sc">$</span>vlambda2_Hans) <span class="sc">/</span> <span class="dv">5</span></span>
+<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a>time_val_Hans <span class="ot">=</span> <span class="fu">mean</span>(vtime_val_Hans)</span>
+<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a><span class="co"># ======================== PC sampler =======================================</span></span>
+<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a><span class="co"># Run the modified PC sampler</span></span>
+<span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" tabindex="-1"></a>vtime_val_PC <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb1-54"><a href="#cb1-54" tabindex="-1"></a>results_PC <span class="ot">&lt;-</span> <span class="cn">NULL</span> </span>
+<span id="cb1-55"><a href="#cb1-55" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
+<span id="cb1-57"><a href="#cb1-57" tabindex="-1"></a>  time_val <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
+<span id="cb1-58"><a href="#cb1-58" tabindex="-1"></a>    res_PC <span class="ot">&lt;-</span> <span class="fu">Modified_PC_Gibbs</span>(</span>
+<span id="cb1-59"><a href="#cb1-59" tabindex="-1"></a>      <span class="at">X =</span> X, <span class="at">y =</span> y, <span class="at">a1=</span><span class="dv">2</span>, <span class="at">b1=</span><span class="dv">1</span>, <span class="at">u1=</span><span class="dv">2</span>, <span class="at">v1=</span><span class="dv">1</span>,</span>
+<span id="cb1-60"><a href="#cb1-60" tabindex="-1"></a>      <span class="at">nsamples=</span>Ns, <span class="at">lambda_init=</span><span class="dv">1</span>, <span class="at">sigma2_init=</span><span class="dv">1</span>, <span class="at">verbose=</span><span class="dv">0</span>)</span>
+<span id="cb1-61"><a href="#cb1-61" tabindex="-1"></a>  })[<span class="dv">3</span>]</span>
+<span id="cb1-62"><a href="#cb1-62" tabindex="-1"></a>  </span>
+<span id="cb1-63"><a href="#cb1-63" tabindex="-1"></a>  vtime_val_PC[i] <span class="ot">&lt;-</span> time_val</span>
+<span id="cb1-64"><a href="#cb1-64" tabindex="-1"></a>  </span>
+<span id="cb1-65"><a href="#cb1-65" tabindex="-1"></a>  <span class="co"># Initialize accumulators after first run</span></span>
+<span id="cb1-66"><a href="#cb1-66" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(results_PC)) {</span>
+<span id="cb1-67"><a href="#cb1-67" tabindex="-1"></a>    results_PC <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-68"><a href="#cb1-68" tabindex="-1"></a>      <span class="at">mBeta =</span> res_PC<span class="sc">$</span>mBeta,</span>
+<span id="cb1-69"><a href="#cb1-69" tabindex="-1"></a>      <span class="at">vsigma2 =</span> res_PC<span class="sc">$</span>vsigma2,</span>
+<span id="cb1-70"><a href="#cb1-70" tabindex="-1"></a>      <span class="at">vlambda2 =</span> res_PC<span class="sc">$</span>vlambda2</span>
+<span id="cb1-71"><a href="#cb1-71" tabindex="-1"></a>    )</span>
+<span id="cb1-72"><a href="#cb1-72" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb1-73"><a href="#cb1-73" tabindex="-1"></a>    results_PC<span class="sc">$</span>mBeta    <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>mBeta <span class="sc">+</span> res_PC<span class="sc">$</span>mBeta</span>
+<span id="cb1-74"><a href="#cb1-74" tabindex="-1"></a>    results_PC<span class="sc">$</span>vsigma2  <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>vsigma2 <span class="sc">+</span> res_PC<span class="sc">$</span>vsigma2</span>
+<span id="cb1-75"><a href="#cb1-75" tabindex="-1"></a>    results_PC<span class="sc">$</span>vlambda2 <span class="ot">&lt;-</span> results_PC<span class="sc">$</span>vlambda2 <span class="sc">+</span> res_PC<span class="sc">$</span>vlambda2</span>
+<span id="cb1-76"><a href="#cb1-76" tabindex="-1"></a>  }</span>
+<span id="cb1-77"><a href="#cb1-77" tabindex="-1"></a>}</span>
+<span id="cb1-78"><a href="#cb1-78" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" tabindex="-1"></a><span class="co"># Take averages</span></span>
+<span id="cb1-80"><a href="#cb1-80" tabindex="-1"></a>mBeta <span class="ot">=</span> (results_PC<span class="sc">$</span>mBeta)<span class="sc">/</span><span class="dv">5</span></span>
+<span id="cb1-81"><a href="#cb1-81" tabindex="-1"></a>vsigma2 <span class="ot">=</span> (results_PC<span class="sc">$</span>vsigma2)<span class="sc">/</span><span class="dv">5</span></span>
+<span id="cb1-82"><a href="#cb1-82" tabindex="-1"></a>vlambda2 <span class="ot">=</span> (results_PC<span class="sc">$</span>vlambda2)<span class="sc">/</span><span class="dv">5</span></span>
+<span id="cb1-83"><a href="#cb1-83" tabindex="-1"></a>time_val_PC <span class="ot">=</span> <span class="fu">mean</span>(vtime_val_PC)</span></code></pre></div>
 </div>
 <div id="convergence-diagnostics" class="section level2">
-<h2>Convergence diagnostics</h2>
+<h2>Convergence Diagnostics</h2>
 <p>Assessing convergence of the MCMC chains is an important step in
-Bayesian analysis. The package provides helper functions such as
-<code>mcmc_stats()</code> and <code>mcmc_diagnostics()</code> to
-summarize mixing behavior and visualize the behavior of the chains. The
-function <code>mcmc_stats()</code> computes numerical summaries of the
-MCMC output, while <code>mcmc_diagnostics()</code> produces basic
-diagnostic plots such as trace and autocorrelation plots for selected
-parameters. These tools allow users to assess mixing and stability of
-the chains in practice. Posterior draws can also be passed to packages
-such as <code>coda</code>, <code>posterior</code>, or
-<code>bayesplot</code> for additional diagnostics.</p>
+Bayesian analysis. We use the <code>mcmc_stats()</code> and
+<code>mcmc_diagnostics()</code> helper functions to evaluate the mixing
+and convergence of the Modified Hans Gibbs sampler.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>stats_Hans <span class="ot">&lt;-</span> <span class="fu">mcmc_stats</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  mBeta_Hans, vsigma2_Hans, vlambda2_Hans,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">time_val =</span> time_val_Hans, <span class="at">inds_use =</span> <span class="dv">200</span><span class="sc">:</span>Ns</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">print</span>(stats_Hans)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;    mix_beta    eff_beta  mix_sigma2  eff_sigma2 mix_lambda2 eff_lambda2 </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;    82.68013 49635.63550    87.51104 52535.79178    72.05850 43259.12238 </span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;        time </span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;     0.03000</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">mcmc_diagnostics</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  mBeta_Hans, vsigma2_Hans, vlambda2_Hans,</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  <span class="at">beta_inds =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">mStat =</span> stats_Hans, <span class="at">doplots =</span> <span class="cn">TRUE</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --><img role="img" src="data:image/png;base64,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" /><!-- --><img role="img" src="data:image/png;base64,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" /><!-- --><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; $ldens_beta
+#&gt; $ldens_beta[[1]]
+#&gt; 
+#&gt; Call:
+#&gt;  density.default(x = mBeta[, j])
+#&gt; 
+#&gt; Data: mBeta[, j] (2000 obs.);    Bandwidth &#39;bw&#39; = 0.01009
+#&gt; 
+#&gt;        x               y           
+#&gt;  Min.   :1.838   Min.   :0.000222  
+#&gt;  1st Qu.:1.949   1st Qu.:0.082179  
+#&gt;  Median :2.061   Median :0.833078  
+#&gt;  Mean   :2.061   Mean   :2.229172  
+#&gt;  3rd Qu.:2.173   3rd Qu.:4.316045  
+#&gt;  Max.   :2.285   Max.   :7.579985  
+#&gt; 
+#&gt; $ldens_beta[[2]]
+#&gt; 
+#&gt; Call:
+#&gt;  density.default(x = mBeta[, j])
+#&gt; 
+#&gt; Data: mBeta[, j] (2000 obs.);    Bandwidth &#39;bw&#39; = 0.009996
+#&gt; 
+#&gt;        x               y           
+#&gt;  Min.   :1.757   Min.   :0.000233  
+#&gt;  1st Qu.:1.860   1st Qu.:0.103123  
+#&gt;  Median :1.963   Median :0.877695  
+#&gt;  Mean   :1.963   Mean   :2.422321  
+#&gt;  3rd Qu.:2.066   3rd Qu.:4.713308  
+#&gt;  Max.   :2.169   Max.   :7.850303  
+#&gt; 
+#&gt; $ldens_beta[[3]]
+#&gt; 
+#&gt; Call:
+#&gt;  density.default(x = mBeta[, j])
+#&gt; 
+#&gt; Data: mBeta[, j] (2000 obs.);    Bandwidth &#39;bw&#39; = 0.009598
+#&gt; 
+#&gt;        x               y          
+#&gt;  Min.   :1.670   Min.   :0.00000  
+#&gt;  1st Qu.:1.797   1st Qu.:0.01344  
+#&gt;  Median :1.924   Median :0.24579  
+#&gt;  Mean   :1.924   Mean   :1.96578  
+#&gt;  3rd Qu.:2.051   3rd Qu.:3.55550  
+#&gt;  Max.   :2.178   Max.   :8.09667  
+#&gt; 
+#&gt; 
+#&gt; $dens_sigma2
+#&gt; 
+#&gt; Call:
+#&gt;  density.default(x = vsigma2)
+#&gt; 
+#&gt; Data: vsigma2 (2000 obs.);   Bandwidth &#39;bw&#39; = 0.01358
+#&gt; 
+#&gt;        x                y           
+#&gt;  Min.   :0.8083   Min.   :0.000165  
+#&gt;  1st Qu.:0.9552   1st Qu.:0.042315  
+#&gt;  Median :1.1021   Median :0.626729  
+#&gt;  Mean   :1.1021   Mean   :1.698430  
+#&gt;  3rd Qu.:1.2490   3rd Qu.:3.318473  
+#&gt;  Max.   :1.3959   Max.   :5.842377  
+#&gt; 
+#&gt; $dens_lambda2
+#&gt; 
+#&gt; Call:
+#&gt;  density.default(x = vlambda2)
+#&gt; 
+#&gt; Data: vlambda2 (2000 obs.);  Bandwidth &#39;bw&#39; = 0.09214
+#&gt; 
+#&gt;        x                y            
+#&gt;  Min.   :0.7931   Min.   :0.0000243  
+#&gt;  1st Qu.:1.6775   1st Qu.:0.0163150  
+#&gt;  Median :2.5619   Median :0.1569984  
+#&gt;  Mean   :2.5619   Mean   :0.2821238  
+#&gt;  3rd Qu.:3.4463   3rd Qu.:0.5399681  
+#&gt;  Max.   :4.3308   Max.   :0.8281255  
+#&gt; 
+#&gt; $mStat
+#&gt;    mix_beta    eff_beta  mix_sigma2  eff_sigma2 mix_lambda2 eff_lambda2 
+#&gt;    82.68013 49635.63550    87.51104 52535.79178    72.05850 43259.12238 
+#&gt;        time 
+#&gt;     0.03000 
+#&gt; 
+#&gt; $beta_inds
+#&gt; [1] 1 2 3
+#&gt; 
+#&gt; $rhat_sigma2
+#&gt; [1] 1.000383
+#&gt; 
+#&gt; $rhat_lambda2
+#&gt; [1] 0.9997187</code></pre>
+<div id="mixing-and-sampling-efficiency" class="section level3">
+<h3>Mixing and Sampling Efficiency</h3>
+<p>The mixing percentages — defined as 100 <span class="math inline">\(\times\)</span> ESS / number of post-burn-in
+samples — indicate how effectively the chain explores the posterior.
+Values above 70% are generally considered indicative of good mixing. The
+regression coefficients (<span class="math inline">\(\boldsymbol{\beta}\)</span>) achieve a mixing
+percentage of 82.7%, <span class="math inline">\(\sigma^2\)</span>
+achieves 87.5%, and <span class="math inline">\(\lambda^2\)</span>
+achieves 72.1%, all reflecting excellent mixing behavior. The sampling
+efficiencies (ESS per second) are also high across all parameters,
+confirming that the sampler produces a large number of effectively
+independent draws per unit of compute time.</p>
+</div>
+<div id="trace-plots" class="section level3">
+<h3>Trace Plots</h3>
+<p>The trace plots for <span class="math inline">\(\sigma^2\)</span> and
+<span class="math inline">\(\lambda^2\)</span> show rapid, stable
+fluctuation around their posterior means throughout all iterations, with
+no visible trends, drifts, or prolonged excursions. This is a hallmark
+of good MCMC mixing — the chain is exploring the posterior distribution
+thoroughly rather than getting stuck in local regions.</p>
+</div>
+<div id="autocorrelation-plots" class="section level3">
+<h3>Autocorrelation Plots</h3>
+<p>The ACF plots for both <span class="math inline">\(\sigma^2\)</span>
+and <span class="math inline">\(\lambda^2\)</span> show that
+autocorrelation drops to negligible levels after lag 1, confirming that
+successive samples are nearly independent. This is consistent with the
+high ESS values reported above.</p>
+</div>
+<div id="r-hat-diagnostics" class="section level3">
+<h3>R-hat Diagnostics</h3>
+<p>The Gelman–Rubin convergence diagnostic (<span class="math inline">\(\hat{R}\)</span>) values are approximately 1.000
+for both <span class="math inline">\(\sigma^2\)</span> and <span class="math inline">\(\lambda^2\)</span>, well below the conventional
+threshold of 1.01. Values this close to 1 provide strong evidence that
+the chain has converged to the stationary distribution.</p>
+</div>
+<div id="posterior-densities" class="section level3">
+<h3>Posterior Densities</h3>
+<p>The estimated posterior densities for the regression coefficients are
+unimodal and well-concentrated, confirming that the sampler correctly
+recovers the true parameters from the simulated data.</p>
+<p>Overall, the diagnostics indicate that the Modified Hans Gibbs
+sampler converges rapidly and mixes efficiently, making it well-suited
+for Bayesian Lasso inference in practice.</p>
+</div>
 </div>
 
 

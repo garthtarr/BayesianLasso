@@ -1,5 +1,9 @@
 # BayesianLasso 0.4.0
 
+- Expanded vignette with complete simulated workflow, convergence 
+  diagnostics, and interpretation guidance.
+- Removed real dataset examples from vignette for CRAN build compatibility.
+
 # BayesianLasso 0.3.9
 
 # BayesianLasso 0.3.8

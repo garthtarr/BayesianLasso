@@ -1,1 +1,7 @@
-
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+inst/doc/
+vignettes/*.html
+vignettes/*.R

@@ -131,7 +131,7 @@ mcmc_diagnostics <- function(mBeta, vsigma2, vlambda2, beta_inds, mStat, doplots
 
 ## Introduction
 
-The \pkg{BayesianLasso} package provides efficient sampling algorithms for Bayesian Lasso regression, modified Hans and PC samplers. The modified Hans sampler is based on a newly defined Lasso distribution.
+The 'BayesianLasso' package provides efficient sampling algorithms for Bayesian Lasso regression, modified Hans and PC samplers. The modified Hans sampler is based on a newly defined Lasso distribution.
 
 This vignette introduces the main functionality of the package and demonstrates how to apply the samplers to a simulated data.
 
