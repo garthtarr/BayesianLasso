@@ -1,3 +1,5 @@
+# BayesianLasso 0.4.1
+
 # BayesianLasso 0.4.0
 
 - Expanded vignette with complete simulated workflow, convergence 
