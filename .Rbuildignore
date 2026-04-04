@@ -14,6 +14,6 @@
 ^tools-raw$
 ^inst/media$
 ^reproduction$
-^build$
 ^inst/helpers$
 ^\.DS_Store$
+^doc$
