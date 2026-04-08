@@ -117,7 +117,7 @@ message("Results dir: ", results_dir)
 
 # Set options
 
-```{r}
+```{r set-up}
 
 
 # Set prior hyperparameter constants
@@ -133,7 +133,7 @@ sigma2_init = 1
 
 # Number of samples to run the MCMC
 nburn = 1000
-nsamples = 5000
+nsamples = 11000
 inds_use = (nburn + 1):nsamples
 
 # How many times to run each sampler
@@ -143,7 +143,7 @@ trials = 5
 
 # Generate and normalize dataset
 
-```{r}
+```{r dataset}
 res = generate_data(dataset_name)
 
 mX = res$mX
@@ -161,7 +161,7 @@ rm(res)
 
 
 
-```{r tiny-example, eval=TRUE}
+```{r PC, eval=TRUE}
 res_PC = benchmark_PC(vy, mX, lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=NA)
 
 ```
@@ -170,14 +170,14 @@ res_PC = benchmark_PC(vy, mX, lambda_init, sigma2_init, a, b, u, v, nburn, nsamp
 # Modified Hans sampler
 
 
-```{r}
+```{r Hans}
 res_hans = benchmark_blasso_hans(vy, mX,lambda_init, sigma2_init, a, b, u, v, nburn, nsamples, trials, beta_inds=NA)
 
 ```
 
 
 
-```{r}
+```{r bayesreg}
 trials <- 5
 if (dataset_name == "cookie") set.seed(3)
 
